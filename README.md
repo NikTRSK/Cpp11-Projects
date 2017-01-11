@@ -1,8 +1,8 @@
 # ITP 435 Assignments - Spring 2017 #
 
 ### PUT YOUR INFO HERE ###
-Name: Tommy Trojan
+Name: Nikica Trajkovski
 
-Email: ttrojan@usc.edu
+Email: trajkovs@usc.edu
 
-Platform: (PC or Mac)
+Platform: PC (Windows 10)
