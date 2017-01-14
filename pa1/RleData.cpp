@@ -1,4 +1,5 @@
 #include "RleData.h"
+#include <iostream>
 
 void RleData::Compress(const char* input, size_t inSize)
 {
@@ -18,18 +19,20 @@ void RleData::Compress(const char* input, size_t inSize)
 //		mData = "\x01" + input[0];
 
 	// TODO: Check for array size
-/*	int compressedPosition = 0; 
+	int compressedPosition = 0; 
 	int conseq = 0; // stores the number of consequtive characters
-	for (int i = 0; i < inSize; ++i)
+	int nonConseq = 0;
+	for (unsigned int i = 0; i < inSize; ++i)
 	{
 		conseq++;
 
 		if (i + 1 >= inSize || input[i] != input[i + 1])
 		{
-
-			//mData[compressedPosition] = 
+			mData[compressedPosition++] = conseq;
+			mData[compressedPosition++] = input[i];
+			conseq = 0;
 		}
-	}*/
+	}
 }
 
 void RleData::Decompress(const char* input, size_t inSize, size_t outSize)
