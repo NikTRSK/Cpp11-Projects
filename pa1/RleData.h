@@ -33,5 +33,14 @@ struct RleData
 		// Bitwise magic
 		return 127;
 	}
+
+	/*
+	 * Helper Functions*/
+
+	// Compresses a positive run of data
+	void CompressPositiveRun(const char* input, int &compressedPosition, int &runLength, const int pos);
+
+	// Compresses a negative run of data
+	void CompressNegativeRun(const char* input, int &compressedPosition, int &runLength, const int pos);
 };
 

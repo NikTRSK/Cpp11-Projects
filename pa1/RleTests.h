@@ -22,13 +22,13 @@ class CompressionTests : public TestFixture<CompressionTests>
 public:
 	TEST_FIXTURE_DESCRIBE(CompressionTests, "Testing Compression...")
 	{
-		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
+		//TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
 		// TODO: Add more Compression test cases
-		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
-		/*		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
-		TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
-		TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
-		TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");*/
+		//TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
+		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
+		//TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
+		//TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
+		//TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
 		// TEST_CASE_DESCRIBE(testOverMaxSingleLetterRuns, "Over max length since char test");
 		// TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length since char test");
 		// Normal single unique string
@@ -38,6 +38,7 @@ public:
 		// Different repetion negative
 		// Alternating runs over max
 		// 0 length input
+		// alternating run negative run at the end
 
 		// VERIFY NEGATIVE RUNS 2s COMPLEMENT
 	}
@@ -63,13 +64,11 @@ public:
 		char test[] = "abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
 			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn";
 
-		char expected[] = "\xe7" "abcdenbhawqpbnakehtfnajsg"
-			"\xe7" "abcdenbhawqpbnakehtfnajsg"
-			"\xeb" "abcdenbhawqpbnakehtfn";
+		char expected[] = "\xa0" "abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn";
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
-	/*
+
 	void testOverMaxPositiveRuns()
 	{
 		char test[] = "aaaaabbbbbcccccdddddeeeeeaaaaabbbbbccccc"
@@ -85,7 +84,7 @@ public:
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
-
+	/*
 	void testOverMaxNegativeRuns()
 	{
 		char test[] = "abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
@@ -111,15 +110,17 @@ public:
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
-
+	*/
 	void testAlternatingRuns()
 	{
 		char test[] = "aaabbbcccccdddddabqwertyuiopnnnnnnnnnnnnnnnnnnnn"
 			"kkkkkkkkkkkkkkkkkkkkkkkkkabcdeabcdeqqqqq";
 
 		char expected[] = "\x03" "a" "\x03" "b" "\x05" "c" "\x05" "d"
-			"\x02" "ab" "\x0A" "qwertyuiop" "\x14" "n" "\x19" "k"
-			"\x05" "abcde" "\x05" "abcde" "\x05" "q";
+			"\xf4" "abqwertyuiop" "\x14" "n" "\x19" "k"
+			"\xf6" "abcdeabcde" "\x05" "q";
+
+		//std::cout << expected << std::endl;
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
@@ -130,7 +131,7 @@ public:
 		char expected[] = "\x01" "w";
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
-	}*/
+	}
 };
 
 class DecompressionTests : public TestFixture<DecompressionTests>
