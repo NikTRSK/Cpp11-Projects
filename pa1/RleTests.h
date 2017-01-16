@@ -22,13 +22,13 @@ class CompressionTests : public TestFixture<CompressionTests>
 public:
 	TEST_FIXTURE_DESCRIBE(CompressionTests, "Testing Compression...")
 	{
-		//TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
+		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
 		// TODO: Add more Compression test cases
-		//TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
+		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
 		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
 		//TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
-		//TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
-		//TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
+		TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
+		TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
 		// TEST_CASE_DESCRIBE(testOverMaxSingleLetterRuns, "Over max length since char test");
 		// TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length since char test");
 		// Normal single unique string
@@ -71,16 +71,17 @@ public:
 
 	void testOverMaxPositiveRuns()
 	{
-		char test[] = "aaaaabbbbbcccccdddddeeeeeaaaaabbbbbccccc"
-			"dddddeeeeeaaaaabbbbbcccccdddddeeeeeaaaaabbbbbccccc"
-			"ccdddddeeeeewwwwwwwwwwwwwwwwwwwwggggggggggggnnnnnn"
-			"nnnnnnnnnnnnxxxxxxxxxxxxxxxxxxxxxxxxxxxxqqqqqqqqqq"
-			"qqqqqqqqqqq";
-		char expected[] = "\x05" "a" "\x05" "b" "\x05" "c" "\x05" "d" "\x05" "e"
-			"\x05" "a" "\x05" "b" "\x05" "c" "\x05" "d" "\x05" "e"
-			"\x05" "a" "\x05" "b" "\x05" "c" "\x05" "d" "\x05" "e"
-			"\x05" "a" "\x05" "b" "\x07" "c" "\x05" "d" "\x05" "e"
-			"\x20" "w" "\x12" "g" "\x18" "n" "\x28" "x" "\x21" "q";
+		char test[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccc";
+		char expected[] = "\x7f" "a" "\x3b" "a" "\x7f" "b" "\x7f" "c" "\x01" "c";
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}

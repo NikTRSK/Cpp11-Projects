@@ -21,69 +21,57 @@ void RleData::Compress(const char* input, size_t inSize)
 		mData[1] = input[0];
 	}
 
-
-	// Check for array size
-	unsigned int instanceSize = inSize;
-	unsigned int charsLeft = inSize;
-
 	int compressedPosition = 0;
 	int conseq = 0; // stores the number of consequtive characters
 	int nonConseq = 0;
 	unsigned int i;
-	for (unsigned int run = 0; run < ceil((double)inSize / MaxRunSize()); ++run)
+
+	for (i = 0; i < inSize; ++i)
 	{
-		if (charsLeft > MaxRunSize())
+		if (i + 1 < inSize && input[i] == input[i + 1])
+			conseq++;
+		else if (i + 1 < inSize && input[i] != input[i + 1])
 		{
-			charsLeft -= 127;
-			instanceSize = 127;
-		}
-		else
-		{
-			instanceSize = charsLeft;
-			charsLeft = 0;
+			if (i + 2 < inSize && input[i + 2] != input[i + 1] || inSize - 1 == i + 1)
+				nonConseq--;
 		}
 
-		for (i = 0; i < instanceSize; ++i)
-		{
-			if (i + 1 < instanceSize && input[i] == input[i + 1])
-				conseq++;
-			else if (i + 1 < instanceSize && input[i] != input[i + 1])
-			{
-				if (i + 2 < instanceSize && input[i + 2] != input[i + 1] || instanceSize - 1 == i + 1)
-					nonConseq--;
-			}
-
-			if (i + 1 < instanceSize && input[i] == input[i + 1] && nonConseq < 0) {
-				conseq = 1;
-				CompressNegativeRun(input, compressedPosition, nonConseq, i);
-			}
-			else if (i + 1 < instanceSize && input[i] != input[i + 1] && conseq > 0) {
-				nonConseq = 0;
-				CompressPositiveRun(input, compressedPosition, conseq, i);
-			}
+		if (i + 1 < inSize && input[i] == input[i + 1] && nonConseq < 0) {
+			conseq = 1;
+			CompressNegativeRun(input, compressedPosition, nonConseq, i);
 		}
-
-		conseq++;
-		nonConseq--;
-
-		if (nonConseq < -1) {
-			conseq = 0;
-			mData[compressedPosition++] = nonConseq;
-			for (int k = abs(nonConseq); k > 0; --k)
-			{
-				mData[compressedPosition++] = input[i - k];
-				std::cout << input[k] << std::endl;
-			}
-
-			std::cout << "NONCONSEQ: " << nonConseq << std::endl;
+		else if (i + 1 < inSize && input[i] != input[i + 1] && conseq > 0) {
 			nonConseq = 0;
+			CompressPositiveRun(input, compressedPosition, conseq, i);
 		}
-		else if (conseq > 1) {
-			nonConseq = 0;
+	}
+
+	conseq++;
+	nonConseq--;
+
+	if (nonConseq < -1) {
+		conseq = 0;
+		mData[compressedPosition++] = nonConseq;
+		for (int k = abs(nonConseq); k > 0; --k)
+		{
+			mData[compressedPosition++] = input[i - k];
+			std::cout << input[k] << std::endl;
+		}
+
+		std::cout << "NONCONSEQ: " << nonConseq << std::endl;
+		nonConseq = 0;
+	}
+	else if (conseq > 1) {
+		nonConseq = 0;
+	/*	if (i + 1 < inSize && input[i] != input[i + 1])
+		{*/
+			std::cout << "CHARS: " << input[i] << input[i+1] << std::endl;
 			mData[compressedPosition++] = conseq;
-			mData[compressedPosition++] = input[instanceSize - 1];
+			mData[compressedPosition++] = input[inSize - 1];
+
+			std::cout << "CONSEQ: " << conseq << std::endl;
 			conseq = 0;
-		}
+		//}
 	}
 
 	std::cout << "NUM: " << compressedPosition << "|  " << mData << std::endl;
