@@ -22,13 +22,13 @@ class CompressionTests : public TestFixture<CompressionTests>
 public:
 	TEST_FIXTURE_DESCRIBE(CompressionTests, "Testing Compression...")
 	{
-		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
+		//TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
 		// TODO: Add more Compression test cases
-		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
-		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
-		//TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
-		TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
-		TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
+		//TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
+		//TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
+		TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
+		//TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
+		//TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
 		// TEST_CASE_DESCRIBE(testOverMaxSingleLetterRuns, "Over max length since char test");
 		// TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length since char test");
 		// Normal single unique string
@@ -85,7 +85,7 @@ public:
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
-	/*
+	
 	void testOverMaxNegativeRuns()
 	{
 		char test[] = "abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
@@ -96,22 +96,17 @@ public:
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
 			"abcdenbhawqpbnakehtfnajsg";
 
-		char expected[] = "\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x15" "abcdenbhawqpbnakehtfn"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x15" "abcdenbhawqpbnakehtfn"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x19" "abcdenbhawqpbnakehtfnajsg"
-			"\x19" "abcdenbhawqpbnakehtfnajsg";
+		char expected[] = "\x81" "abcdenbhawqpbnakehtfnajsgabcdenbha"
+			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
+			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
+			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
+			"enbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnabcdenbhawqpb"
+			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
+			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg";
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
-	*/
+	
 	void testAlternatingRuns()
 	{
 		char test[] = "aaabbbcccccdddddabqwertyuiopnnnnnnnnnnnnnnnnnnnn"

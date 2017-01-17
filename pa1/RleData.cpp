@@ -1,6 +1,7 @@
 #include "RleData.h"
 #include <iostream>
 #include <stdlib.h>
+#include <algorithm>
 
 void RleData::Compress(const char* input, size_t inSize)
 {
@@ -29,7 +30,9 @@ void RleData::Compress(const char* input, size_t inSize)
 	for (i = 0; i < inSize; ++i)
 	{
 		if (i + 1 < inSize && input[i] == input[i + 1])
+		{
 			conseq++;
+		}
 		else if (i + 1 < inSize && input[i] != input[i + 1])
 		{
 			if (i + 2 < inSize && input[i + 2] != input[i + 1] || inSize - 1 == i + 1)
@@ -51,27 +54,26 @@ void RleData::Compress(const char* input, size_t inSize)
 
 	if (nonConseq < -1) {
 		conseq = 0;
-		mData[compressedPosition++] = nonConseq;
+		// edge case: when at the end of array don't need to subtract so add 1
+		nonConseq++;
+		CompressNegativeRun(input, compressedPosition, nonConseq, i);
+
+		/*mData[compressedPosition++] = nonConseq;
 		for (int k = abs(nonConseq); k > 0; --k)
 		{
 			mData[compressedPosition++] = input[i - k];
 			std::cout << input[k] << std::endl;
-		}
+		}*/
 
-		std::cout << "NONCONSEQ: " << nonConseq << std::endl;
+		//std::cout << "NONCONSEQ: " << nonConseq << std::endl;
 		nonConseq = 0;
 	}
-	else if (conseq > 1) {
+	else if (conseq > 1)
+	{
 		nonConseq = 0;
-	/*	if (i + 1 < inSize && input[i] != input[i + 1])
-		{*/
-			std::cout << "CHARS: " << input[i] << input[i+1] << std::endl;
-			mData[compressedPosition++] = conseq;
-			mData[compressedPosition++] = input[inSize - 1];
-
-			std::cout << "CONSEQ: " << conseq << std::endl;
-			conseq = 0;
-		//}
+		// edge case: when at the end of array don't need to add so subtract 1
+		conseq--;
+		CompressPositiveRun(input, compressedPosition, conseq, i-1); // i-1 to account for the end of the array
 	}
 
 	std::cout << "NUM: " << compressedPosition << "|  " << mData << std::endl;
@@ -94,18 +96,41 @@ std::ostream& operator<< (std::ostream& stream, const RleData& rhs)
 void RleData::CompressPositiveRun(const char* input, int &compressedPosition, int &runLength, const int pos)
 {
 	runLength++;
-	//std::cout << "CONSEQ: " << conseq << std::endl;
-	mData[compressedPosition++] = runLength;
-	mData[compressedPosition++] = input[pos];
+	//std::cout << "CONSEQ: " << runLength << std::endl;
+	while (runLength > 0)
+	{
+		//std::cout << "CONSEQ: " << runLength << std::endl;
+		if (runLength > 127)
+		{
+			mData[compressedPosition++] = 127;
+			
+		}
+		else
+			mData[compressedPosition++] = runLength;
+		mData[compressedPosition++] = input[pos];
+		runLength -= 127;
+	}
 	runLength = 0;
 }
 
 void RleData::CompressNegativeRun(const char* input, int &compressedPosition, int &runLength, const int pos)
 {
 	runLength--;
-	//std::cout << "NONCONSEQ: " << nonConseq << std::endl;
-	mData[compressedPosition++] = runLength;
-	for (int k = abs(runLength); k > 0; --k)
-		mData[compressedPosition++] = input[pos - k];
+	/*std::cout << "NONCONSEQ: " << runLength << std::endl;*/
+	while (runLength < 0)
+	{
+		std::cout << "NONCONSEQ: " << runLength << std::endl;
+		if (runLength < -127)
+		{
+			mData[compressedPosition++] = -127;
+		}
+		else
+			mData[compressedPosition++] = runLength;
+		
+		for (int k = abs(std::max(runLength, -127)); k > 0; --k)
+			mData[compressedPosition++] = input[pos - k];
+
+		runLength += 127;
+	}
 	runLength = 0;
 }
