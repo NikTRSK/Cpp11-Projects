@@ -23,7 +23,6 @@ public:
 	TEST_FIXTURE_DESCRIBE(CompressionTests, "Testing Compression...")
 	{
 		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
-		// TODO: Add more Compression test cases
 		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
 		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
 		TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
@@ -32,14 +31,12 @@ public:
 		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
 		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
 		TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
-		// Normal single unique string
-		// Normal single char positive
+		TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
 		// Non letters
 		// Same repetition negative
 		// Different repetion negative
 		// Alternating runs over max
 		// 0 length input
-		// alternating run negative run at the end
 
 		// VERIFY NEGATIVE RUNS 2s COMPLEMENT
 	}
@@ -135,7 +132,7 @@ public:
 			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
-			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
 			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
@@ -147,7 +144,7 @@ public:
 			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 			"bbbbbbbbbbbbbbbbbbbbbbbbbbb"
 
-			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
 			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
@@ -161,7 +158,7 @@ public:
 
 		char expected[] = "\x7f" "a" "\x3b" "a" 
 
-			"\x81" "abcdenbhawqpbnakehtfnajsgabcdenbha"
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
 			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
 			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
 			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
@@ -169,9 +166,9 @@ public:
 			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
 			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
 			
-			"\x7f" "b" "\x7f" 
+			"\x7f" "b"
 			
-			"\x81" "abcdenbhawqpbnakehtfnajsgabcdenbha"
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
 			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
 			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
 			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
@@ -179,7 +176,7 @@ public:
 			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
 			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
 
-			"c" "\x01" "c";
+			"\x7f" "c" "\x01" "c";
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
@@ -191,7 +188,7 @@ public:
 			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
-			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
 			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
@@ -207,7 +204,7 @@ public:
 			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
 			"cccccccccccccccccccccccccccc"
 
-			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
 			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
 			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
@@ -217,7 +214,7 @@ public:
 
 		char expected[] = "\x7f" "a" "\x3b" "a"
 
-			"\x81" "abcdenbhawqpbnakehtfnajsgabcdenbha"
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
 			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
 			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
 			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
@@ -229,7 +226,7 @@ public:
 
 			"c" "\x01" "c"
 
-			"\x81" "abcdenbhawqpbnakehtfnajsgabcdenbha"
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
 			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
 			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
 			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
@@ -263,6 +260,18 @@ public:
 			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 		char expected[] = "\x7f" "a" "\x7f" "a" "\x7f" "a" "\x7f" "a"
 			"\x7f" "a" "\x7f" "a" "\x7f" "a" "\x29" "a";
+
+		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testnonLettersBasic()
+	{
+		char test[] = "???????????????????????????"
+			"'''''''''''''''''''''''''''"
+			"///////////////////////////"
+			"`!?><12:;][{}]{}]/12345190=-+-";
+		char expected[] = "\x1b" "?" "\x1b" "'" "\x1b" "/"
+			"\xe2" "`!?><12:;][{}]{}]/12345190=-+-";
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
