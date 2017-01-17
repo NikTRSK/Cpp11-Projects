@@ -55,28 +55,17 @@ void RleData::Compress(const char* input, size_t inSize)
 	if (nonConseq < -1) {
 		conseq = 0;
 		// edge case: when at the end of array don't need to subtract so add 1
-		nonConseq++;
-		CompressNegativeRun(input, compressedPosition, nonConseq, i);
-
-		/*mData[compressedPosition++] = nonConseq;
-		for (int k = abs(nonConseq); k > 0; --k)
-		{
-			mData[compressedPosition++] = input[i - k];
-			std::cout << input[k] << std::endl;
-		}*/
-
-		//std::cout << "NONCONSEQ: " << nonConseq << std::endl;
+		CompressNegativeRun(input, compressedPosition, ++nonConseq, i);
 		nonConseq = 0;
 	}
 	else if (conseq > 1)
 	{
 		nonConseq = 0;
 		// edge case: when at the end of array don't need to add so subtract 1
-		conseq--;
-		CompressPositiveRun(input, compressedPosition, conseq, i-1); // i-1 to account for the end of the array
+		CompressPositiveRun(input, compressedPosition, --conseq, i-1); // i-1 to account for the end of the array
 	}
 
-	std::cout << "NUM: " << compressedPosition << "|  " << mData << std::endl;
+	//std::cout << "NUM: " << compressedPosition << "|  " << mData << std::endl;
 }
 
 void RleData::Decompress(const char* input, size_t inSize, size_t outSize)
@@ -101,12 +90,10 @@ void RleData::CompressPositiveRun(const char* input, int &compressedPosition, in
 	{
 		//std::cout << "CONSEQ: " << runLength << std::endl;
 		if (runLength > 127)
-		{
 			mData[compressedPosition++] = 127;
-			
-		}
 		else
 			mData[compressedPosition++] = runLength;
+
 		mData[compressedPosition++] = input[pos];
 		runLength -= 127;
 	}
@@ -117,18 +104,17 @@ void RleData::CompressNegativeRun(const char* input, int &compressedPosition, in
 {
 	runLength--;
 	/*std::cout << "NONCONSEQ: " << runLength << std::endl;*/
+	unsigned int backwardsCounter = abs(runLength);
 	while (runLength < 0)
 	{
-		std::cout << "NONCONSEQ: " << runLength << std::endl;
+		//std::cout << "NONCONSEQ: " << runLength << std::endl;
 		if (runLength < -127)
-		{
 			mData[compressedPosition++] = -127;
-		}
 		else
 			mData[compressedPosition++] = runLength;
 		
 		for (int k = abs(std::max(runLength, -127)); k > 0; --k)
-			mData[compressedPosition++] = input[pos - k];
+			mData[compressedPosition++] = input[pos - backwardsCounter--];
 
 		runLength += 127;
 	}
