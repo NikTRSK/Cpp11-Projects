@@ -284,6 +284,16 @@ public:
 	{
 		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive run test");
 		// TODO: Add more Decompression test  cases
+		TEST_CASE_DESCRIBE(testBasicPositiveRuns2, "Basic positive runs test 2");
+		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
+		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
+		TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
+		TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
+		TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
+		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
+		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
+		TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
+		TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
 	}
 	
 	void testBasicPositiveRuns()
@@ -291,6 +301,243 @@ public:
 		char test[] = "\x28" "x";
 		char expected[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 		
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testBasicPositiveRuns2()
+	{
+		char test[] = "\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d"
+			"\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d"
+			"\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d"
+			"\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d"
+			"\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d"
+			"\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d"
+			"\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d"
+			"\x03" "a" "\x03" "b" "\x03" "c" "\x03" "d";
+		char expected[] = "aaabbbcccdddaaabbbcccdddaaabbbcccdddaaabbbc"
+			"ccdddaaabbbcccdddaaabbbcccdddaaabbbcccdddaaabbbcccddd";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testBasicNegativeRuns()
+	{
+		char test[] = "\xa0" "abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn";
+
+		char expected[] = "abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testOverMaxPositiveRuns()
+	{
+		char test[] = "\x7f" "a" "\x3b" "a" "\x7f" "b" "\x7f" "c" "\x01" "c";
+		char expected[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccc";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testOverMaxNegativeRuns()
+	{
+		char test[] = "\x81" "abcdenbhawqpbnakehtfnajsgabcdenbha"
+			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
+			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
+			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
+			"enbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnabcdenbhawqpb"
+			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
+			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg";
+
+		char expected[] = "abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsg";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testAlternatingRuns()
+	{
+		char test[] = "\x03" "a" "\x03" "b" "\x05" "c" "\x05" "d"
+			"\xf4" "abqwertyuiop" "\x14" "n" "\x19" "k"
+			"\xf6" "abcdeabcde" "\x05" "q";
+
+		char expected[] = "aaabbbcccccdddddabqwertyuiopnnnnnnnnnnnnnnnnnnnn"
+			"kkkkkkkkkkkkkkkkkkkkkkkkkabcdeabcdeqqqqq";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testLengthOneRuns()
+	{
+		char test[] = "\x01" "w"; 
+		char expected[] = "w";	
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testOverMaxAlternatingRuns1()
+	{
+		char test[] = "\x7f" "a" "\x3b" "a"
+
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
+			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
+			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
+			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
+			"enbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnabcdenbhawqpb"
+			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
+			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+
+			"\x7f" "b"
+
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
+			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
+			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
+			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
+			"enbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnabcdenbhawqpb"
+			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
+			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+
+			"\x7f" "c" "\x01" "c";
+
+		char expected[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsg"
+
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsg"
+
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccc";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testOverMaxAlternatingRuns2()
+	{
+		char test[] = "\x7f" "a" "\x3b" "a"
+
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
+			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
+			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
+			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
+			"enbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnabcdenbhawqpb"
+			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
+			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+
+			"\x7f" "b" "\x7f"
+
+			"c" "\x01" "c"
+
+			"\x81" "qbcdenbhawqpbnakehtfnajsgabcdenbha"
+			"wqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbn"
+			"akehtfnabcdenbhawqpbnakehtfnajsgabcden"
+			"\x81" "bhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsgabcd"
+			"enbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnabcdenbhawqpb"
+			"nakehtfnajsgabcdenbhawqp" "\xc1" "bnakehtfnajsgabcdenbh"
+			"awqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg";
+
+		char expected[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsg"
+
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccccccccccccccccccccccccc"
+			"cccccccccccccccccccccccccccc"
+
+			"qbcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakeh"
+			"tfnajsgabcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfn"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsgabcdenbhawqpbnakehtfnajsg"
+			"abcdenbhawqpbnakehtfnajsg";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testOverMaxSingleUniqueStirngRuns()
+	{
+		char test[] = "\x7f" "a" "\x7f" "a" "\x7f" "a" "\x7f" "a"
+			"\x7f" "a" "\x7f" "a" "\x7f" "a" "\x29" "a";
+
+		char expected[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testnonLettersBasic()
+	{
+		char test[] = "\x1b" "?" "\x1b" "'" "\x1b" "/"
+			"\xe2" "`!?><12:;][{}]{}]/12345190=-+-";
+
+		char expected[] = "???????????????????????????"
+			"'''''''''''''''''''''''''''"
+			"///////////////////////////"
+			"`!?><12:;][{}]{}]/12345190=-+-";
+
 		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
 };
