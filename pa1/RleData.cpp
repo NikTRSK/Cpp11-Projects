@@ -51,13 +51,14 @@ void RleData::Compress(const char* input, size_t inSize)
 	conseq++;
 	nonConseq--;
 
+
 	if (nonConseq < -1) {
 		conseq = 0;
 		// edge case: when at the end of array don't need to subtract so add 1
 		CompressNegativeRun(input, compressedPosition, ++nonConseq, i);
 		nonConseq = 0;
 	}
-	else if (conseq > 1)
+	else if (conseq > 0)
 	{
 		nonConseq = 0;
 		// edge case: when at the end of array don't need to add so subtract 1

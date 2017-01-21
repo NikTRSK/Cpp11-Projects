@@ -32,10 +32,11 @@ public:
 		//TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
 		//TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
 		//TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
-		TEST_CASE_DESCRIBE(testRandomCheck, "Random check test");
-		TEST_CASE_DESCRIBE(testEndsWithSingle, "Random check test");
-		TEST_CASE_DESCRIBE(testPositiveEndsWithSingle, "Random check test");
-		TEST_CASE_DESCRIBE(testStartsWithSingle, "Random check test");
+		//TEST_CASE_DESCRIBE(testRandomCheck, "Random check test");
+		//TEST_CASE_DESCRIBE(testEndsWithSingle, "Ends with single test");
+		//TEST_CASE_DESCRIBE(testPositiveEndsWithSingle, "Positive ends with single test");
+		TEST_CASE_DESCRIBE(testStartsWithSingle, "Positive starts with single test");
+		TEST_CASE_DESCRIBE(testPositiveWithSingleInMiddle, "Positive with single in middle test");
 		// Non letters
 		// Same repetition negative
 		// Different repetion negative
@@ -315,6 +316,14 @@ public:
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
+
+	void testPositiveWithSingleInMiddle()
+	{
+		char test[] = "bbbbbbbbbbbbbbbbbbbbbbbbcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+		char expected[] = "\x18" "b" "\x01" "c" "\x22" "b";
+
+		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
 };
 
 class DecompressionTests : public TestFixture<DecompressionTests>
@@ -322,18 +331,18 @@ class DecompressionTests : public TestFixture<DecompressionTests>
 public:
 	TEST_FIXTURE_DESCRIBE(DecompressionTests, "Testing Decompression...")
 	{
-		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive run test");
-		// TODO: Add more Decompression test  cases
-		TEST_CASE_DESCRIBE(testBasicPositiveRuns2, "Basic positive runs test 2");
-		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
-		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
-		TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
-		TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
-		TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
-		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
-		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
-		TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
-		TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
+		//TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive run test");
+		//// TODO: Add more Decompression test  cases
+		//TEST_CASE_DESCRIBE(testBasicPositiveRuns2, "Basic positive runs test 2");
+		//TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
+		//TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
+		//TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
+		//TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
+		//TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
+		//TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
+		//TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
+		//TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
+		//TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
 	}
 	
 	void testBasicPositiveRuns()

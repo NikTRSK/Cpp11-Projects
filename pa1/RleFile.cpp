@@ -101,12 +101,6 @@ void RleFile::ExtractArchive(const std::string& source)
 		std::ofstream out(mHeader.fileName, std::ios::out | std::ios::binary | std::ios::trunc);
 		if (out.is_open())
 		{
-			// Setup the header
-		/*	out.write(mHeader.sig, 4);
-			out.write(reinterpret_cast<char*>(&(mHeader.fileSize)), 4);
-			out.write(reinterpret_cast<char*>(&(mHeader.fileNameLength)), 4);
-			out.write(mHeader.fileName.c_str(), mHeader.fileNameLength);*/
-
 			// Write the data
 			std::cout << "mSize: " << mData.mSize << ", " << mData.mData << "\n";
 			out.write(mData.mData, mData.mSize);
