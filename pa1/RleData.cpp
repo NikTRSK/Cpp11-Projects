@@ -13,7 +13,7 @@ void RleData::Compress(const char* input, size_t inSize)
 
 	// Allocate the output data array (2*inSize for safety)
 	mData = new char[2 * inSize];
-	mSize = 2 * inSize;
+	//mSize = 2 * inSize;
 
 	// Base case: len = 1
 	if (inSize == 1) {
@@ -25,7 +25,7 @@ void RleData::Compress(const char* input, size_t inSize)
 	int conseq = 0; // stores the number of consequtive characters
 	int nonConseq = 0;
 	unsigned int i;
-	std::cout << "!_NUM: " << inSize << "|  " << mData << std::endl;
+	//std::cout << "!_NUM: " << inSize << "|  " << mData << std::endl;
 	for (i = 0; i < inSize; ++i)
 	{
 		if (i + 1 < inSize && input[i] == input[i + 1])
@@ -64,6 +64,7 @@ void RleData::Compress(const char* input, size_t inSize)
 		CompressPositiveRun(input, compressedPosition, --conseq, i-1); // i-1 to account for the end of the array
 	}
 
+	mSize = compressedPosition;
 	std::cout << "NUM: " << compressedPosition << "|  " << mData << std::endl;
 }
 
@@ -73,8 +74,9 @@ void RleData::Decompress(const char* input, size_t inSize, size_t outSize)
 	delete[] mData;
 	mSize = 0;
 
+	//std::cout << "OUTPUT: " << input[0] << ", " << input[1] << std::endl;
 	// Allocate the output data array (2*inSize for safety)
-	mData = new char[outSize];
+	mData = new char[2 * outSize];
 	mSize = outSize;
 
 	unsigned int position = 0;
@@ -99,7 +101,7 @@ void RleData::Decompress(const char* input, size_t inSize, size_t outSize)
 		++i;
 	}
 
-	//std::cout << "OUTPUT: " << mData << std::endl;
+	std::cout << "OUTSIZE: " << outSize << " |pos: " << position << " |OUTPUT: " << mData << std::endl;
 }
 
 std::ostream& operator<< (std::ostream& stream, const RleData& rhs)

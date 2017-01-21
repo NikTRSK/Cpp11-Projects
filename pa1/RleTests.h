@@ -22,16 +22,20 @@ class CompressionTests : public TestFixture<CompressionTests>
 public:
 	TEST_FIXTURE_DESCRIBE(CompressionTests, "Testing Compression...")
 	{
-		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
-		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
-		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
-		TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
-		TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
-		TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
-		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
-		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
-		TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
-		TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
+		//TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive runs test");
+		//TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
+		//TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
+		//TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
+		//TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
+		//TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
+		//TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
+		//TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
+		//TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
+		//TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
+		TEST_CASE_DESCRIBE(testRandomCheck, "Random check test");
+		TEST_CASE_DESCRIBE(testEndsWithSingle, "Random check test");
+		TEST_CASE_DESCRIBE(testPositiveEndsWithSingle, "Random check test");
+		TEST_CASE_DESCRIBE(testStartsWithSingle, "Random check test");
 		// Non letters
 		// Same repetition negative
 		// Different repetion negative
@@ -272,6 +276,42 @@ public:
 			"`!?><12:;][{}]{}]/12345190=-+-";
 		char expected[] = "\x1b" "?" "\x1b" "'" "\x1b" "/"
 			"\xe2" "`!?><12:;][{}]{}]/12345190=-+-";
+
+		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testRandomCheck()
+	{
+		char test[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"cccccccccccccccccccccccccccccc"
+			"ddddddddddddddddddddddddddddddddddddddd"
+			"asdasdasdadasdas";
+		char expected[] = "\x1d" "a" "\x20" "b" "\x1e" "c" "\x27" "d" "\xf0" "asdasdasdadasdas";
+
+		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testEndsWithSingle()
+	{
+		char test[] = "abcdefghjjja";
+		char expected[] = "\xf8" "abcdefgh" "\x03" "j" "\x01" "a";
+
+		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testPositiveEndsWithSingle()
+	{
+		char test[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
+		char expected[] = "\x3a" "a" "\x01" "b";
+
+		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testStartsWithSingle()
+	{
+		char test[] = "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+		char expected[] = "\x01" "a" "\x3a" "b";
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}

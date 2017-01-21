@@ -16,7 +16,8 @@ void Part1Tests()
 
 // Check if the a string ends with a certain substring
 bool ends_with(std::string input, std::string substring) {
-	if (input.substr(substring.length() - 1 - 3, input.length() - 1).find(substring) != std::string::npos)
+	size_t found = input.substr(input.length() - 1 - 3, input.length() - 1).find(substring);
+	if (found != std::string::npos)
 		return true;
 	else
 		return false;
@@ -33,14 +34,20 @@ int main(int argc, char* argv[])
 	{
 		// TODO: Get the file name from argv[1] and either compress/decompress
 		std::string inputFileName = argv[1];
-
+		std::cout << "Working with " << inputFileName << std::endl;
 		RleFile archiver;
 
 		// Get the extension and check if it is and archive
 		if (ends_with(inputFileName, ".rl1"))
+		{
+			std::cout << "Extracting...\n";
 			archiver.ExtractArchive(inputFileName);
+		}
 		else
+		{
+			std::cout << "Archiving...\n";
 			archiver.CreateArchive(inputFileName);
+		}
 	}
 	return 0;
 }
