@@ -1,1 +1,19 @@
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccdddddddddddddddddddddddddddddddddddddddasdasdasdadasdas
+abcdefghjjja
+abcdefgh
+
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab
+
+abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+
+bbbbbbbbbbbbbbbbbbbbbbbb
+c
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+
+
+
+		TEST_CASE_DESCRIBE(testEndsWithSingle, "Random check test");
+		TEST_CASE_DESCRIBE(testPositiveEndsWithSingle, "Random check test");
+		TEST_CASE_DESCRIBE(testStartsWithSingle, "Random check test");
+		testPositiveWithSingleInMiddle
+
+
