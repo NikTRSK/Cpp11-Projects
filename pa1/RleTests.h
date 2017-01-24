@@ -38,13 +38,7 @@ public:
 		TEST_CASE_DESCRIBE(testStartsWithSingle, "Positive starts with single test");
 		TEST_CASE_DESCRIBE(testPositiveWithSingleInMiddle, "Positive with single in middle test");
 		TEST_CASE_DESCRIBE(testMixedTest, "Mixed test");
-		// Non letters
-		// Same repetition negative
-		// Different repetion negative
-		// Alternating runs over max
-		// 0 length input
-
-		// VERIFY NEGATIVE RUNS 2s COMPLEMENT
+		TEST_CASE_DESCRIBE(testEmptyTest, "Empty test");
 	}
 	
 	void testBasicPositiveRuns()
@@ -333,6 +327,14 @@ public:
 
 		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
+
+	void testEmptyTest()
+	{
+		char test[] = "";
+		char expected[] = "";
+
+		runCompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
 };
 
 class DecompressionTests : public TestFixture<DecompressionTests>
@@ -340,18 +342,25 @@ class DecompressionTests : public TestFixture<DecompressionTests>
 public:
 	TEST_FIXTURE_DESCRIBE(DecompressionTests, "Testing Decompression...")
 	{
-		//TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive run test");
-		//// TODO: Add more Decompression test  cases
-		//TEST_CASE_DESCRIBE(testBasicPositiveRuns2, "Basic positive runs test 2");
-		//TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
-		//TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
-		//TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
-		//TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
-		//TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
-		//TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
-		//TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
-		//TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
-		//TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
+		TEST_CASE_DESCRIBE(testBasicPositiveRuns, "Basic positive run test");
+		// TODO: Add more Decompression test  cases
+		TEST_CASE_DESCRIBE(testBasicPositiveRuns2, "Basic positive runs test 2");
+		TEST_CASE_DESCRIBE(testBasicNegativeRuns, "Basic negative runs test");
+		TEST_CASE_DESCRIBE(testOverMaxPositiveRuns, "Over max length positive runs test");
+		TEST_CASE_DESCRIBE(testOverMaxNegativeRuns, "Over max length negative runs test");
+		TEST_CASE_DESCRIBE(testAlternatingRuns, "Alternating runs test");
+		TEST_CASE_DESCRIBE(testLengthOneRuns, "String length one test");
+		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns1, "Over max length alternating char test (end with positive run)");
+		TEST_CASE_DESCRIBE(testOverMaxAlternatingRuns2, "Over max length alternating char test (end with negative run)");
+		TEST_CASE_DESCRIBE(testOverMaxSingleUniqueStirngRuns, "Over max length single char test");
+		TEST_CASE_DESCRIBE(testnonLettersBasic, "Non letters basic test");
+		TEST_CASE_DESCRIBE(testRandomCheck, "Random check test");
+		TEST_CASE_DESCRIBE(testEndsWithSingle, "Ends with single test");
+		TEST_CASE_DESCRIBE(testPositiveEndsWithSingle, "Positive ends with single test");
+		TEST_CASE_DESCRIBE(testStartsWithSingle, "Positive starts with single test");
+		TEST_CASE_DESCRIBE(testPositiveWithSingleInMiddle, "Positive with single in middle test");
+		TEST_CASE_DESCRIBE(testMixedTest, "Mixed test");
+		TEST_CASE_DESCRIBE(testEmptyTest, "Empty test");
 	}
 	
 	void testBasicPositiveRuns()
@@ -595,6 +604,66 @@ public:
 			"'''''''''''''''''''''''''''"
 			"///////////////////////////"
 			"`!?><12:;][{}]{}]/12345190=-+-";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testRandomCheck()
+	{
+		char test[] = "\x1d" "a" "\x20" "b" "\x1e" "c" "\x27" "d" "\xf0" "asdasdasdadasdas";
+		char expected[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			"cccccccccccccccccccccccccccccc"
+			"ddddddddddddddddddddddddddddddddddddddd"
+			"asdasdasdadasdas";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testEndsWithSingle()
+	{
+		char test[] = "\xf8" "abcdefgh" "\x03" "j" "\x01" "a";
+		char expected[] = "abcdefghjjja";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testPositiveEndsWithSingle()
+	{
+		char test[] = "\x3a" "a" "\x01" "b";
+		char expected[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testStartsWithSingle()
+	{
+		char test[] = "\x01" "a" "\x3a" "b";
+		char expected[] = "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testPositiveWithSingleInMiddle()
+	{
+		char test[] = "\x18" "b" "\x01" "c" "\x22" "b";
+		char expected[] = "bbbbbbbbbbbbbbbbbbbbbbbbcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testMixedTest()
+	{
+		char test[] = "\x04" "a" "\x05" "b" "\xfb" "abcde" "\x02" "f" "\x01" "n" "\x03" "m";
+		char expected[] = "aaaabbbbbabcdeffnmmm";
+
+		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
+	}
+
+	void testEmptyTest()
+	{
+		char test[] = "";
+		char expected[] = "";
 
 		runDecompressionTest(test, sizeof(test) - 1, expected, sizeof(expected) - 1);
 	}
