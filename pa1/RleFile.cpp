@@ -86,7 +86,7 @@ void RleFile::ExtractArchive(const std::string& source)
 		if (out.is_open())
 		{
 			// Write the data
-			out.write(mData.mData, mData.mSize);
+			out.write(mData.mData, mHeader.fileSize);
 			out.close();
 		}
 
