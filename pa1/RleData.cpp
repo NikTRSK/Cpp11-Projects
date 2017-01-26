@@ -58,9 +58,8 @@ void RleData::Decompress(const char* input, size_t inSize, size_t outSize)
 	delete[] mData;
 	mSize = 0;
 
-	// Allocate the output data array (2 * outSize for safety)
-	mData = new char[2 * outSize];
-
+	// Allocate the output data array
+	mData = new char[outSize];
 	unsigned int i = 0;
 	unsigned int numOccurences = 0;
 	while(i < inSize)

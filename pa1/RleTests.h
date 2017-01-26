@@ -40,7 +40,7 @@ public:
 		TEST_CASE_DESCRIBE(testMixedTest, "Mixed test");
 		TEST_CASE_DESCRIBE(testEmptyTest, "Empty test");
 	}
-	
+
 	void testBasicPositiveRuns()
 	{
 		char test[] = "aaabbbcccdddaaabbbcccdddaaabbbcccdddaaabbbc"

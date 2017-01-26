@@ -24,7 +24,7 @@ void RleFile::CreateArchive(const std::string& source)
 		// Compress the data
 		mData.Compress(memblock, (int)size);
 
-		std::cout << "Compression level: " << (int)((double)(mData.mSize)/size * 100) << "%\n";
+		std::cout << "Compression level: " << 100 - (int)((double)(mData.mSize)/size * 100) << "%\n";
 		mHeader.sig[0] = 'R'; mHeader.sig[1] = 'L'; mHeader.sig[2] = 'E'; mHeader.sig[3] = '\x01';
 		
 		// Output the compressed data to a file
@@ -41,7 +41,7 @@ void RleFile::CreateArchive(const std::string& source)
 			arc.write(source.c_str(), mHeader.fileNameLength);
 
 			// Write the data
-			arc.write(mData.mData, mData.mSize); // Should this just be mSize?
+			arc.write(mData.mData, mData.mSize);
 			arc.close();
 		}
 
@@ -80,7 +80,7 @@ void RleFile::ExtractArchive(const std::string& source)
 		for (unsigned int i = 0; i < mHeader.fileNameLength; ++i)
 			mHeader.fileName.push_back(memblock[9 + i]);
 
-		mData.Decompress(memblock + 9 + mHeader.fileNameLength, (int)size - 9 , mHeader.fileSize);
+		mData.Decompress(memblock + 9 + mHeader.fileNameLength, (int)size - 9 - mHeader.fileNameLength, mHeader.fileSize);
 				
 		std::ofstream out(mHeader.fileName, std::ios::out | std::ios::binary | std::ios::trunc);
 		if (out.is_open())
