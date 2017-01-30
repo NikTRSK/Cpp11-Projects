@@ -20,13 +20,15 @@ int main(int argc, char* argv[])
 		// argv[1] - dictionary file
 		// argv[2] - password file
 		std::ifstream dictFile(argv[1]);
-		//ProcessData dataProcessor;
-		//dataProcessor.calculateDictionaryHashes(dictFile);
 		if (dictFile.is_open())
 		{
 			dataProcessor.calculateDictionaryHashes(dictFile);
 			dataProcessor.dictionaryAttack(argv[2]);
+			dataProcessor.bruteForceAttackSingleThreaded();
+			dataProcessor.writePasswordToFile();
+			//dataProcessor.bruteForceAttack();
 		}
+		//dataProcessor.bruteForceAttack();
 	}
 
 	return 0;
