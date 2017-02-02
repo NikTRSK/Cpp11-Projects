@@ -11,7 +11,7 @@ ProcessData::~ProcessData()
 	delete mHashedDictionary;
 }
 
-std::string ProcessData::calculateHash(char * input)
+std::string ProcessData::CalculateHash(char * input)
 {
 	// Hash the input password
 	unsigned char hash[20];
@@ -24,7 +24,7 @@ std::string ProcessData::calculateHash(char * input)
 	return s;
 }
 
-std::string ProcessData::calculateHash(std::string input)
+std::string ProcessData::CalculateHash(std::string input)
 {
 	// Hash the input password
 	unsigned char hash[20];
@@ -37,7 +37,7 @@ std::string ProcessData::calculateHash(std::string input)
 	return s;
 }
 
-void ProcessData::calculateDictionaryHashes(std::ifstream &dictFile)
+void ProcessData::CalculateDictionaryHashes(std::ifstream &dictFile)
 {
 	if (dictFile.is_open())
 	{
@@ -47,7 +47,7 @@ void ProcessData::calculateDictionaryHashes(std::ifstream &dictFile)
 		std::string phrase;
 		while (std::getline(dictFile, phrase))
 		{
-			std::string hashedPhrase = calculateHash(phrase);
+			std::string hashedPhrase = CalculateHash(phrase);
 			mHashedDictionary->insert(std::make_pair(hashedPhrase, phrase));
 		}
 		double elapsed = timer.getElapsed();
@@ -57,11 +57,13 @@ void ProcessData::calculateDictionaryHashes(std::ifstream &dictFile)
 	dictFile.close();
 }
 
-void ProcessData::dictionaryAttack(char * passwordFilename)
+void ProcessData::DictionaryAttack(char * passwordFilename)
 {
 	std::ifstream passwordFile(passwordFilename);
 
 	std::string hashToCrack;
+	Timer timer;
+	timer.start();
 	while (getline(passwordFile, hashToCrack))
 	{
 		auto searchResult = mHashedDictionary->find(hashToCrack);
@@ -82,11 +84,15 @@ void ProcessData::dictionaryAttack(char * passwordFilename)
 		}
 	}
 
+	double elapsed = timer.getElapsed();
+	std::cout << "Dictionary attack finished.\n";
+	std::cout << "Time elapsed: " << elapsed << "s.\n";
+
 	passwordFile.close();
 	
 }
 
-void ProcessData::bruteForceAttack()
+void ProcessData::BruteForceAttack()
 {
 	int numPerm = 0;
 	int arr[4] = { 0 };
@@ -108,7 +114,7 @@ void ProcessData::bruteForceAttack()
 				}
 			}
 		}
-		std::string phrase = { convertToChar(arr[0]), convertToChar(arr[1]), convertToChar(arr[2]), convertToChar(arr[3]) };
+		std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
 		std::string phrase2 = {std::to_string(arr[0]) + " " + std::to_string(arr[1]) + " " + std::to_string(arr[2]) + " " + std::to_string(arr[3])};
 		solution.push_back(phrase2 + " \t| " + phrase);
 		numPerm++;
@@ -128,7 +134,7 @@ void ProcessData::bruteForceAttack()
 	test.close();	
 }
 
-void ProcessData::bruteForceAttackSingleThreaded()
+void ProcessData::BruteForceAttackSingleThreaded()
 {
 	// Setup timer
 	Timer timer;
@@ -155,8 +161,8 @@ void ProcessData::bruteForceAttackSingleThreaded()
 					}
 				}
 			}
-			std::string phrase = { convertToChar(arr[0]), convertToChar(arr[1]), convertToChar(arr[2]), convertToChar(arr[3]) };
-			if (mSolvedPasswords[*indexToCrack].first == calculateHash(phrase))
+			std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+			if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
 			{
 				mSolvedPasswords[*indexToCrack].second = phrase;
 				mPasswordsToBruteForce.erase(indexToCrack);
@@ -165,16 +171,35 @@ void ProcessData::bruteForceAttackSingleThreaded()
 	}
 
 	double elapsed = timer.getElapsed();
-	std::cout << "Brute force attack finished.\n";
+	std::cout << "Brute force attack (serial) finished.\n";
 	std::cout << "Time elapsed: " << elapsed << "s.\n";
 	std::cout << mPasswordsToBruteForce.size() << std::endl;
 }
 
-void ProcessData::bruteForceAttackParallel()
+void ProcessData::BruteForceAttackParallel()
 {
+	Timer timer;
+	timer.start();
+
+	tbb::parallel_invoke(
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 0, 3); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 4, 7); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 8, 11); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 12, 15); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 16, 19); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 20, 23); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 24, 27); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 28, 31); },
+		[this] { BruteForceInRange(mPasswordsToBruteForce, 32, 35); }
+	);
+
+	double elapsed = timer.getElapsed();
+	std::cout << "Brute force attack (parallel) finished.\n";
+	std::cout << "Time elapsed: " << elapsed << "s.\n";
+	std::cout << mPasswordsToBruteForce.size() << std::endl;
 }
 
-char ProcessData::convertToChar(int number)
+char ProcessData::ConvertToChar(int number)
 {
 	// Handle numbers 0-9
 	if (number >= 0 && number <= 9)
@@ -183,7 +208,73 @@ char ProcessData::convertToChar(int number)
 	return static_cast<char>(number + 87);
 }
 
-void ProcessData::writePasswordToFile()
+void ProcessData::BruteForceInRange(std::vector<int> &passwordsToCrack, int from, int to)
+{
+	for (auto indexToCrack = std::end(mPasswordsToBruteForce) - 1; indexToCrack != std::begin(mPasswordsToBruteForce); --indexToCrack)
+	{
+		if (mSolvedPasswords[*indexToCrack].second == "??")
+		{
+			int arr[4] = { 0 };
+			arr[0] = from;
+			while (arr[0] <= to)
+			{
+				arr[3]++;
+				if (arr[3] > 35) {
+					arr[3] = 0;
+					arr[2]++;
+					if (arr[2] > 35) {
+						arr[2] = 0;
+						arr[1]++;
+						if (arr[1] > 35) {
+							arr[1] = 0;
+							arr[0]++;
+						}
+					}
+				}
+				std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+				if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
+				{
+					mSolvedPasswords[*indexToCrack].second = phrase;
+				}
+				else
+				{
+					if (arr[0] == 0)
+					{
+						phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+						if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
+						{
+							mSolvedPasswords[*indexToCrack].second = phrase;
+						}
+						else
+						{
+							if (arr[1] == 0)
+							{
+								phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+								if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
+								{
+									mSolvedPasswords[*indexToCrack].second = phrase;
+								}
+								else
+								{
+									if (arr[2] == 0)
+									{
+										phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+										if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
+										{
+											mSolvedPasswords[*indexToCrack].second = phrase;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void ProcessData::WritePasswordToFile()
 {
 	std::ofstream crackedPwrdsFile("pass_solved.txt");
 	if (crackedPwrdsFile.is_open())

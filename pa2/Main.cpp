@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	// Basic hashing
 	if (argc == 2)
 	{
-		std::cout << dataProcessor.calculateHash(argv[1]) << std::endl;
+		std::cout << dataProcessor.CalculateHash(argv[1]) << std::endl;
 	}
 
 	// Dictionary lookup
@@ -22,13 +22,11 @@ int main(int argc, char* argv[])
 		std::ifstream dictFile(argv[1]);
 		if (dictFile.is_open())
 		{
-			dataProcessor.calculateDictionaryHashes(dictFile);
-			dataProcessor.dictionaryAttack(argv[2]);
-			dataProcessor.bruteForceAttackSingleThreaded();
-			dataProcessor.writePasswordToFile();
-			//dataProcessor.bruteForceAttack();
+			dataProcessor.CalculateDictionaryHashes(dictFile);
+			dataProcessor.DictionaryAttack(argv[2]);
+			dataProcessor.BruteForceAttackParallel();
+			dataProcessor.WritePasswordToFile();
 		}
-		//dataProcessor.bruteForceAttack();
 	}
 
 	return 0;
