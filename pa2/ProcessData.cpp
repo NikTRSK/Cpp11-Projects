@@ -80,7 +80,8 @@ void ProcessData::DictionaryAttack(char * passwordFilename)
 		mSolvedPasswords.push_back(crackAttempt);
 		if (crackAttempt.second == "??")
 		{
-			mPasswordsToBruteForce.push_back(mSolvedPasswords.size()-1);
+			mPasswordsToBruteForce.insert({hashToCrack, mSolvedPasswords.size() - 1});
+			//mPasswordsToBruteForce.push_back(mSolvedPasswords.size()-1);
 		}
 	}
 
@@ -92,83 +93,13 @@ void ProcessData::DictionaryAttack(char * passwordFilename)
 	
 }
 
-void ProcessData::BruteForceAttack()
-{
-	int numPerm = 0;
-	int arr[4] = { 0 };
-	std::vector<std::string> solution;
-
-
-	while (arr[0] < 36)
-	{
-		arr[3]++;
-		if (arr[3] > 35) {
-			arr[3] = 0;
-			arr[2]++;
-			if (arr[2] > 35) {
-				arr[2] = 0;
-				arr[1]++;
-				if (arr[1] > 35) {
-					arr[1] = 0;
-					arr[0]++;
-				}
-			}
-		}
-		std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-		std::string phrase2 = {std::to_string(arr[0]) + " " + std::to_string(arr[1]) + " " + std::to_string(arr[2]) + " " + std::to_string(arr[3])};
-		solution.push_back(phrase2 + " \t| " + phrase);
-		numPerm++;
-	}
-
-
-
-
-	std::ofstream test("test.txt");
-	if (test.is_open())
-	{
-		for (std::string i : solution) {
-			test << i << std::endl;
-		}
-	}
-	test << "PERMS: " << numPerm << ", " << solution.size();
-	test.close();	
-}
-
 void ProcessData::BruteForceAttackSingleThreaded()
 {
 	// Setup timer
 	Timer timer;
 	timer.start();
 
-	for (auto indexToCrack = std::end(mPasswordsToBruteForce)-1; indexToCrack != std::begin(mPasswordsToBruteForce); --indexToCrack)
-	{
-		int arr[4] = { 0 };
-		while (arr[0] < 36)
-		{
-			arr[3]++;
-			if (arr[3] > 35)
-			{
-				arr[3] = 0;
-				arr[2]++;
-				if (arr[2] > 35)
-				{
-					arr[2] = 0;
-					arr[1]++;
-					if (arr[1] > 35)
-					{
-						arr[1] = 0;
-						arr[0]++;
-					}
-				}
-			}
-			std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-			if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
-			{
-				mSolvedPasswords[*indexToCrack].second = phrase;
-				mPasswordsToBruteForce.erase(indexToCrack);
-			}
-		}
-	}
+	BruteForceInRange(mPasswordsToBruteForce, 0, 35);
 
 	double elapsed = timer.getElapsed();
 	std::cout << "Brute force attack (serial) finished.\n";
@@ -208,65 +139,61 @@ char ProcessData::ConvertToChar(int number)
 	return static_cast<char>(number + 87);
 }
 
-void ProcessData::BruteForceInRange(std::vector<int> &passwordsToCrack, int from, int to)
+void ProcessData::BruteForceInRange(std::multimap<std::string, int> &passwordsToCrack, int from, int to)
 {
-	for (auto indexToCrack = std::end(mPasswordsToBruteForce) - 1; indexToCrack != std::begin(mPasswordsToBruteForce); --indexToCrack)
+	int arr[4] = { 0 };
+	arr[0] = from;
+	while (arr[0] <= to)
 	{
-		if (mSolvedPasswords[*indexToCrack].second == "??")
+		arr[3]++;
+		if (arr[3] > 35)
 		{
-			int arr[4] = { 0 };
-			arr[0] = from;
-			while (arr[0] <= to)
+			arr[3] = 0;
+			arr[2]++;
+			if (arr[2] > 35)
 			{
-				arr[3]++;
-				if (arr[3] > 35) {
-					arr[3] = 0;
-					arr[2]++;
-					if (arr[2] > 35) {
-						arr[2] = 0;
-						arr[1]++;
-						if (arr[1] > 35) {
-							arr[1] = 0;
-							arr[0]++;
-						}
-					}
-				}
-				std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-				if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
+				arr[2] = 0;
+				arr[1]++;
+				if (arr[1] > 35)
 				{
-					mSolvedPasswords[*indexToCrack].second = phrase;
+					arr[1] = 0;
+					arr[0]++;
 				}
-				else
+			}
+		}
+		std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+		std::string hashedPermutation = CalculateHash(phrase);
+		auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
+		for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
+		{
+			mSolvedPasswords[crackedIdx->second].second = phrase;
+		}
+		if (arr[0] == 0)
+		{
+			phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+			hashedPermutation = CalculateHash(phrase);
+			auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
+			for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
+			{
+				mSolvedPasswords[crackedIdx->second].second = phrase;
+			}
+			if (arr[1] == 0)
+			{
+				phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+				hashedPermutation = CalculateHash(phrase);
+				auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
+				for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
 				{
-					if (arr[0] == 0)
+					mSolvedPasswords[crackedIdx->second].second = phrase;
+				}
+				if (arr[2] == 0)
+				{
+					phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
+					hashedPermutation = CalculateHash(phrase);
+					auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
+					for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
 					{
-						phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-						if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
-						{
-							mSolvedPasswords[*indexToCrack].second = phrase;
-						}
-						else
-						{
-							if (arr[1] == 0)
-							{
-								phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-								if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
-								{
-									mSolvedPasswords[*indexToCrack].second = phrase;
-								}
-								else
-								{
-									if (arr[2] == 0)
-									{
-										phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-										if (mSolvedPasswords[*indexToCrack].first == CalculateHash(phrase))
-										{
-											mSolvedPasswords[*indexToCrack].second = phrase;
-										}
-									}
-								}
-							}
-						}
+						mSolvedPasswords[crackedIdx->second].second = phrase;
 					}
 				}
 			}

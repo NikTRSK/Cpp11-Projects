@@ -10,16 +10,16 @@
 #include <utility>
 #include <string>
 #include <tbb/parallel_invoke.h>
-#include <algorithm> // remove (sort)
+#include <map>
 #pragma once
 class ProcessData
 {
 private:
 	std::unordered_map<std::string, std::string> *mHashedDictionary;
 	std::vector<std::pair<std::string, std::string> > mSolvedPasswords;
-	std::vector<int> mPasswordsToBruteForce;
-
-	//std::vector<std::string, std::string> mPasswordsToBruteForce;
+	//std::vector<int> mPasswordsToBruteForce;
+	//std::unordered_map<std::string, int> mPasswordsToBruteForce;
+	std::multimap<std::string, int> mPasswordsToBruteForce;
 
 public:
 	ProcessData();
@@ -29,11 +29,11 @@ public:
 	std::string CalculateHash(std::string input);
 	void CalculateDictionaryHashes(std::ifstream &dictFile);
 	void DictionaryAttack(char * passwordFilename);
-	void BruteForceAttack();
 	void BruteForceAttackSingleThreaded();
 	void BruteForceAttackParallel();
 	char ConvertToChar(int number);
-	void BruteForceInRange(std::vector<int> &passwordsToCrack, int from, int to);
+	//void BruteForceInRange(std::vector<int> &passwordsToCrack, int from, int to);
+	void BruteForceInRange(std::multimap<std::string, int> &passwordsToCrack, int from, int to);
 	void WritePasswordToFile();
 };
 

@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
 			dataProcessor.CalculateDictionaryHashes(dictFile);
 			dataProcessor.DictionaryAttack(argv[2]);
 			dataProcessor.BruteForceAttackParallel();
+			//dataProcessor.BruteForceAttackSingleThreaded();
 			dataProcessor.WritePasswordToFile();
 		}
 	}
