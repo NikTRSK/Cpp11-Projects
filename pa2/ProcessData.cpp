@@ -11,6 +11,14 @@ ProcessData::~ProcessData()
 	delete mHashedDictionary;
 }
 
+void ProcessData::CrackPasswords(char * dictFile, char * passFile)
+{
+	CalculateDictionaryHashes(dictFile);
+	DictionaryAttack(passFile);
+	BruteForceAttackParallel();
+	WritePasswordToFile();
+}
+
 std::string ProcessData::CalculateHash(char * input)
 {
 	// Hash the input password
@@ -24,7 +32,7 @@ std::string ProcessData::CalculateHash(char * input)
 	return s;
 }
 
-std::string ProcessData::CalculateHash(std::string input)
+std::string ProcessData::CalculateHash(std::string const &input)
 {
 	// Hash the input password
 	unsigned char hash[20];
@@ -37,33 +45,43 @@ std::string ProcessData::CalculateHash(std::string input)
 	return s;
 }
 
-void ProcessData::CalculateDictionaryHashes(std::ifstream &dictFile)
+void ProcessData::CalculateDictionaryHashes(char * dictionary)
 {
-	if (dictFile.is_open())
+	std::ifstream dictFile(dictionary);
+	if (!dictFile.is_open())
 	{
-		// Setup timer to check time elapsed
-		Timer timer;
-		timer.start();
-		std::string phrase;
-		while (std::getline(dictFile, phrase))
-		{
-			std::string hashedPhrase = CalculateHash(phrase);
-			mHashedDictionary->insert(std::make_pair(hashedPhrase, phrase));
-		}
-		double elapsed = timer.getElapsed();
-		std::cout << "The dictionary has been loaded.\n";
-		std::cout << "Time elapsed: " << elapsed << "s.\n";
+		std::cerr << "Cannot open dictionary file.\n";
 	}
+
+	// Setup timer to check time elapsed
+	Timer timer;
+	timer.start();
+	std::string phrase;
+	while (std::getline(dictFile, phrase))
+	{
+		std::string hashedPhrase = CalculateHash(phrase);
+		mHashedDictionary->insert(std::make_pair(hashedPhrase, phrase));
+	}
+	double elapsed = timer.getElapsed();
+	std::cout << "The dictionary has been loaded.\n";
+	std::cout << "Time elapsed: " << elapsed << "s.\n";
 	dictFile.close();
 }
 
 void ProcessData::DictionaryAttack(char * passwordFilename)
 {
 	std::ifstream passwordFile(passwordFilename);
+	if (!passwordFile.is_open())
+	{
+		std::cerr << "Cannot open passwords file\n";
+		return;
+	}
 
 	std::string hashToCrack;
 	Timer timer;
 	timer.start();
+	// Check all the input passwords against mHashedDisctionary and store them to mSolvedPasswords
+	// If can't find password stores the value as ??
 	while (getline(passwordFile, hashToCrack))
 	{
 		auto searchResult = mHashedDictionary->find(hashToCrack);
@@ -81,7 +99,6 @@ void ProcessData::DictionaryAttack(char * passwordFilename)
 		if (crackAttempt.second == "??")
 		{
 			mPasswordsToBruteForce.insert({hashToCrack, mSolvedPasswords.size() - 1});
-			//mPasswordsToBruteForce.push_back(mSolvedPasswords.size()-1);
 		}
 	}
 
@@ -90,7 +107,6 @@ void ProcessData::DictionaryAttack(char * passwordFilename)
 	std::cout << "Time elapsed: " << elapsed << "s.\n";
 
 	passwordFile.close();
-	
 }
 
 void ProcessData::BruteForceAttackSingleThreaded()
@@ -104,7 +120,6 @@ void ProcessData::BruteForceAttackSingleThreaded()
 	double elapsed = timer.getElapsed();
 	std::cout << "Brute force attack (serial) finished.\n";
 	std::cout << "Time elapsed: " << elapsed << "s.\n";
-	std::cout << mPasswordsToBruteForce.size() << std::endl;
 }
 
 void ProcessData::BruteForceAttackParallel()
@@ -112,6 +127,7 @@ void ProcessData::BruteForceAttackParallel()
 	Timer timer;
 	timer.start();
 
+	// Split up the passwords and perform the Brute Force attack.
 	tbb::parallel_invoke(
 		[this] { BruteForceInRange(mPasswordsToBruteForce, 0, 3); },
 		[this] { BruteForceInRange(mPasswordsToBruteForce, 4, 7); },
@@ -127,7 +143,6 @@ void ProcessData::BruteForceAttackParallel()
 	double elapsed = timer.getElapsed();
 	std::cout << "Brute force attack (parallel) finished.\n";
 	std::cout << "Time elapsed: " << elapsed << "s.\n";
-	std::cout << mPasswordsToBruteForce.size() << std::endl;
 }
 
 char ProcessData::ConvertToChar(int number)
@@ -141,6 +156,7 @@ char ProcessData::ConvertToChar(int number)
 
 void ProcessData::BruteForceInRange(std::multimap<std::string, int> &passwordsToCrack, int from, int to)
 {
+	// Counting machine to generate all 4 character permutations
 	int arr[4] = { 0 };
 	arr[0] = from;
 	while (arr[0] <= to)
@@ -161,43 +177,36 @@ void ProcessData::BruteForceInRange(std::multimap<std::string, int> &passwordsTo
 				}
 			}
 		}
+		// Check the phrases of length 1, 2, 3, 4
 		std::string phrase = { ConvertToChar(arr[0]), ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-		std::string hashedPermutation = CalculateHash(phrase);
-		auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
-		for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
-		{
-			mSolvedPasswords[crackedIdx->second].second = phrase;
-		}
+		ProcessPermutation(phrase);
 		if (arr[0] == 0)
 		{
 			phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-			hashedPermutation = CalculateHash(phrase);
-			auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
-			for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
-			{
-				mSolvedPasswords[crackedIdx->second].second = phrase;
-			}
+			ProcessPermutation(phrase);
 			if (arr[1] == 0)
 			{
 				phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-				hashedPermutation = CalculateHash(phrase);
-				auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
-				for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
-				{
-					mSolvedPasswords[crackedIdx->second].second = phrase;
-				}
+				ProcessPermutation(phrase);
 				if (arr[2] == 0)
 				{
 					phrase = { ConvertToChar(arr[1]), ConvertToChar(arr[2]), ConvertToChar(arr[3]) };
-					hashedPermutation = CalculateHash(phrase);
-					auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
-					for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
-					{
-						mSolvedPasswords[crackedIdx->second].second = phrase;
-					}
+					ProcessPermutation(phrase);
 				}
 			}
 		}
+	}
+}
+
+void ProcessData::ProcessPermutation(std::string const &phrase)
+{
+	// Hash the input phrase
+	std::string hashedPermutation = CalculateHash(phrase);
+	// Check it against the unsolved passwords and update the solved passwords
+	auto searchResult = mPasswordsToBruteForce.equal_range(hashedPermutation);
+	for (auto crackedIdx = searchResult.first; crackedIdx != searchResult.second; ++crackedIdx)
+	{
+		mSolvedPasswords[crackedIdx->second].second = phrase;
 	}
 }
 

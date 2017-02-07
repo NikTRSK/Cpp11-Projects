@@ -14,22 +14,13 @@ int main(int argc, char* argv[])
 		std::cout << dataProcessor.CalculateHash(argv[1]) << std::endl;
 	}
 
-	// Dictionary lookup
+	// Password cracking attack
 	if (argc == 3)
 	{
 		// argv[1] - dictionary file
 		// argv[2] - password file
-		std::ifstream dictFile(argv[1]);
-		if (dictFile.is_open())
-		{
-			dataProcessor.CalculateDictionaryHashes(dictFile);
-			dataProcessor.DictionaryAttack(argv[2]);
-			dataProcessor.BruteForceAttackParallel();
-			//dataProcessor.BruteForceAttackSingleThreaded();
-			dataProcessor.WritePasswordToFile();
-		}
+		dataProcessor.CrackPasswords(argv[1], argv[2]);
 	}
 
 	return 0;
 }
-

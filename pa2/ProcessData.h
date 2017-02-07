@@ -17,23 +17,35 @@ class ProcessData
 private:
 	std::unordered_map<std::string, std::string> *mHashedDictionary;
 	std::vector<std::pair<std::string, std::string> > mSolvedPasswords;
-	//std::vector<int> mPasswordsToBruteForce;
-	//std::unordered_map<std::string, int> mPasswordsToBruteForce;
 	std::multimap<std::string, int> mPasswordsToBruteForce;
+
+	/* HELPER FUNCTIONS */
+	/* Converts 0-35 to a char */
+	char ConvertToChar(int number);
+	/* Brute Force helper function */
+	void BruteForceInRange(std::multimap<std::string, int> &passwordsToCrack, int from, int to);
+	/* Checks mPasswordsToBruteForce against a single permutation */
+	void ProcessPermutation(std::string const &phrase);
 
 public:
 	ProcessData();
 	~ProcessData();
 
+	/* Crack Passwords */
+	void CrackPasswords(char * dictFile, char * passFile);
+	/* Hashes a char* string */
 	std::string CalculateHash(char * input);
-	std::string CalculateHash(std::string input);
-	void CalculateDictionaryHashes(std::ifstream &dictFile);
+	/* Hashes a std::string string */
+	std::string CalculateHash(std::string const &input);
+	/* Calculates hashes from an input file */
+	void CalculateDictionaryHashes(char * dictionary);
+	/* Perform a dictionarry attack on an input file with hashed password */
 	void DictionaryAttack(char * passwordFilename);
+	/* Perform a Single Threaded Brute Force attack */
 	void BruteForceAttackSingleThreaded();
+	/* Perform a Parallel Brute Force attack */
 	void BruteForceAttackParallel();
-	char ConvertToChar(int number);
-	//void BruteForceInRange(std::vector<int> &passwordsToCrack, int from, int to);
-	void BruteForceInRange(std::multimap<std::string, int> &passwordsToCrack, int from, int to);
+	/* Writes mSolvedPasswords to a file */
 	void WritePasswordToFile();
 };
 
