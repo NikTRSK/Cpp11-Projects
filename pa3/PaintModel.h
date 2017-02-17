@@ -20,7 +20,17 @@ public:
 	void AddShape(std::shared_ptr<Shape> shape);
 	// Remove a shape from the paint model
 	void RemoveShape(std::shared_ptr<Shape> shape);
+
+	//USER DEFINED//
+	// Returns true if there’s currently an active command
+	bool HasActiveCommand();
+	// Creates a command of a specific type
+	void CreateCommand(CommandType commandType, const wxPoint& start);
+	// Updates the current Command
+	void UpdateCommand(const wxPoint& newPoint);
+	void FinalizeCommand();
 private:
 	// Vector of all the shapes in the model
 	std::vector<std::shared_ptr<Shape>> mShapes;
+	std::shared_ptr<Command> mCurrentActiveCommand;
 };

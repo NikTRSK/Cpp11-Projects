@@ -228,10 +228,29 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 	if (event.LeftDown())
 	{
 		// TODO: This is when the left mouse button is pressed
+		switch (mCurrentTool)
+		{
+		case ID_DrawRect:
+			mModel->CreateCommand(CM_DrawRect, event.GetPosition());
+			mPanel->PaintNow();
+			break;
+		case ID_DrawEllipse:
+			mModel->CreateCommand(CM_DrawEllipse, event.GetPosition());
+			mPanel->PaintNow();
+			break;
+
+		default: break;
+		}
 	}
 	else if (event.LeftUp())
 	{
 		// TODO: This is when the left mouse button is released
+		if (mModel->HasActiveCommand())
+		{
+			mModel->UpdateCommand(event.GetPosition());
+			mModel->FinalizeCommand();
+			mPanel->PaintNow();
+		}
 	}
 }
 
