@@ -6,7 +6,9 @@ Shape::Shape(const wxPoint& start)
 	,mTopLeft(start)
 	,mBotRight(start)
 {
-
+	// Init Pen & Brush
+	mPen = *wxBLACK_PEN;
+	mBrush = *wxWHITE_BRUSH;
 }
 
 // Tests whether the provided point intersects
@@ -50,4 +52,35 @@ void Shape::GetBounds(wxPoint& topLeft, wxPoint& botRight) const
 {
 	topLeft = mTopLeft;
 	botRight = mBotRight;
+}
+
+int Shape::GetPenWidth()
+{
+	return mPen.GetWidth();
+}
+
+const wxPen& Shape::GetPen()
+{
+	return mPen;
+}
+
+const wxBrush& Shape::GetBrush()
+{
+	return mBrush;
+}
+
+void Shape::SetPenWidth(const int& size)
+{
+	mPen.SetWidth(size);
+
+}
+
+void Shape::SetPenColor(const wxColour& color)
+{
+	mPen.SetColour(color);
+}
+
+void Shape::SetBrushColor(const wxColour& color)
+{
+	mBrush.SetColour(color);
 }

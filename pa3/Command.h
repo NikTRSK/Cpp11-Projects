@@ -35,6 +35,7 @@ public:
 	// Used to "redo" the command
 	virtual void Redo(std::shared_ptr<PaintModel> model) = 0;
 	virtual ~Command() { }
+	std::shared_ptr<Shape> GetShape();
 protected:
 	wxPoint mStartPoint;
 	wxPoint mEndPoint;

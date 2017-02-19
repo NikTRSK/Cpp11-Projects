@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <stack>
 #include "Shape.h"
 #include "Command.h"
 #include <wx/bitmap.h>
@@ -29,8 +30,45 @@ public:
 	// Updates the current Command
 	void UpdateCommand(const wxPoint& newPoint);
 	void FinalizeCommand();
+	// Adds the current command to the undo stack
+	void AddCurrentCommandToUndoStack();
+	// Returns false if undo stack is empty
+	bool CanUndo();
+	// Returns false if redo stack is empty
+	bool CanRedo();
+	// Returns the removed command  and push is to the Redo stack
+	// Assumes that the stack is not empty
+	void Undo();
+	// Returns the removed command  and push is to the Redo stack
+	// Assumes that the stack is not empty
+	void Redo();
+	const std::shared_ptr<Command> & GetTopInUndo();
+	const std::shared_ptr<Command> & GetTopInRedo();
+
+	std::shared_ptr<Command> & GetCurrentCommand();
+	// Clear stack
+	void ClearRedo();
+	void ClearUndo();
+	std::vector<std::shared_ptr<Shape>> & GetShapes();
+
+	int GetPenWidth();
+	const wxPen & GetPen();
+	const wxBrush & GetBrush();
+
+	void SetPenWidth(const int & size);
+	void SetPenColor(const wxColour& color);
+	void SetBrushColor(const wxColour& color);
+
 private:
 	// Vector of all the shapes in the model
 	std::vector<std::shared_ptr<Shape>> mShapes;
 	std::shared_ptr<Command> mCurrentActiveCommand;
+
+	// Undo/Redo Stacks
+	std::stack<std::shared_ptr<Command>> mUndo;
+	std::stack<std::shared_ptr<Command>> mRedo;
+
+	// Pen and Brush
+	wxPen mPen;
+	wxBrush mBrush;
 };

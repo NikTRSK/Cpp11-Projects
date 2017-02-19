@@ -17,7 +17,15 @@ public:
 	void GetBounds(wxPoint& topLeft, wxPoint& botRight) const;
 	// Draw the shape
 	virtual void Draw(wxDC& dc) const = 0;
-	virtual ~Shape() { }	
+	virtual ~Shape() { }
+
+	int GetPenWidth();
+	const wxPen & GetPen();
+	const wxBrush & GetBrush();
+
+	void SetPenWidth(const int & size);
+	void SetPenColor(const wxColour& color);
+	void SetBrushColor(const wxColour& color);
 protected:
 	// Starting point of shape
 	wxPoint mStartPoint;
@@ -27,4 +35,8 @@ protected:
 	wxPoint mTopLeft;
 	// Bottom right point of shape
 	wxPoint mBotRight;
+
+	// Pen and Brush
+	wxPen mPen;
+	wxBrush mBrush;
 };

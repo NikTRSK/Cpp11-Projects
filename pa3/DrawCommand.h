@@ -1,6 +1,7 @@
 #pragma once
 #include "Command.h"
 #include "Shape.h"
+#include "PaintModel.h"
 class DrawCommand :	public Command
 {
 public:
@@ -13,5 +14,7 @@ public:
 	void Undo(std::shared_ptr<PaintModel> model) override;
 	// Used to "redo" the command
 	void Redo(std::shared_ptr<PaintModel> model) override;
+
+	// do we need a shape var here
 };
 

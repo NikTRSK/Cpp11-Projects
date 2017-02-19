@@ -47,6 +47,18 @@
     <ClInclude Include="EllipseShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LineShape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PencilShape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetPenCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetBrushCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PaintApp.cpp">
@@ -77,6 +89,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EllipseShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LineShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PencilShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SetPenCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SetBrushCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

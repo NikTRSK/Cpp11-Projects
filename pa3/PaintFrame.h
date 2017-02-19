@@ -52,6 +52,8 @@ private:
 	void ToggleTool(EventID toolID);
 
 	void SetCursor(CursorType type);
+	// Enable/Disable the Redo/Undo menu options if possible
+	void EnableUndoRedoMenus();
 	
 	wxDECLARE_EVENT_TABLE();
 private:

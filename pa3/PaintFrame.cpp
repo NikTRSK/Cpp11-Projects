@@ -176,6 +176,7 @@ void PaintFrame::OnNew(wxCommandEvent& event)
 {
 	mModel->New();
 	mPanel->PaintNow();
+	EnableUndoRedoMenus();
 }
 
 void PaintFrame::OnExport(wxCommandEvent& event)
@@ -191,11 +192,19 @@ void PaintFrame::OnImport(wxCommandEvent& event)
 void PaintFrame::OnUndo(wxCommandEvent& event)
 {
 	// TODO
+	mModel->GetTopInUndo()->Undo(mModel);
+	mPanel->PaintNow();
+	// Check if we need to enable/disable menu
+	EnableUndoRedoMenus();
 }
 
 void PaintFrame::OnRedo(wxCommandEvent& event)
 {
 	// TODO
+	mModel->GetTopInRedo()->Redo(mModel);
+	mPanel->PaintNow();
+	// Check if we need to enable/disable menu
+	EnableUndoRedoMenus();
 }
 
 void PaintFrame::OnUnselect(wxCommandEvent& event)
@@ -211,16 +220,41 @@ void PaintFrame::OnDelete(wxCommandEvent& event)
 void PaintFrame::OnSetPenColor(wxCommandEvent& event)
 {
 	// TODO
+	wxColourData data;
+	data.SetColour(mModel->GetPen().GetColour());
+	wxColourDialog dialog(this, &data);
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		// Use dialog.GetColourData() to get the color and make stuff happen
+		// UNDO PEN?
+		mModel->CreateCommand(CM_SetPen, wxPoint(1, 1));
+		mModel->FinalizeCommand();
+		mModel->SetPenColor(dialog.GetColourData().GetColour()); // Yay API calls
+		mPanel->PaintNow(); // Don't forget to wipe
+	}
 }
 
 void PaintFrame::OnSetPenWidth(wxCommandEvent& event)
 {
 	// TODO
+
 }
 
 void PaintFrame::OnSetBrushColor(wxCommandEvent& event)
 {
 	// TODO
+	wxColourData data;
+	data.SetColour(mModel->GetBrush().GetColour());
+	wxColourDialog dialog(this, &data);
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		// Use dialog.GetColourData() to get the color and make stuff happen
+		// UNDO BRUSH?
+		mModel->CreateCommand(CM_SetBrush, wxPoint(1, 1));
+		mModel->FinalizeCommand();
+		mModel->SetPenColor(dialog.GetColourData().GetColour()); // Yay API calls
+		mPanel->PaintNow(); // Don't forget to wipe
+	}
 }
 
 void PaintFrame::OnMouseButton(wxMouseEvent& event)
@@ -230,6 +264,10 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 		// TODO: This is when the left mouse button is pressed
 		switch (mCurrentTool)
 		{
+		case ID_DrawLine:
+			mModel->CreateCommand(CM_DrawLine, event.GetPosition());
+			mPanel->PaintNow();
+			break;
 		case ID_DrawRect:
 			mModel->CreateCommand(CM_DrawRect, event.GetPosition());
 			mPanel->PaintNow();
@@ -238,9 +276,29 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 			mModel->CreateCommand(CM_DrawEllipse, event.GetPosition());
 			mPanel->PaintNow();
 			break;
+		case ID_DrawPencil:
+			mModel->CreateCommand(CM_DrawPencil, event.GetPosition());
+			mPanel->PaintNow();
+			break;
+		case ID_SetPenColor:
+			mModel->CreateCommand(CM_SetPen, event.GetPosition());
+			mPanel->PaintNow();
+			break;
+		case ID_SetPenWidth:
+			mModel->CreateCommand(CM_SetPen, event.GetPosition());
+			mPanel->PaintNow();
+			break;
+		case ID_SetBrushColor:
+			mModel->CreateCommand(CM_SetBrush, event.GetPosition());
+			mPanel->PaintNow();
+			break;
+		case ID_Selector:
+			// other stuff
+
 
 		default: break;
 		}
+		mModel->ClearRedo();
 	}
 	else if (event.LeftUp())
 	{
@@ -252,6 +310,8 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 			mPanel->PaintNow();
 		}
 	}
+	// Enable Redo/Undo menus if needed
+	EnableUndoRedoMenus();
 }
 
 void PaintFrame::OnMouseMove(wxMouseEvent& event)
@@ -279,6 +339,32 @@ void PaintFrame::SetCursor(CursorType type)
 	if (cursor != nullptr)
 	{
 		mPanel->SetCursor(*cursor);
+	}
+}
+
+void PaintFrame::EnableUndoRedoMenus()
+{
+	// Undo menu
+	if(mModel->CanUndo())
+	{
+		mEditMenu->Enable(wxID_UNDO, true);
+		mToolbar->EnableTool(wxID_UNDO, true);
+	}
+	else
+	{
+		mEditMenu->Enable(wxID_UNDO, false);
+		mToolbar->EnableTool(wxID_UNDO, false);
+	}
+	// Redo menu
+	if (mModel->CanRedo())
+	{
+		mEditMenu->Enable(wxID_REDO, true);
+		mToolbar->EnableTool(wxID_REDO, true);
+	}
+	else
+	{
+		mEditMenu->Enable(wxID_REDO, false);
+		mToolbar->EnableTool(wxID_REDO, false);
 	}
 }
 
