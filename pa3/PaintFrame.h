@@ -15,12 +15,12 @@ private:
 	void SetupMenu();
 	void SetupToolbar();
 	void SetupModelAndView();
-	
+
 	// Exit event (close program)
 	void OnExit(wxCommandEvent& event);
 	// File>New event
 	void OnNew(wxCommandEvent& event);
-	
+
 	// Export the drawing to an image
 	void OnExport(wxCommandEvent& event);
 	// Import an image into the drawing
@@ -41,7 +41,7 @@ private:
 	void OnSetPenWidth(wxCommandEvent& event);
 	// Colors>Brush Color
 	void OnSetBrushColor(wxCommandEvent& event);
-	
+
 	// Event when the mouse button is clicked
 	void OnMouseButton(wxMouseEvent& event);
 	// Event when the mouse moves (inside draw panel)
@@ -54,7 +54,7 @@ private:
 	void SetCursor(CursorType type);
 	// Enable/Disable the Redo/Undo menu options if possible
 	void EnableUndoRedoMenus();
-	
+
 	wxDECLARE_EVENT_TABLE();
 private:
 	CursorCache mCursors;
@@ -71,4 +71,7 @@ private:
 	class PaintDrawPanel* mPanel;
 
 	EventID mCurrentTool;
+
+	// Checks if we have selected the move option (cursor has arrow)
+	bool mMoveCursor;
 };

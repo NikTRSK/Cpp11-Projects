@@ -10,7 +10,7 @@ class PaintModel : public std::enable_shared_from_this<PaintModel>
 {
 public:
 	PaintModel();
-	
+
 	// Draws any shapes in the model to the provided DC (draw context)
 	void DrawShapes(wxDC& dc, bool showSelection = true);
 
@@ -42,8 +42,15 @@ public:
 	// Returns the removed command  and push is to the Redo stack
 	// Assumes that the stack is not empty
 	void Redo();
-	const std::shared_ptr<Command> & GetTopInUndo();
-	const std::shared_ptr<Command> & GetTopInRedo();
+	std::shared_ptr<Command> & GetTopInUndo();
+	std::shared_ptr<Command> & GetTopInRedo();
+
+	// Shape Stacks
+	void UndoShape();
+	void RedoShape();
+	std::stack<std::shared_ptr<Shape>> & GetTopInUndoShape();
+	std::stack<std::shared_ptr<Shape>> & GetTopInRedoShape();
+	void AddSelectedShapeToUndoStack();
 
 	std::shared_ptr<Command> & GetCurrentCommand();
 	// Clear stack
@@ -59,6 +66,12 @@ public:
 	void SetPenColor(const wxColour& color);
 	void SetBrushColor(const wxColour& color);
 
+	std::shared_ptr<Shape> & GetSelectedShape();
+	bool SelectShape(wxPoint point);
+
+	void Export(wxString fname, wxSize imageSize);
+	void Import(const wxString & fname);
+
 private:
 	// Vector of all the shapes in the model
 	std::vector<std::shared_ptr<Shape>> mShapes;
@@ -67,8 +80,22 @@ private:
 	// Undo/Redo Stacks
 	std::stack<std::shared_ptr<Command>> mUndo;
 	std::stack<std::shared_ptr<Command>> mRedo;
+	// Shape Stacks
+	std::stack<std::shared_ptr<Shape>> mUndoShape;
+	std::stack<std::shared_ptr<Shape>> mRedoShape;
+	// Pen/Brush Stacks
+	std::stack<wxPen> mUndoPen;
+	std::stack<wxPen> mRedoPen;
+	std::stack<wxBrush> mUndoBrush;
+	std::stack<wxBrush> mRedoBrush;
 
 	// Pen and Brush
 	wxPen mPen;
 	wxBrush mBrush;
+
+	// The shape currently selected by the selection tool
+	std::shared_ptr<Shape> mSelectedShape;
+
+	// Store the imported image
+	wxBitmap mImage;
 };

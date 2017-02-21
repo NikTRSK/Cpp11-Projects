@@ -12,5 +12,7 @@ LineShape::~LineShape()
 
 void LineShape::Draw(wxDC& dc) const
 {
-	dc.DrawLine(mStartPoint, mEndPoint);
+	dc.SetPen(GetPen());
+	dc.SetBrush(GetBrush());
+	dc.DrawLine(mStartPoint + mOffset, mEndPoint + mOffset);
 }

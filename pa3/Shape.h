@@ -20,12 +20,15 @@ public:
 	virtual ~Shape() { }
 
 	int GetPenWidth();
-	const wxPen & GetPen();
-	const wxBrush & GetBrush();
+	wxPen GetPen() const;
+	wxBrush GetBrush() const;
 
 	void SetPenWidth(const int & size);
 	void SetPenColor(const wxColour& color);
 	void SetBrushColor(const wxColour& color);
+	void DrawSelection(wxDC& dc);
+	const wxPoint & GetOffset();
+	void UpdateOffset(const wxPoint & newOffset);
 protected:
 	// Starting point of shape
 	wxPoint mStartPoint;
@@ -39,4 +42,7 @@ protected:
 	// Pen and Brush
 	wxPen mPen;
 	wxBrush mBrush;
+
+	// Offset required for MoveCommand
+	wxPoint mOffset;
 };

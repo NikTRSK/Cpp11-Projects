@@ -30,6 +30,7 @@ void DrawCommand::Undo(std::shared_ptr<PaintModel> model)
 //	{
 		model->GetShapes().pop_back();
 		model->Undo();
+		model->GetCurrentCommand().reset();
 //	}
 }
 

@@ -16,13 +16,23 @@ void PencilShape::Draw(wxDC& dc) const
 {
 	// DrawLines accepts 2 or more points so we need
 	// to handle the case of just having a dot.
-	if(mPoints.size() == 1)
+	dc.SetPen(GetPen());
+	dc.SetBrush(GetBrush());
+	if (mPoints.size() == 1)
 	{
-		dc.DrawPoint(*mPoints.begin());
+		dc.DrawPoint(mPoints.front());
 	}
 	else if (mPoints.size() > 1)
 	{
-		dc.DrawLines(mPoints.size(), &mPoints.front());
+		// check if you only need the first drawlines call
+		if (mOffset == wxPoint(0, 0))
+		{
+			dc.DrawLines(mPoints.size(), &mPoints.front());
+		}
+		else
+		{
+			dc.DrawLines(mPoints.size(), &mPoints.front(), mOffset.x, mOffset.y);
+		}
 	}
 }
 
@@ -44,9 +54,9 @@ void PencilShape::Finalize()
 		right = point->x;
 
 	/* left <=
-	 * right =>
-	 *
-	 */
+	* right =>
+	*
+	*/
 	for (point; point != mPoints.end(); ++point)
 	{
 		if (point->y < top)

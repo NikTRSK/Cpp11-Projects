@@ -17,5 +17,7 @@ public:
 	virtual void Redo(std::shared_ptr<PaintModel> model) override;
 
 	// do we need shape var here
+	std::stack <wxBrush> mUndoBrush;
+	std::stack <wxBrush> mRedoBrush;
 };
 

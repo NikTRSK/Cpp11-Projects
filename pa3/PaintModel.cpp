@@ -15,13 +15,35 @@ PaintModel::PaintModel()
 void PaintModel::DrawShapes(wxDC& dc, bool showSelection)
 {
 	// TODO
-	for (auto iter = mShapes.begin(); iter != mShapes.end(); ++iter)
+	// Draw an imported image
+	if (mImage.IsOk())
 	{
-//		iter.d
-		(*iter)->Draw((dc));
+		dc.DrawBitmap(mImage, 0, 0);
+	}
+	// Redraw all shapes
+	// If none of the shapes are selected reset the selection
+	bool resetSelected = true;
+	for (auto shape = mShapes.begin(); shape != mShapes.end(); ++shape)
+	{
+		(*shape)->Draw((dc));
+		if (mSelectedShape == *shape)
+		{
+			resetSelected = false;
+
+			// Show the selection around the shape
+			if (showSelection)
+			{
+				mSelectedShape->DrawSelection(dc);
+			}
+		}
 		// TODO: call draw on each shape. (once draw is implemented)
 	}
-	
+	// Reset selection if needed
+	if (resetSelected && showSelection)
+	{
+		mSelectedShape.reset();
+	}
+
 }
 
 // Clear the current paint model and start fresh
@@ -35,8 +57,13 @@ void PaintModel::New()
 	ClearRedo();
 	ClearUndo();
 
+	// Clear Pen/Brush Stacks
+
 	mPen = *wxBLACK_PEN;
 	mBrush = *wxWHITE_BRUSH;
+
+	mSelectedShape.reset();
+	mImage = wxBitmap();
 }
 
 // Add a shape to the paint model
@@ -108,14 +135,43 @@ void PaintModel::Redo()
 	mRedo.pop();
 }
 
-const std::shared_ptr<Command>& PaintModel::GetTopInUndo()
+std::shared_ptr<Command>& PaintModel::GetTopInUndo()
 {
 	return mUndo.top();
 }
 
-const std::shared_ptr<Command>& PaintModel::GetTopInRedo()
+std::shared_ptr<Command>& PaintModel::GetTopInRedo()
 {
 	return mRedo.top();
+}
+
+void PaintModel::UndoShape()
+{
+	AddShape(mUndoShape.top());
+	mUndoShape.push(mRedoShape.top());
+	mRedoShape.pop();
+}
+
+void PaintModel::RedoShape()
+{
+	RemoveShape(mRedoShape.top());
+	mUndoShape.push(mRedoShape.top());
+	mRedoShape.pop();
+}
+
+std::stack<std::shared_ptr<Shape>>& PaintModel::GetTopInUndoShape()
+{
+	return mUndoShape;
+}
+
+std::stack<std::shared_ptr<Shape>>& PaintModel::GetTopInRedoShape()
+{
+	return mRedoShape;
+}
+
+void PaintModel::AddSelectedShapeToUndoStack()
+{
+	mUndoShape.push(GetSelectedShape());
 }
 
 std::shared_ptr<Command> & PaintModel::GetCurrentCommand()
@@ -126,7 +182,7 @@ std::shared_ptr<Command> & PaintModel::GetCurrentCommand()
 void PaintModel::ClearRedo()
 {
 	// Because C++ is stupid
-	while(!mRedo.empty())
+	while (!mRedo.empty())
 	{
 		mRedo.pop();
 	}
@@ -174,4 +230,79 @@ void PaintModel::SetPenColor(const wxColour& color)
 void PaintModel::SetBrushColor(const wxColour& color)
 {
 	mBrush.SetColour(color);
+}
+
+std::shared_ptr<Shape>& PaintModel::GetSelectedShape()
+{
+	return mSelectedShape;
+}
+
+bool PaintModel::SelectShape(wxPoint point)
+{
+	for (auto shape = mShapes.rbegin(); shape != mShapes.rend(); ++shape)
+	{
+		if ((*shape)->Intersects(point))
+		{
+			mSelectedShape = *shape;
+			return true;
+		}
+		mSelectedShape.reset();
+	}
+	return false;
+}
+
+void PaintModel::Export(wxString fname, wxSize imageSize)
+{
+	wxString fileExtension = fname.substr(fname.find_last_of("."));
+
+	wxBitmapType imageType;
+
+	if (fileExtension == ".png")
+	{
+		imageType = wxBITMAP_TYPE_PNG;
+	}
+	else if (fileExtension == ".bmp")
+	{
+		imageType = wxBITMAP_TYPE_BMP;
+	}
+	else if (fileExtension == ".jpeg" || fileExtension == ".jpg")
+	{
+		imageType = wxBITMAP_TYPE_JPEG;
+	}
+
+	wxBitmap image;
+	// Create the bitmap of the specified wxSize
+	image.Create(imageSize);
+	// Create a memory DC to draw to the bitmap
+	wxMemoryDC dc(image);
+	// Clear the background color
+	dc.SetBackground(*wxWHITE_BRUSH);
+	dc.Clear();
+	// Draw all the shapes (make sure not the selection!)
+	DrawShapes(dc, false);
+	// Write the bitmap with the specified file name and wxBitmapType
+	image.SaveFile(fname, imageType);
+}
+
+void PaintModel::Import(const wxString& fname)
+{
+	New();
+	wxString fileExtension = fname.substr(fname.find_last_of("."));
+
+	wxBitmapType imageType;
+
+	if (fileExtension == ".png")
+	{
+		imageType = wxBITMAP_TYPE_PNG;
+	}
+	else if (fileExtension == ".bmp")
+	{
+		imageType = wxBITMAP_TYPE_BMP;
+	}
+	else if (fileExtension == ".jpeg" || fileExtension == ".jpg")
+	{
+		imageType = wxBITMAP_TYPE_JPEG;
+	}
+
+	mImage.LoadFile(fname, imageType);
 }

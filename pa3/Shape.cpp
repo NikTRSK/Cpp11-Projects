@@ -2,9 +2,9 @@
 
 Shape::Shape(const wxPoint& start)
 	:mStartPoint(start)
-	,mEndPoint(start)
-	,mTopLeft(start)
-	,mBotRight(start)
+	, mEndPoint(start)
+	, mTopLeft(start)
+	, mBotRight(start)
 {
 	// Init Pen & Brush
 	mPen = *wxBLACK_PEN;
@@ -50,8 +50,8 @@ void Shape::Finalize()
 
 void Shape::GetBounds(wxPoint& topLeft, wxPoint& botRight) const
 {
-	topLeft = mTopLeft;
-	botRight = mBotRight;
+	topLeft = mTopLeft + mOffset;
+	botRight = mBotRight + mOffset;
 }
 
 int Shape::GetPenWidth()
@@ -59,12 +59,12 @@ int Shape::GetPenWidth()
 	return mPen.GetWidth();
 }
 
-const wxPen& Shape::GetPen()
+wxPen Shape::GetPen() const
 {
 	return mPen;
 }
 
-const wxBrush& Shape::GetBrush()
+wxBrush Shape::GetBrush() const
 {
 	return mBrush;
 }
@@ -83,4 +83,30 @@ void Shape::SetPenColor(const wxColour& color)
 void Shape::SetBrushColor(const wxColour& color)
 {
 	mBrush.SetColour(color);
+}
+
+void Shape::DrawSelection(wxDC& dc)
+{
+	// Create a transparent outline
+	dc.SetPen(*wxBLACK_DASHED_PEN);
+	dc.SetBrush(*wxTRANSPARENT_BRUSH);
+
+	// Get the selection bounds
+	wxPoint x;
+	wxPoint y;
+	GetBounds(x, y);
+
+	// The 5, 5 are so the selection is around the shape
+	dc.DrawRectangle(wxRect(x - wxPoint(5, 5), y + wxPoint(5, 5)));
+}
+
+const wxPoint& Shape::GetOffset()
+{
+	return mOffset;
+}
+
+void Shape::UpdateOffset(const wxPoint& newOffset)
+{
+	mOffset.x = newOffset.x - mStartPoint.x;
+	mOffset.y = newOffset.y - mStartPoint.y;
 }

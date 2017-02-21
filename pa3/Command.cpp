@@ -8,6 +8,8 @@
 #include "DrawCommand.h"
 #include "SetPenCommand.h"
 #include "SetBrushCommand.h"
+#include "MoveCommand.h"
+#include "DeleteCommand.h"
 
 Command::Command(const wxPoint& start, std::shared_ptr<Shape> shape)
 	:mStartPoint(start)
@@ -62,9 +64,14 @@ std::shared_ptr<Command> CommandFactory::Create(std::shared_ptr<PaintModel> mode
 			break;
 
 		case CM_Move:
-		break;
+			shape = model->GetSelectedShape();
+			retVal = std::make_shared<MoveCommand>(start, shape);
+			break;
 
-		case CM_Delete: break;
+		case CM_Delete:
+			// ?? do we the current shape?
+			retVal = std::make_shared<DeleteCommand>(start, shape);
+			break;
 
 		case CM_SetPen:
 			retVal = std::make_shared<SetPenCommand>(start, shape);
