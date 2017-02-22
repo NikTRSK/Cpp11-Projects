@@ -24,15 +24,16 @@ void PencilShape::Draw(wxDC& dc) const
 	}
 	else if (mPoints.size() > 1)
 	{
+		dc.DrawLines(mPoints.size(), &mPoints.front(), mOffset.x, mOffset.y);
 		// check if you only need the first drawlines call
-		if (mOffset == wxPoint(0, 0))
-		{
-			dc.DrawLines(mPoints.size(), &mPoints.front());
-		}
-		else
-		{
-			dc.DrawLines(mPoints.size(), &mPoints.front(), mOffset.x, mOffset.y);
-		}
+//		if (mOffset == wxPoint(0, 0))
+//		{
+//			dc.DrawLines(mPoints.size(), &mPoints.front());
+//		}
+//		else
+//		{
+//			dc.DrawLines(mPoints.size(), &mPoints.front(), mOffset.x, mOffset.y);
+//		}
 	}
 }
 
@@ -57,29 +58,29 @@ void PencilShape::Finalize()
 	* right =>
 	*
 	*/
-	for (point; point != mPoints.end(); ++point)
+	for (auto const & point : mPoints)
 	{
-		if (point->y < top)
+		if (point.y < top)
 		{
-			top = point->y;
+			top = point.y;
 		}
-		if (point->y > bottom)
+		if (point.y > bottom)
 		{
-			bottom = point->y;
+			bottom = point.y;
 		}
-		if (point->y < left)
+		if (point.x < left)
 		{
-			left = point->y;
+			left = point.x;
 		}
-		if (point->x > right)
+		if (point.x > right)
 		{
-			right = point->x;
+			right = point.x;
 		}
-
-		mTopLeft.x = left;
-		mTopLeft.y = top;
-		mBotRight.x = right;
-		mBotRight.y = bottom;
 	}
 
+	// Store the correct values for the bounds
+	mTopLeft.x = left;
+	mTopLeft.y = top;
+	mBotRight.x = right;
+	mBotRight.y = bottom;
 }

@@ -46,3 +46,17 @@ void SetBrushCommand::Redo(std::shared_ptr<PaintModel> model)
 	mRedoBrush.pop();
 	model->Redo();
 }
+
+void SetBrushCommand::ClearStacks()
+{
+	// Because C++ is stupid
+	while (!mUndoBrush.empty())
+	{
+		mUndoBrush.pop();
+	}
+	// Because C++ is stupid
+	while (!mRedoBrush.empty())
+	{
+		mRedoBrush.pop();
+	}
+}

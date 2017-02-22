@@ -6,7 +6,6 @@ RectShape::RectShape(const wxPoint& start) : Shape(start)
 {
 }
 
-
 RectShape::~RectShape()
 {
 }

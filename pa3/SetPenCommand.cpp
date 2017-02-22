@@ -49,3 +49,17 @@ void SetPenCommand::Redo(std::shared_ptr<PaintModel> model)
 	mRedoPen.pop();
 	model->Redo();
 }
+
+void SetPenCommand::ClearStacks()
+{
+	// Because C++ is stupid
+	while (!mUndoPen.empty())
+	{
+		mUndoPen.pop();
+	}
+	// Because C++ is stupid
+	while (!mRedoPen.empty())
+	{
+		mRedoPen.pop();
+	}
+}

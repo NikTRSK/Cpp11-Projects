@@ -14,6 +14,8 @@ public:
 	virtual void Undo(std::shared_ptr<PaintModel> model) override;
 	// Used to "redo" the command
 	virtual void Redo(std::shared_ptr<PaintModel> model) override;
+	// Clear the stacks
+	void ClearStacks();
 
 	// do we need shape var here
 	std::stack <wxPen> mUndoPen;

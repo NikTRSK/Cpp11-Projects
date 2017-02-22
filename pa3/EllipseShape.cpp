@@ -12,5 +12,13 @@ EllipseShape::~EllipseShape()
 
 void EllipseShape::Draw(wxDC & dc) const
 {
-	dc.DrawEllipse(wxRect(this->mTopLeft, this->mBotRight));
+	dc.SetPen(GetPen());
+	dc.SetBrush(GetBrush());
+
+	// Get the Ellipse bounds
+	wxPoint x;
+	wxPoint y;
+	GetBounds(x, y);
+
+	dc.DrawEllipse(wxRect(x, y));
 }

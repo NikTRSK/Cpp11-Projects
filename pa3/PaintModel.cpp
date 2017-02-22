@@ -23,10 +23,10 @@ void PaintModel::DrawShapes(wxDC& dc, bool showSelection)
 	// Redraw all shapes
 	// If none of the shapes are selected reset the selection
 	bool resetSelected = true;
-	for (auto shape = mShapes.begin(); shape != mShapes.end(); ++shape)
+	for (auto const &shape : mShapes)
 	{
-		(*shape)->Draw((dc));
-		if (mSelectedShape == *shape)
+		shape->Draw((dc));
+		if (mSelectedShape == shape)
 		{
 			resetSelected = false;
 
@@ -58,6 +58,8 @@ void PaintModel::New()
 	ClearUndo();
 
 	// Clear Pen/Brush Stacks
+//	mPen->ClearStacks();
+//	mBrush->ClearStacks();
 
 	mPen = *wxBLACK_PEN;
 	mBrush = *wxWHITE_BRUSH;
@@ -78,10 +80,10 @@ void PaintModel::AddShape(std::shared_ptr<Shape> shape)
 // Remove a shape from the paint model
 void PaintModel::RemoveShape(std::shared_ptr<Shape> shape)
 {
-	auto iter = std::find(mShapes.begin(), mShapes.end(), shape);
-	if (iter != mShapes.end())
+	auto foundShape = std::find(mShapes.begin(), mShapes.end(), shape);
+	if (foundShape != mShapes.end())
 	{
-		mShapes.erase(iter);
+		mShapes.erase(foundShape);
 	}
 }
 
@@ -219,16 +221,31 @@ const wxBrush& PaintModel::GetBrush()
 
 void PaintModel::SetPenWidth(const int& size)
 {
+	// If shape selected update it with new width
+	if (mSelectedShape)
+	{
+		mSelectedShape->SetPenWidth(size);
+	}
 	mPen.SetWidth(size);
 }
 
 void PaintModel::SetPenColor(const wxColour& color)
 {
+	// If shape selected update it with new color
+	if (mSelectedShape)
+	{
+		mSelectedShape->SetPenColor(color);
+	}
 	mPen.SetColour(color);
 }
 
 void PaintModel::SetBrushColor(const wxColour& color)
 {
+	// If shape selected update it with new color
+	if (mSelectedShape)
+	{
+		mSelectedShape->SetBrushColor(color);
+	}
 	mBrush.SetColour(color);
 }
 
@@ -239,11 +256,11 @@ std::shared_ptr<Shape>& PaintModel::GetSelectedShape()
 
 bool PaintModel::SelectShape(wxPoint point)
 {
-	for (auto shape = mShapes.rbegin(); shape != mShapes.rend(); ++shape)
+	for (auto const &shape: mShapes)
 	{
-		if ((*shape)->Intersects(point))
+		if (shape->Intersects(point))
 		{
-			mSelectedShape = *shape;
+			mSelectedShape = shape;
 			return true;
 		}
 		mSelectedShape.reset();

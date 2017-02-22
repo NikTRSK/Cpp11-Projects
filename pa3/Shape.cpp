@@ -97,7 +97,7 @@ void Shape::DrawSelection(wxDC& dc)
 	GetBounds(x, y);
 
 	// The 5, 5 are so the selection is around the shape
-	dc.DrawRectangle(wxRect(x - wxPoint(5, 5), y + wxPoint(5, 5)));
+	dc.DrawRectangle(wxRect(x - wxPoint(3, 3), y + wxPoint(3, 3)));
 }
 
 const wxPoint& Shape::GetOffset()
