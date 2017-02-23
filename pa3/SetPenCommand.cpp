@@ -18,15 +18,13 @@ void SetPenCommand::Update(const wxPoint& newPoint)
 
 void SetPenCommand::Finalize(std::shared_ptr<PaintModel> model)
 {
-//	model->AddCurrentPenToPenUndoStack();
-	// Pen is added to the PenUndoStack in PaintModel before the command is created
+	mOldPen = model->GetPen();
 	model->AddCurrentCommandToUndoStack();
 	model->GetCurrentCommand().reset();
 
-	// If a shape is selected add change the color and save teh old color
+	// If a shape is selected add change the color and save the old color
 	if (model->GetSelectedShape())
 	{
-//		model->GetSelectedShape()->AddToUndoPenStack(); //model->GetPen()
 		mShape = model->GetSelectedShape();
 		mShape->SetPenColor(model->GetPen().GetColour());
 		mShape->SetPenWidth(model->GetPenWidth());
@@ -36,15 +34,24 @@ void SetPenCommand::Finalize(std::shared_ptr<PaintModel> model)
 void SetPenCommand::Undo(std::shared_ptr<PaintModel> model)
 {
 	model->Undo();
-	mShape->SetPenColor(model->GetTopInPenUndo().GetColour());
-	mShape->SetPenWidth(model->GetTopInPenUndo().GetWidth());
-	model->UndoPen();
+	if (mShape)
+	{
+		mShape->SetPenColor(mOldPen.GetColour());
+		mShape->SetPenWidth(mOldPen.GetWidth());
+	}
+	mCurrPen = model->GetPen();
+	model->SetPenColor(mOldPen.GetColour());
+	model->SetPenWidth(mOldPen.GetWidth());
 }
 
 void SetPenCommand::Redo(std::shared_ptr<PaintModel> model)
 {
 	model->Redo();
-	mShape->SetPenColor(model->GetTopInPenRedo().GetColour());
-	mShape->SetPenWidth(model->GetTopInPenRedo().GetWidth());
-	model->RedoPen();
+	if (mShape)
+	{
+		mShape->SetPenColor(mCurrPen.GetColour());
+		mShape->SetPenWidth(mCurrPen.GetWidth());
+	}
+	model->SetPenColor(mCurrPen.GetColour());
+	model->SetPenWidth(mCurrPen.GetWidth());
 }

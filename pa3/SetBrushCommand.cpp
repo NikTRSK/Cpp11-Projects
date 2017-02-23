@@ -1,12 +1,9 @@
 #include "SetBrushCommand.h"
 
-
-
 SetBrushCommand::SetBrushCommand(const wxPoint& start, std::shared_ptr<Shape> shape)
 	: Command(start, shape)
 {
 }
-
 
 SetBrushCommand::~SetBrushCommand()
 {
@@ -18,14 +15,13 @@ void SetBrushCommand::Update(const wxPoint& newPoint)
 
 void SetBrushCommand::Finalize(std::shared_ptr<PaintModel> model)
 {
-//	model->AddCurrentBrushToBrushUndoStack();
-	// Brush is added to the BrushUndoStack in PaintModel before the command is created
+	mOldBrush = model->GetBrush();
 	model->AddCurrentCommandToUndoStack();
 	model->GetCurrentCommand().reset();
 
+	// If the shape is selected paint it
 	if (model->GetSelectedShape())
 	{
-		// add to undo for brush
 		mShape = model->GetSelectedShape();
 		mShape->SetBrushColor(model->GetBrush().GetColour());
 	}
@@ -34,27 +30,22 @@ void SetBrushCommand::Finalize(std::shared_ptr<PaintModel> model)
 void SetBrushCommand::Undo(std::shared_ptr<PaintModel> model)
 {
 	model->Undo();
-	mShape->SetBrushColor(model->GetTopInBrushUndo().GetColour());
-	model->UndoBrush();
+	// Only Paint a shape if there is one.
+	// Makes sure we can also undo colors without objects.
+	if (mShape)
+	{
+		mShape->SetBrushColor(mOldBrush.GetColour());
+	}
+	mCurrBrush = model->GetBrush();
+	model->SetBrushColor(mOldBrush.GetColour());
 }
 
 void SetBrushCommand::Redo(std::shared_ptr<PaintModel> model)
 {
 	model->Redo();
-	mShape->SetBrushColor(model->GetTopInBrushRedo().GetColour());
-	model->RedoBrush();
+	if (mShape)
+	{
+		mShape->SetBrushColor(mCurrBrush.GetColour());
+	}
+	model->SetBrushColor(mCurrBrush.GetColour());
 }
-
-//void SetBrushCommand::ClearStacks()
-//{
-//	// Because C++ is stupid
-//	while (!mUndoBrush.empty())
-//	{
-//		mUndoBrush.pop();
-//	}
-//	// Because C++ is stupid
-//	while (!mRedoBrush.empty())
-//	{
-//		mRedoBrush.pop();
-//	}
-//}

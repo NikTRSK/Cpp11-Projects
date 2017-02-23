@@ -6,7 +6,6 @@ DrawCommand::DrawCommand(const wxPoint& start, std::shared_ptr<Shape> shape)
 
 }
 
-
 DrawCommand::~DrawCommand()
 {
 }
@@ -21,7 +20,7 @@ void DrawCommand::Finalize(std::shared_ptr<PaintModel> model)
 {
 	mShape->Finalize();
 	model->AddCurrentCommandToUndoStack();
-	model->GetCurrentCommand().reset(); // do i need this
+	model->GetCurrentCommand().reset();
 }
 
 void DrawCommand::Undo(std::shared_ptr<PaintModel> model)

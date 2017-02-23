@@ -15,11 +15,10 @@ public:
 	virtual void Undo(std::shared_ptr<PaintModel> model) override;
 	// Used to "redo" the command
 	virtual void Redo(std::shared_ptr<PaintModel> model) override;
-	// Clear the stacks
-//	void ClearStacks();
-
-//	// do we need shape var here
-//	std::stack <wxBrush> mUndoBrush;
-//	std::stack <wxBrush> mRedoBrush;
+	
+private:
+	// For Undo/Redo of Brushes
+	wxBrush mCurrBrush;
+	wxBrush mOldBrush;
 };
 

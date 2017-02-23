@@ -15,7 +15,5 @@ public:
 	void Undo(std::shared_ptr<PaintModel> model) override;
 	// Used to "redo" the command
 	void Redo(std::shared_ptr<PaintModel> model) override;
-
-	// do we need a shape var here
 };
 

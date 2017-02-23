@@ -14,7 +14,6 @@ PaintModel::PaintModel()
 // Draws any shapes in the model to the provided DC (draw context)
 void PaintModel::DrawShapes(wxDC& dc, bool showSelection)
 {
-	// TODO
 	// Draw an imported image
 	if (mImage.IsOk())
 	{
@@ -23,7 +22,7 @@ void PaintModel::DrawShapes(wxDC& dc, bool showSelection)
 	// Redraw all shapes
 	// If none of the shapes are selected reset the selection
 	bool resetSelected = true;
-	for (auto const &shape : mShapes)
+	for (const auto & shape : mShapes)
 	{
 		shape->Draw(dc);
 		if (mSelectedShape == shape)
@@ -36,7 +35,6 @@ void PaintModel::DrawShapes(wxDC& dc, bool showSelection)
 				mSelectedShape->DrawSelection(dc);
 			}
 		}
-		// TODO: call draw on each shape. (once draw is implemented)
 	}
 	// Reset selection if needed
 	if (resetSelected && showSelection)
@@ -49,17 +47,12 @@ void PaintModel::DrawShapes(wxDC& dc, bool showSelection)
 // Clear the current paint model and start fresh
 void PaintModel::New()
 {
-	// TODO
 	// Clear all the data
 	mShapes.clear();
 	mCurrentActiveCommand.reset();
 
 	ClearRedo();
 	ClearUndo();
-
-	// Clear Pen/Brush Stacks
-	ClearBrushStacks();
-	ClearPenStacks();
 
 	mPen = *wxBLACK_PEN;
 	mBrush = *wxWHITE_BRUSH;
@@ -105,7 +98,6 @@ void PaintModel::UpdateCommand(const wxPoint& newPoint)
 
 void PaintModel::FinalizeCommand()
 {
-	// TODO: not sure if this is what I'm supposed to be doing
 	mCurrentActiveCommand->Finalize(shared_from_this());
 	mCurrentActiveCommand.reset();
 }
@@ -145,101 +137,6 @@ std::shared_ptr<Command>& PaintModel::GetTopInUndo()
 std::shared_ptr<Command>& PaintModel::GetTopInRedo()
 {
 	return mRedo.top();
-}
-
-void PaintModel::UndoBrush()
-{
-	mRedoBrush.push(GetBrush());
-	SetBrushColor(mUndoBrush.top().GetColour());
-	wxString wtf = mUndoBrush.top().GetColour().GetAsString();
-//	mRedoBrush.push(mUndoBrush.top());
-	mUndoBrush.pop();
-}
-
-void PaintModel::RedoBrush()
-{
-	mUndoBrush.push(GetBrush());
-	// Try doing it with GetShape on Command
-	SetBrushColor(mRedoBrush.top().GetColour());
-	wxString wtf = mRedoBrush.top().GetColour().GetAsString();
-//	mUndoBrush.push(mRedoBrush.top());
-	mRedoBrush.pop();
-}
-
-void PaintModel::ClearBrushStacks()
-{
-	// Because C++ is stupid
-	while (!mUndoBrush.empty())
-	{
-		mUndoBrush.pop();
-	}
-	// Because C++ is stupid
-	while (!mRedoBrush.empty())
-	{
-		mRedoBrush.pop();
-	}
-}
-
-void PaintModel::AddCurrentBrushToBrushUndoStack()
-{
-	mUndoBrush.push(GetBrush());
-	wxString wtf = mUndoBrush.top().GetColour().GetAsString();
-}
-
-wxBrush & PaintModel::GetTopInBrushUndo()
-{
-	return mUndoBrush.top();
-}
-
-wxBrush & PaintModel::GetTopInBrushRedo()
-{
-	return mRedoBrush.top();
-}
-
-void PaintModel::AddCurrentPenToPenUndoStack()
-{
-	mUndoPen.push(GetPen());
-}
-
-wxPen& PaintModel::GetTopInPenUndo()
-{
-	return mUndoPen.top();
-}
-
-void PaintModel::UndoPen()
-{
-	mRedoPen.push(GetPen());
-	SetPenColor(mUndoPen.top().GetColour());
-	SetPenWidth(mUndoPen.top().GetWidth());
-//	mRedoPen.push(mUndoPen.top());
-	mUndoPen.pop();
-}
-
-void PaintModel::RedoPen()
-{
-	SetPenColor(mRedoPen.top().GetColour());
-	SetPenWidth(mRedoPen.top().GetWidth());
-	mUndoPen.push(mRedoPen.top());
-	mRedoPen.pop();
-}
-
-void PaintModel::ClearPenStacks()
-{
-	// Because C++ is stupid
-	while (!mUndoPen.empty())
-	{
-		mUndoPen.pop();
-	}
-	// Because C++ is stupid
-	while (!mRedoPen.empty())
-	{
-		mRedoPen.pop();
-	}
-}
-
-wxPen& PaintModel::GetTopInPenRedo()
-{
-	return mRedoPen.top();
 }
 
 std::shared_ptr<Command> & PaintModel::GetCurrentCommand()
@@ -322,7 +219,7 @@ std::shared_ptr<Shape>& PaintModel::GetSelectedShape()
 
 bool PaintModel::SelectShape(wxPoint point)
 {
-	for (auto const &shape: mShapes)
+	for (const auto & shape: mShapes)
 	{
 		if (shape->Intersects(point))
 		{

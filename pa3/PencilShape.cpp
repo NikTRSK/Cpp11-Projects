@@ -1,12 +1,9 @@
 #include "PencilShape.h"
 
-
-/* TODO: Right now draws lines only. */
 PencilShape::PencilShape(const wxPoint & start) : Shape(start)
 {
 	mPoints.push_back(start);
 }
-
 
 PencilShape::~PencilShape()
 {
@@ -25,15 +22,6 @@ void PencilShape::Draw(wxDC& dc) const
 	else if (mPoints.size() > 1)
 	{
 		dc.DrawLines(mPoints.size(), &mPoints.front(), mOffset.x, mOffset.y);
-		// check if you only need the first drawlines call
-//		if (mOffset == wxPoint(0, 0))
-//		{
-//			dc.DrawLines(mPoints.size(), &mPoints.front());
-//		}
-//		else
-//		{
-//			dc.DrawLines(mPoints.size(), &mPoints.front(), mOffset.x, mOffset.y);
-//		}
 	}
 }
 
@@ -58,7 +46,7 @@ void PencilShape::Finalize()
 	* right =>
 	*
 	*/
-	for (auto const & point : mPoints)
+	for (const auto & point : mPoints)
 	{
 		if (point.y < top)
 		{

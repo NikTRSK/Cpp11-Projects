@@ -22,7 +22,6 @@ public:
 	// Remove a shape from the paint model
 	void RemoveShape(std::shared_ptr<Shape> shape);
 
-	//USER DEFINED//
 	// Returns true if there’s currently an active command
 	bool HasActiveCommand();
 	// Creates a command of a specific type
@@ -45,20 +44,6 @@ public:
 	std::shared_ptr<Command> & GetTopInUndo();
 	std::shared_ptr<Command> & GetTopInRedo();
 
-	// Brush/Pen stacks. Can't have them in their commands :(((
-	void UndoBrush();
-	void RedoBrush();
-	void ClearBrushStacks();
-	void AddCurrentBrushToBrushUndoStack();
-	wxBrush & GetTopInBrushUndo();
-	wxBrush & GetTopInBrushRedo();
-
-	void UndoPen();
-	void RedoPen();
-	void ClearPenStacks();
-	void AddCurrentPenToPenUndoStack();
-	wxPen & GetTopInPenUndo();
-	wxPen & GetTopInPenRedo();
 
 	std::shared_ptr<Command> & GetCurrentCommand();
 	// Clear stack
@@ -88,14 +73,6 @@ private:
 	// Undo/Redo Stacks
 	std::stack<std::shared_ptr<Command>> mUndo;
 	std::stack<std::shared_ptr<Command>> mRedo;
-	// Shape Stacks
-//	std::stack<std::shared_ptr<Shape>> mUndoShape;
-//	std::stack<std::shared_ptr<Shape>> mRedoShape;
-	// Pen/Brush Stacks
-	std::stack<wxPen> mUndoPen;
-	std::stack<wxPen> mRedoPen;
-	std::stack<wxBrush> mUndoBrush;
-	std::stack<wxBrush> mRedoBrush;
 
 	// Pen and Brush
 	wxPen mPen;

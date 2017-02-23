@@ -34,9 +34,9 @@ std::shared_ptr<Command> CommandFactory::Create(std::shared_ptr<PaintModel> mode
 	CommandType type, const wxPoint& start)
 {
 	std::shared_ptr<Command> retVal;
-	std::shared_ptr<Shape> shape; // TODO: Should we use mShape instead
+	std::shared_ptr<Shape> shape = nullptr;
 	
-	// TODO: Actually create a command based on the type passed in
+	// Create a command based on the type passed in
 	switch (type)
 	{
 		case CM_DrawLine:
@@ -69,7 +69,6 @@ std::shared_ptr<Command> CommandFactory::Create(std::shared_ptr<PaintModel> mode
 			break;
 
 		case CM_Delete:
-			// ?? do we the current shape?
 			retVal = std::make_shared<DeleteCommand>(start, shape);
 			break;
 

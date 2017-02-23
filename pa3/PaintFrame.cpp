@@ -183,7 +183,6 @@ void PaintFrame::OnNew(wxCommandEvent& event)
 
 void PaintFrame::OnExport(wxCommandEvent& event)
 {
-	// TODO
 	wxFileDialog
 		saveFileDialog(this, _("Save image as"), "", "",
 			"PNG files (*.png)|*.png|JPEG files (*.jpeg)|*.jpeg|JPG files (*.jpg)|*.jpg|BMP files (*.bmp)|*.bmp",
@@ -197,7 +196,6 @@ void PaintFrame::OnExport(wxCommandEvent& event)
 
 void PaintFrame::OnImport(wxCommandEvent& event)
 {
-	// TODO
 	wxFileDialog
 		openFileDialog(this, _("Open an image file"), "", "",
 			"PNG files (*.png)|*.png|JPEG files (*.jpeg)|*.jpeg|JPG files (*.jpg)|*.jpg|BMP files (*.bmp)|*.bmp",
@@ -210,7 +208,6 @@ void PaintFrame::OnImport(wxCommandEvent& event)
 
 void PaintFrame::OnUndo(wxCommandEvent& event)
 {
-	// TODO
 	mModel->GetTopInUndo()->Undo(mModel);
 	mPanel->PaintNow();
 	// Check if we need to enable/disable menu
@@ -219,7 +216,6 @@ void PaintFrame::OnUndo(wxCommandEvent& event)
 
 void PaintFrame::OnRedo(wxCommandEvent& event)
 {
-	// TODO
 	mModel->GetTopInRedo()->Redo(mModel);
 	mPanel->PaintNow();
 	// Check if we need to enable/disable menu
@@ -228,33 +224,30 @@ void PaintFrame::OnRedo(wxCommandEvent& event)
 
 void PaintFrame::OnUnselect(wxCommandEvent& event)
 {
-	// TODO
 	mModel->GetSelectedShape().reset();
+	mEditMenu->Enable(ID_Delete, false);
 	mEditMenu->Enable(ID_Unselect, false);
 	mPanel->PaintNow();
 }
 
 void PaintFrame::OnDelete(wxCommandEvent& event)
 {
-	// TODO
 	mModel->CreateCommand(CM_Delete, wxPoint(1, 1));
 	mModel->FinalizeCommand();
 	mEditMenu->Enable(ID_Delete, false);
+	mEditMenu->Enable(ID_Unselect, false);
 	SetCursor(CU_Default);
 	mPanel->PaintNow();
 }
 
 void PaintFrame::OnSetPenColor(wxCommandEvent& event)
 {
-	// TODO
 	wxColourData data;
 	data.SetColour(mModel->GetPen().GetColour());
 	wxColourDialog dialog(this, &data);
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		// Use dialog.GetColourData() to get the color and make stuff happen
-		// UNDO PEN?
-		mModel->AddCurrentPenToPenUndoStack();
 		mModel->CreateCommand(CM_SetPen, wxPoint(1, 1));
 		mModel->FinalizeCommand();
 		mModel->SetPenColor(dialog.GetColourData().GetColour()); // Yay API calls
@@ -265,11 +258,11 @@ void PaintFrame::OnSetPenColor(wxCommandEvent& event)
 
 void PaintFrame::OnSetPenWidth(wxCommandEvent& event)
 {
-	// TODO
 	wxTextEntryDialog dialog(this, "Enter font size (1-10): ");
-	wxTextValidator tv(wxFILTER_INCLUDE_LIST);
+	wxTextValidator textValidator(wxFILTER_INCLUDE_LIST);
 	wxArrayString input;
 
+	// Why you no initializer list wx, why?
 	for (int i = 1; i < 11; i++)
 	{
 		wxString inString;
@@ -277,14 +270,12 @@ void PaintFrame::OnSetPenWidth(wxCommandEvent& event)
 		input.Add(inString);
 	}
 
-	tv.SetIncludes(input);
-	dialog.SetTextValidator(tv);
+	textValidator.SetIncludes(input);
+	dialog.SetTextValidator(textValidator);
 
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		// Use dialog.GetColourData() to get the color and make stuff happen
-		// UNDO PEN?
-		mModel->AddCurrentPenToPenUndoStack();
 		mModel->CreateCommand(CM_SetPen, wxPoint(1, 1));
 		mModel->FinalizeCommand();
 		mModel->SetPenWidth(wxAtoi(dialog.GetValue()));
@@ -295,15 +286,12 @@ void PaintFrame::OnSetPenWidth(wxCommandEvent& event)
 
 void PaintFrame::OnSetBrushColor(wxCommandEvent& event)
 {
-	// TODO
 	wxColourData data;
 	data.SetColour(mModel->GetBrush().GetColour());
 	wxColourDialog dialog(this, &data);
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		// Use dialog.GetColourData() to get the color and make stuff happen
-		// UNDO BRUSH?
-		mModel->AddCurrentBrushToBrushUndoStack();
 		mModel->CreateCommand(CM_SetBrush, wxPoint(1, 1));
 		mModel->FinalizeCommand();
 		mModel->SetBrushColor(dialog.GetColourData().GetColour()); // Yay API calls
@@ -316,7 +304,7 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 {
 	if (event.LeftDown())
 	{
-		// TODO: This is when the left mouse button is pressed
+		// This is when the left mouse button is pressed
 		switch (mCurrentTool)
 		{
 		case ID_DrawLine:
@@ -371,7 +359,7 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 	}
 	else if (event.LeftUp())
 	{
-		// TODO: This is when the left mouse button is released
+		// This is when the left mouse button is released
 		if (mModel->HasActiveCommand())
 		{
 			mModel->UpdateCommand(event.GetPosition());
@@ -385,7 +373,7 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 
 void PaintFrame::OnMouseMove(wxMouseEvent& event)
 {
-	// TODO: This is when the mouse is moved inside the drawable area
+	// This is when the mouse is moved inside the drawable area
 	if (mModel->HasActiveCommand())
 	{
 		mModel->UpdateCommand(event.GetPosition());
@@ -454,6 +442,12 @@ void PaintFrame::EnableUndoRedoMenus()
 	{
 		mEditMenu->Enable(wxID_REDO, false);
 		mToolbar->EnableTool(wxID_REDO, false);
+	}
+
+	if (!mModel->GetSelectedShape())
+	{
+		mEditMenu->Enable(ID_Delete, false);
+		mEditMenu->Enable(ID_Unselect, false);
 	}
 }
 
