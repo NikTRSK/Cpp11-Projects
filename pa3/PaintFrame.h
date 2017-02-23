@@ -53,7 +53,7 @@ private:
 
 	void SetCursor(CursorType type);
 	// Enable/Disable the Redo/Undo menu options if possible
-	void EnableUndoRedoMenus();
+	void SetupMenus();
 
 	wxDECLARE_EVENT_TABLE();
 private:

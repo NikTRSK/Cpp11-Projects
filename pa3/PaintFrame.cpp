@@ -178,7 +178,7 @@ void PaintFrame::OnNew(wxCommandEvent& event)
 {
 	mModel->New();
 	mPanel->PaintNow();
-	EnableUndoRedoMenus();
+	SetupMenus();
 }
 
 void PaintFrame::OnExport(wxCommandEvent& event)
@@ -202,7 +202,9 @@ void PaintFrame::OnImport(wxCommandEvent& event)
 			"PNG files (*.png)|*.png|JPEG files (*.jpeg)|*.jpeg|JPG files (*.jpg)|*.jpg|BMP files (*.bmp)|*.bmp",
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL)
+	{
 		return;
+	}
 	mModel->Import(openFileDialog.GetPath());
 	mPanel->PaintNow();
 }
@@ -212,7 +214,7 @@ void PaintFrame::OnUndo(wxCommandEvent& event)
 	mModel->GetTopInUndo()->Undo(mModel);
 	mPanel->PaintNow();
 	// Check if we need to enable/disable menu
-	EnableUndoRedoMenus();
+	SetupMenus();
 }
 
 void PaintFrame::OnRedo(wxCommandEvent& event)
@@ -220,7 +222,7 @@ void PaintFrame::OnRedo(wxCommandEvent& event)
 	mModel->GetTopInRedo()->Redo(mModel);
 	mPanel->PaintNow();
 	// Check if we need to enable/disable menu
-	EnableUndoRedoMenus();
+	SetupMenus();
 }
 
 void PaintFrame::OnUnselect(wxCommandEvent& event)
@@ -254,7 +256,7 @@ void PaintFrame::OnSetPenColor(wxCommandEvent& event)
 		mModel->SetPenColor(dialog.GetColourData().GetColour()); // Yay API calls
 		mPanel->PaintNow(); // Don't forget to wipe
 	}
-	EnableUndoRedoMenus();
+	SetupMenus();
 }
 
 void PaintFrame::OnSetPenWidth(wxCommandEvent& event)
@@ -282,7 +284,7 @@ void PaintFrame::OnSetPenWidth(wxCommandEvent& event)
 		mModel->SetPenWidth(wxAtoi(dialog.GetValue()));
 		mPanel->PaintNow(); // Don't forget to wipe
 	}
-	EnableUndoRedoMenus();
+	SetupMenus();
 }
 
 void PaintFrame::OnSetBrushColor(wxCommandEvent& event)
@@ -298,7 +300,7 @@ void PaintFrame::OnSetBrushColor(wxCommandEvent& event)
 		mModel->SetBrushColor(dialog.GetColourData().GetColour()); // Yay API calls
 		mPanel->PaintNow(); // Don't forget to wipe
 	}
-	EnableUndoRedoMenus();
+	SetupMenus();
 }
 
 void PaintFrame::OnMouseButton(wxMouseEvent& event)
@@ -369,7 +371,7 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 		}
 	}
 	// Enable Redo/Undo menus if needed
-	EnableUndoRedoMenus();
+	SetupMenus();
 }
 
 void PaintFrame::OnMouseMove(wxMouseEvent& event)
@@ -420,7 +422,7 @@ void PaintFrame::SetCursor(CursorType type)
 	}
 }
 
-void PaintFrame::EnableUndoRedoMenus()
+void PaintFrame::SetupMenus()
 {
 	// Undo menu
 	if (mModel->CanUndo())
