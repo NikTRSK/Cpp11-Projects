@@ -13,14 +13,14 @@ MoveCommand::~MoveCommand()
 
 void MoveCommand::Update(const wxPoint & newPoint)
 {
-	mShape->UpdateOffset(newPoint - mStartPoint);
+	mShape->SetOffset(newPoint - mStartPoint);
 }
 
 void MoveCommand::Finalize(std::shared_ptr<PaintModel> model)
 {
-	mOldOffset = mShape->mCumulativeOffset;
-	mShape->mCumulativeOffset += mShape->GetOffset();
-	mShape->mOffset = wxPoint(0, 0);
+	mOldOffset = mShape->GetCumulativeOffset();
+	mShape->AddToCumulativeOffset(mShape->GetOffset());
+	mShape->SetOffset(wxPoint(0, 0));
 	model->AddCurrentCommandToUndoStack();
 	model->GetCurrentCommand().reset();
 }
@@ -28,17 +28,18 @@ void MoveCommand::Finalize(std::shared_ptr<PaintModel> model)
 void MoveCommand::Undo(std::shared_ptr<PaintModel> model)
 {
 	model->Undo();
-
-	wxPoint tempOffset = mShape->mCumulativeOffset;
-	mShape->mCumulativeOffset = mOldOffset;
-	mOldOffset = tempOffset;
+	RedoOffset();
 }
 
 void MoveCommand::Redo(std::shared_ptr<PaintModel> model)
 {
 	model->Redo();
+	RedoOffset();
+}
 
-	wxPoint tempOffset = mShape->mCumulativeOffset;
-	mShape->mCumulativeOffset = mOldOffset;
+void MoveCommand::RedoOffset()
+{
+	wxPoint tempOffset = mShape->GetCumulativeOffset();
+	mShape->SetCumulativeOffset(mOldOffset);
 	mOldOffset = tempOffset;
 }

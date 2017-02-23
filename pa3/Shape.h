@@ -19,18 +19,22 @@ public:
 	virtual void Draw(wxDC& dc) const = 0;
 	virtual ~Shape() { }
 
-	int GetPenWidth();
+	// Pen Functions specific for the shape
 	wxPen GetPen() const;
-	wxBrush GetBrush() const;
-
+	int GetPenWidth() const;
 	void SetPenWidth(const int & size);
 	void SetPenColor(const wxColour& color);
+	// Brush Functioins specific for the shape
+	wxBrush GetBrush() const;
 	void SetBrushColor(const wxColour& color);
+	// Draws a selection around the selected shape
 	void DrawSelection(wxDC& dc);
+	// Offsets used for the Move Function
 	const wxPoint & GetOffset();
-	void UpdateOffset(const wxPoint & newOffset);
-	wxPoint mCumulativeOffset;
-	wxPoint mOffset;
+	const wxPoint & GetCumulativeOffset();
+	void SetOffset(const wxPoint & newOffset);
+	void SetCumulativeOffset(const wxPoint & newOffset);
+	void AddToCumulativeOffset(const wxPoint & toAdd);
 
 protected:
 	// Starting point of shape
@@ -47,6 +51,7 @@ protected:
 	wxBrush mBrush;
 
 	// Offset required for MoveCommand
-	
+	wxPoint mCumulativeOffset;
+	wxPoint mOffset;
 	
 };

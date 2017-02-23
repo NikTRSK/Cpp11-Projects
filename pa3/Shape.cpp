@@ -56,7 +56,7 @@ void Shape::GetBounds(wxPoint& topLeft, wxPoint& botRight) const
 	botRight = mBotRight + mOffset + mCumulativeOffset;
 }
 
-int Shape::GetPenWidth()
+int Shape::GetPenWidth() const
 {
 	return mPen.GetWidth();
 }
@@ -98,7 +98,7 @@ void Shape::DrawSelection(wxDC& dc)
 	wxPoint y;
 	GetBounds(x, y);
 
-	// The 5, 5 are so the selection is around the shape
+	// The 3, 3 are so the selection is around the shape
 	dc.DrawRectangle(wxRect(x - wxPoint(3, 3), y + wxPoint(3, 3)));
 }
 
@@ -107,11 +107,22 @@ const wxPoint& Shape::GetOffset()
 	return mOffset;
 }
 
-void Shape::UpdateOffset(const wxPoint& newOffset)
+const wxPoint& Shape::GetCumulativeOffset()
+{
+	return mCumulativeOffset;
+}
+
+void Shape::SetCumulativeOffset(const wxPoint& newOffset)
+{
+	mCumulativeOffset = newOffset;
+}
+
+void Shape::AddToCumulativeOffset(const wxPoint& toAdd)
+{
+	mCumulativeOffset += toAdd;
+}
+
+void Shape::SetOffset(const wxPoint& newOffset)
 {
 	mOffset = newOffset;
-//	mOffset += newOffset - mStartPoint;
-//	mOffset.x = newOffset.x - mStartPoint.x;
-//	mOffset.y = newOffset.y - mStartPoint.y;
-//	mOffset = newOffset - mOffset;
 }
