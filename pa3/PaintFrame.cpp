@@ -198,6 +198,7 @@ void PaintFrame::OnImport(wxCommandEvent& event)
 {
 	wxFileDialog
 		openFileDialog(this, _("Open an image file"), "", "",
+			"Image files (*png, *jpeg, *jpg, *bmp)|*png; *jpeg; *jpg; *bmp|"
 			"PNG files (*.png)|*.png|JPEG files (*.jpeg)|*.jpeg|JPG files (*.jpg)|*.jpg|BMP files (*.bmp)|*.bmp",
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL)
