@@ -45,12 +45,20 @@ public:
 	std::shared_ptr<Command> & GetTopInUndo();
 	std::shared_ptr<Command> & GetTopInRedo();
 
-	// Shape Stacks
-	void UndoShape();
-	void RedoShape();
-	std::stack<std::shared_ptr<Shape>> & GetTopInUndoShape();
-	std::stack<std::shared_ptr<Shape>> & GetTopInRedoShape();
-	void AddSelectedShapeToUndoStack();
+	// Brush/Pen stacks. Can't have them in their commands :(((
+	void UndoBrush();
+	void RedoBrush();
+	void ClearBrushStacks();
+	void AddCurrentBrushToBrushUndoStack();
+	wxBrush & GetTopInBrushUndo();
+	wxBrush & GetTopInBrushRedo();
+
+	void UndoPen();
+	void RedoPen();
+	void ClearPenStacks();
+	void AddCurrentPenToPenUndoStack();
+	wxPen & GetTopInPenUndo();
+	wxPen & GetTopInPenRedo();
 
 	std::shared_ptr<Command> & GetCurrentCommand();
 	// Clear stack
@@ -81,8 +89,8 @@ private:
 	std::stack<std::shared_ptr<Command>> mUndo;
 	std::stack<std::shared_ptr<Command>> mRedo;
 	// Shape Stacks
-	std::stack<std::shared_ptr<Shape>> mUndoShape;
-	std::stack<std::shared_ptr<Shape>> mRedoShape;
+//	std::stack<std::shared_ptr<Shape>> mUndoShape;
+//	std::stack<std::shared_ptr<Shape>> mRedoShape;
 	// Pen/Brush Stacks
 	std::stack<wxPen> mUndoPen;
 	std::stack<wxPen> mRedoPen;

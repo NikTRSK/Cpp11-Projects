@@ -14,12 +14,12 @@ SetBrushCommand::~SetBrushCommand()
 
 void SetBrushCommand::Update(const wxPoint& newPoint)
 {
-
 }
 
 void SetBrushCommand::Finalize(std::shared_ptr<PaintModel> model)
 {
-	mUndoBrush.push(model->GetBrush());
+//	model->AddCurrentBrushToBrushUndoStack();
+	// Brush is added to the BrushUndoStack in PaintModel before the command is created
 	model->AddCurrentCommandToUndoStack();
 	model->GetCurrentCommand().reset();
 
@@ -33,30 +33,28 @@ void SetBrushCommand::Finalize(std::shared_ptr<PaintModel> model)
 
 void SetBrushCommand::Undo(std::shared_ptr<PaintModel> model)
 {
-	model->SetBrushColor(mUndoBrush.top().GetColour());
-	mRedoBrush.push(mUndoBrush.top());
-	mUndoBrush.pop();
 	model->Undo();
+	mShape->SetBrushColor(model->GetTopInBrushUndo().GetColour());
+	model->UndoBrush();
 }
 
 void SetBrushCommand::Redo(std::shared_ptr<PaintModel> model)
 {
-	model->SetBrushColor(mRedoBrush.top().GetColour());
-	mUndoBrush.push(mRedoBrush.top());
-	mRedoBrush.pop();
 	model->Redo();
+	mShape->SetBrushColor(model->GetTopInBrushRedo().GetColour());
+	model->RedoBrush();
 }
 
-void SetBrushCommand::ClearStacks()
-{
-	// Because C++ is stupid
-	while (!mUndoBrush.empty())
-	{
-		mUndoBrush.pop();
-	}
-	// Because C++ is stupid
-	while (!mRedoBrush.empty())
-	{
-		mRedoBrush.pop();
-	}
-}
+//void SetBrushCommand::ClearStacks()
+//{
+//	// Because C++ is stupid
+//	while (!mUndoBrush.empty())
+//	{
+//		mUndoBrush.pop();
+//	}
+//	// Because C++ is stupid
+//	while (!mRedoBrush.empty())
+//	{
+//		mRedoBrush.pop();
+//	}
+//}

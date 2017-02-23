@@ -13,7 +13,6 @@ DeleteCommand::~DeleteCommand()
 
 void DeleteCommand::Finalize(std::shared_ptr<PaintModel> model)
 {
-//	model->AddSelectedShapeToUndoStack();
 	mShape = model->GetSelectedShape();
 	model->AddCurrentCommandToUndoStack();
 	model->RemoveShape(model->GetSelectedShape());

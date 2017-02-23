@@ -26,19 +26,15 @@ void DrawCommand::Finalize(std::shared_ptr<PaintModel> model)
 
 void DrawCommand::Undo(std::shared_ptr<PaintModel> model)
 {
-//	if (model->CanUndo())
-//	{
-		model->GetShapes().pop_back();
-		model->Undo();
-		model->GetCurrentCommand().reset();
-//	}
+	// PaintFrame handles CanUndo checking
+	model->GetShapes().pop_back();
+	model->Undo();
+	model->GetCurrentCommand().reset();
 }
 
 void DrawCommand::Redo(std::shared_ptr<PaintModel> model)
 {
-//	if (model->CanRedo())
-//	{
+	// PaintFrame handles CanRedo checking
 	model->GetShapes().push_back(model->GetTopInRedo()->GetShape());
-		model->Redo();
-//	}
+	model->Redo();
 }

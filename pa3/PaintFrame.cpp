@@ -254,6 +254,7 @@ void PaintFrame::OnSetPenColor(wxCommandEvent& event)
 	{
 		// Use dialog.GetColourData() to get the color and make stuff happen
 		// UNDO PEN?
+		mModel->AddCurrentPenToPenUndoStack();
 		mModel->CreateCommand(CM_SetPen, wxPoint(1, 1));
 		mModel->FinalizeCommand();
 		mModel->SetPenColor(dialog.GetColourData().GetColour()); // Yay API calls
@@ -283,6 +284,7 @@ void PaintFrame::OnSetPenWidth(wxCommandEvent& event)
 	{
 		// Use dialog.GetColourData() to get the color and make stuff happen
 		// UNDO PEN?
+		mModel->AddCurrentPenToPenUndoStack();
 		mModel->CreateCommand(CM_SetPen, wxPoint(1, 1));
 		mModel->FinalizeCommand();
 		mModel->SetPenWidth(wxAtoi(dialog.GetValue()));
@@ -301,6 +303,7 @@ void PaintFrame::OnSetBrushColor(wxCommandEvent& event)
 	{
 		// Use dialog.GetColourData() to get the color and make stuff happen
 		// UNDO BRUSH?
+		mModel->AddCurrentBrushToBrushUndoStack();
 		mModel->CreateCommand(CM_SetBrush, wxPoint(1, 1));
 		mModel->FinalizeCommand();
 		mModel->SetBrushColor(dialog.GetColourData().GetColour()); // Yay API calls
@@ -349,7 +352,9 @@ void PaintFrame::OnMouseButton(wxMouseEvent& event)
 			{
 				mModel->CreateCommand(CM_Move, event.GetPosition());
 			}
-			else if (mModel->SelectShape(event.GetPosition()))
+			
+			// Enable Unselect/Delete menus if needed
+			if (mModel->SelectShape(event.GetPosition()))
 			{
 				mEditMenu->Enable(ID_Unselect, true);
 				mEditMenu->Enable(ID_Delete, true);
@@ -386,7 +391,9 @@ void PaintFrame::OnMouseMove(wxMouseEvent& event)
 		mModel->UpdateCommand(event.GetPosition());
 		mPanel->PaintNow();
 	}
-	else if (mModel->GetSelectedShape())
+	
+	// Change cursor if its within shape area
+	if (mModel->GetSelectedShape())
 	{
 		if (mModel->GetSelectedShape()->Intersects(event.GetPosition()))
 		{

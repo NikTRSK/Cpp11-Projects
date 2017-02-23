@@ -16,10 +16,10 @@ public:
 	// Used to "redo" the command
 	virtual void Redo(std::shared_ptr<PaintModel> model) override;
 	// Clear the stacks
-	void ClearStacks();
+//	void ClearStacks();
 
-	// do we need shape var here
-	std::stack <wxBrush> mUndoBrush;
-	std::stack <wxBrush> mRedoBrush;
+//	// do we need shape var here
+//	std::stack <wxBrush> mUndoBrush;
+//	std::stack <wxBrush> mRedoBrush;
 };
 

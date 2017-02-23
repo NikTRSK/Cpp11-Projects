@@ -18,7 +18,8 @@ void SetPenCommand::Update(const wxPoint& newPoint)
 
 void SetPenCommand::Finalize(std::shared_ptr<PaintModel> model)
 {
-	mUndoPen.push(model->GetPen());
+//	model->AddCurrentPenToPenUndoStack();
+	// Pen is added to the PenUndoStack in PaintModel before the command is created
 	model->AddCurrentCommandToUndoStack();
 	model->GetCurrentCommand().reset();
 
@@ -34,32 +35,16 @@ void SetPenCommand::Finalize(std::shared_ptr<PaintModel> model)
 
 void SetPenCommand::Undo(std::shared_ptr<PaintModel> model)
 {
-	model->SetPenColor(mUndoPen.top().GetColour());
-	model->SetPenWidth(mUndoPen.top().GetWidth());
-	mRedoPen.push(mUndoPen.top());
-	mUndoPen.pop();
 	model->Undo();
+	mShape->SetPenColor(model->GetTopInPenUndo().GetColour());
+	mShape->SetPenWidth(model->GetTopInPenUndo().GetWidth());
+	model->UndoPen();
 }
 
 void SetPenCommand::Redo(std::shared_ptr<PaintModel> model)
 {
-	model->SetPenColor(mRedoPen.top().GetColour());
-	model->SetPenWidth(mRedoPen.top().GetWidth());
-	mUndoPen.push(mRedoPen.top());
-	mRedoPen.pop();
 	model->Redo();
-}
-
-void SetPenCommand::ClearStacks()
-{
-	// Because C++ is stupid
-	while (!mUndoPen.empty())
-	{
-		mUndoPen.pop();
-	}
-	// Because C++ is stupid
-	while (!mRedoPen.empty())
-	{
-		mRedoPen.pop();
-	}
+	mShape->SetPenColor(model->GetTopInPenRedo().GetColour());
+	mShape->SetPenWidth(model->GetTopInPenRedo().GetWidth());
+	model->RedoPen();
 }
