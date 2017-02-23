@@ -9,6 +9,8 @@ Shape::Shape(const wxPoint& start)
 	// Init Pen & Brush
 	mPen = *wxBLACK_PEN;
 	mBrush = *wxWHITE_BRUSH;
+
+	mOffset = mCumulativeOffset = wxPoint(0, 0);
 }
 
 // Tests whether the provided point intersects
@@ -50,8 +52,8 @@ void Shape::Finalize()
 
 void Shape::GetBounds(wxPoint& topLeft, wxPoint& botRight) const
 {
-	topLeft = mTopLeft + mOffset;
-	botRight = mBotRight + mOffset;
+	topLeft = mTopLeft + mOffset + mCumulativeOffset;
+	botRight = mBotRight + mOffset + mCumulativeOffset;
 }
 
 int Shape::GetPenWidth()
@@ -107,6 +109,9 @@ const wxPoint& Shape::GetOffset()
 
 void Shape::UpdateOffset(const wxPoint& newOffset)
 {
-	mOffset.x = newOffset.x - mStartPoint.x;
-	mOffset.y = newOffset.y - mStartPoint.y;
+	mOffset = newOffset;
+//	mOffset += newOffset - mStartPoint;
+//	mOffset.x = newOffset.x - mStartPoint.x;
+//	mOffset.y = newOffset.y - mStartPoint.y;
+//	mOffset = newOffset - mOffset;
 }

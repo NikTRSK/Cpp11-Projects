@@ -29,6 +29,9 @@ public:
 	void DrawSelection(wxDC& dc);
 	const wxPoint & GetOffset();
 	void UpdateOffset(const wxPoint & newOffset);
+	wxPoint mCumulativeOffset;
+	wxPoint mOffset;
+
 protected:
 	// Starting point of shape
 	wxPoint mStartPoint;
@@ -44,5 +47,6 @@ protected:
 	wxBrush mBrush;
 
 	// Offset required for MoveCommand
-	wxPoint mOffset;
+	
+	
 };

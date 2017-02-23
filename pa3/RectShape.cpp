@@ -1,5 +1,5 @@
 #include "RectShape.h"
-
+#include <iostream>
 
 
 RectShape::RectShape(const wxPoint& start) : Shape(start)
