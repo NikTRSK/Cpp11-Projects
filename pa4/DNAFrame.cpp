@@ -17,6 +17,7 @@
 #include "DNADrawPanel.h"
 #include "Exceptions.h"
 #include "DNAAlignDlg.h"
+#include "FASTA.h"
 
 enum
 {
@@ -70,4 +71,21 @@ void DNAFrame::OnNew(wxCommandEvent& event)
 void DNAFrame::OnAminoHist(wxCommandEvent& event)
 {
 	// TODO: Implement (File>Amino Acid Histogram...)
+	// Handle exception
+	wxFileDialog
+		openFileDialog(this, _("Open an image file"), "./data", "",
+			"FASTA files (*.fasta)|*.fasta",
+			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	if (openFileDialog.ShowModal() == wxID_CANCEL)
+	{
+		return;
+	}
+	try
+	{
+		mFASTAInfo = std::make_shared<FASTA>(openFileDialog.GetPath());
+	}
+	catch(FileLoadExcept& fle)
+	{
+		std::cerr << fle.what() << std::endl;
+	}
 }
