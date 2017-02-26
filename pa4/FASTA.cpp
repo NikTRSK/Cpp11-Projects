@@ -11,7 +11,7 @@ FASTA::FASTA(const char * filename)
 	}
 	// Get the total number of characters in the file
 	std::ifstream::pos_type fileLength = file.tellg();
-//	std::cout << "^^^^^^^^" << fileSize << std::endl;
+	//	std::cout << "^^^^^^^^" << fileSize << std::endl;
 	file.seekg(0, std::ios::beg); // Seek back to start of file
 	mData.reserve(static_cast<unsigned int>(fileLength));
 	// Get the header from the file
@@ -22,20 +22,20 @@ FASTA::FASTA(const char * filename)
 	}
 	// Erase the first character of the header
 	mHeader.erase(0, 1);
-	
+
 	std::cout << mHeader << std::endl;
 
 	// Read in the data file
 	char c;
 	while (file.get(c))
 	{
-		if (isValid(c))
+		if (IsValid(c))
 		{
 			mData.push_back(c);
 		}
 		// If the character is invalid throw exception.
 		// Else just keep going
-		else if (!isIgnored(c))
+		else if (!IsIgnored(c))
 		{
 			throw FileLoadExcept();
 		}
@@ -49,9 +49,19 @@ FASTA::~FASTA()
 {
 }
 
-bool FASTA::isValid(char c)
+const std::string& FASTA::GetHeader() const
 {
-	for (auto const& ch : validCharacters)
+	return mHeader;
+}
+
+const std::string& FASTA::GetData() const
+{
+	return mData;
+}
+
+bool FASTA::IsValid(char c)
+{
+	for (auto const& ch : mValidCharacters)
 	{
 		if (c == ch)
 		{
@@ -61,9 +71,9 @@ bool FASTA::isValid(char c)
 	return false;
 }
 
-bool FASTA::isIgnored(char c)
+bool FASTA::IsIgnored(char c)
 {
-	for (auto const& ch : ignoredCharacters)
+	for (auto const& ch : mIgnoredCharacters)
 	{
 		if (c == ch)
 		{

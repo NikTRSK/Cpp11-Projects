@@ -11,13 +11,17 @@ class FASTA
 public:
 	FASTA(const char * filename);
 	~FASTA();
-	bool isValid(char c);
-	bool isIgnored(char c);
+	const std::string & GetHeader() const;
+	const std::string & GetData() const;
+
+protected:
+	bool IsValid(char c);
+	bool IsIgnored(char c);
 
 private:
 	std::string mHeader;
 	std::string mData;
 
-	std::vector<char> validCharacters = {'T', 'C', 'A', 'G'};
-	std::vector<char> ignoredCharacters = {'\n', '\r', '\xff'};
+	std::vector<char> mValidCharacters = { 'T', 'C', 'A', 'G' };
+	std::vector<char> mIgnoredCharacters = { '\n', '\r', '\xff' };
 };
