@@ -10,11 +10,11 @@ public:
 	~FASTAHistogram();
 //	const auto & GetFrequencyTable() const;
 //	const auto & GetTotalAminoCount() const;
-//	const std::unordered_map<char, std::string> & GetCodeToNameMap() const;
+	const std::unordered_map<char, std::string> & GetCodeToNameMap() const;
 
 private:
 	std::shared_ptr<FASTA> mFASTAFile;
-/*	std::unordered_map<char, std::string> mCodeToFullNameMap
+	std::unordered_map<char, std::string> mCodeToFullNameMap
 	= {
 		{ 'M', "Methionine" },
 		{ 'F', "Phenylalanine" },
@@ -38,7 +38,7 @@ private:
 		{ 'S', "Serine" },
 		{ 'R', "Arginine" },
 		{ 'G', "Glycine" }
-	};*/
+	};
 	std::unordered_map<char, unsigned int> mCodonFrequencies
 	= {
 		{ 'M', 0 },

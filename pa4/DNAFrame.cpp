@@ -82,10 +82,14 @@ void DNAFrame::OnAminoHist(wxCommandEvent& event)
 	}
 	try
 	{
-		mFASTAInfo = std::make_shared<FASTA>(openFileDialog.GetPath());
+		mFASTAData = std::make_shared<FASTA>(openFileDialog.GetPath());
+		mFASTAHistogram = std::make_shared<FASTAHistogram>(mFASTAData);
+		mPanel->AddData(mFASTAData, mFASTAHistogram);
+		mPanel->PaintNow();
 	}
-	catch(FileLoadExcept& fle)
+	catch (FileLoadExcept& fle)
 	{
-		std::cerr << fle.what() << std::endl;
+		std::cout << fle.what() << std::endl;
+		wxMessageBox("FASTA file is invalid", "Error", wxOK | wxICON_ERROR);
 	}
 }

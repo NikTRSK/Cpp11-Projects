@@ -12,12 +12,14 @@
 #include <wx/frame.h>
 #include <string>
 #include <memory>
+#include "FASTAHistogram.h"
 
 class DNADrawPanel : public wxPanel
 {
 public:
 	DNADrawPanel(wxFrame* parent);
 	void PaintNow();
+	void AddData(std::shared_ptr<FASTA> FASTAData, std::shared_ptr<FASTAHistogram> FASTAHistogram);
 
 protected:
 	void PaintEvent(wxPaintEvent & evt);
@@ -27,5 +29,7 @@ protected:
 	
 public:
 	// Variables here
+	std::shared_ptr<FASTA> mFASTAData;
+	std::shared_ptr<FASTAHistogram> mFASTAHistogram;
 };
 

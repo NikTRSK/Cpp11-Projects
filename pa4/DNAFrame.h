@@ -12,6 +12,7 @@
 #include <wx/menu.h>
 #include <memory>
 #include "FASTA.h"
+#include "FASTAHistogram.h"
 
 class DNAFrame : public wxFrame
 {
@@ -28,5 +29,6 @@ private:
 	class DNADrawPanel* mPanel;
 	
 	// Variables here
-	std::shared_ptr<FASTA> mFASTAInfo;
+	std::shared_ptr<FASTA> mFASTAData;
+	std::shared_ptr<FASTAHistogram> mFASTAHistogram;
 };

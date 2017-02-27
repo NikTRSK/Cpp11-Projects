@@ -35,6 +35,12 @@ void DNADrawPanel::PaintNow()
 	Render(dc);
 }
 
+void DNADrawPanel::AddData(std::shared_ptr<FASTA> FASTAData, std::shared_ptr<FASTAHistogram> FASTAHistogram)
+{
+	mFASTAData = FASTAData;
+	mFASTAHistogram = FASTAHistogram;
+}
+
 void DNADrawPanel::Render(wxDC& dc)
 {
 	// Clear
@@ -42,4 +48,25 @@ void DNADrawPanel::Render(wxDC& dc)
 	dc.Clear();
 	
 	// TODO: Draw histogram, if one has been generated
+	if (mFASTAData && mFASTAHistogram)
+	{
+		std::cout << mFASTAData->GetHeader() << std::endl;
+		// Print Header
+		dc.DrawText(mFASTAData->GetHeader(), 50, 50);
+
+		// Cycle through hasmaps and generate each amino frequency
+		//		std::unordered_map<char, std::string> codeToNameMap = mFASTAHistogram->GetCodeToNameMap();
+		//		auto const & codonFrequencies = mFASTAHistogram->GetFrequencyTable();
+
+		//		unsigned int x = 50, y = 100;
+		//		wxString codonName;
+		//		for (auto const & codon : codonFrequencies)
+		//		{
+		//			dc.SetBrush(*wxRED_BRUSH);
+		//			dc.SetPen(*wxBLACK_PEN);
+		////			codonName = codeToNameMap;
+		///			dc.DrawText()
+		//		}
+
+	}
 }

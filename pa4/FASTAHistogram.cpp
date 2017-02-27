@@ -56,10 +56,10 @@ FASTAHistogram::~FASTAHistogram()
 //	return mTotalAminoCount;
 //}
 
-//const std::unordered_map<char, std::string> & FASTAHistogram::GetCodeToNameMap() const
-//{
-//	return mCodeToFullNameMap;
-//}
+const std::unordered_map<char, std::string> & FASTAHistogram::GetCodeToNameMap() const
+{
+	return mCodeToFullNameMap;
+}
 
 char FASTAHistogram::BaseToIdx(char c)
 {
