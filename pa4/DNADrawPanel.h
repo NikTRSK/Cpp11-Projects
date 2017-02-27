@@ -13,6 +13,8 @@
 #include <string>
 #include <memory>
 #include "FASTAHistogram.h"
+#include <iomanip>
+#include <sstream>
 
 class DNADrawPanel : public wxPanel
 {
@@ -27,9 +29,20 @@ protected:
  
 	DECLARE_EVENT_TABLE()
 	
-public:
+private:
+	// Convert a number to a string with set precision. Default 2 decimal places
+	template <typename T>
+	std::string ToStringWithPrecision(const T & number, const int decimalPlaces = 2);
 	// Variables here
 	std::shared_ptr<FASTA> mFASTAData;
 	std::shared_ptr<FASTAHistogram> mFASTAHistogram;
 };
+
+template <typename T>
+std::string DNADrawPanel::ToStringWithPrecision(const T& number, const int decimalPlaces)
+{
+	std::ostringstream toOutput;
+	toOutput << std::fixed << std::setprecision(decimalPlaces) << number;
+	return toOutput.str();
+}
 
