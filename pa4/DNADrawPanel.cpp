@@ -55,7 +55,7 @@ void DNADrawPanel::Render(wxDC& dc)
 		dc.DrawText(mFASTAData->GetHeader(), 50, 50);
 
 		// Cycle through hasmaps and generate each amino frequency
-		//		std::unordered_map<char, std::string> codeToNameMap = mFASTAHistogram->GetCodeToNameMap();
+				auto & codeToNameMap = mFASTAHistogram->GetCodeToNameMap();
 		//		auto const & codonFrequencies = mFASTAHistogram->GetFrequencyTable();
 
 		//		unsigned int x = 50, y = 100;

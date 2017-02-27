@@ -8,8 +8,8 @@ class FASTAHistogram
 public:
 	FASTAHistogram(std::shared_ptr<FASTA> FASTAFile);
 	~FASTAHistogram();
-//	const auto & GetFrequencyTable() const;
-//	const auto & GetTotalAminoCount() const;
+	const std::unordered_map<char, unsigned int> & GetFrequencyTable() const;
+	const unsigned int & GetTotalAminoCount() const;
 	const std::unordered_map<char, std::string> & GetCodeToNameMap() const;
 
 private:

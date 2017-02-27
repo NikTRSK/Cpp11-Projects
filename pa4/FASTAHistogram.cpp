@@ -46,15 +46,15 @@ FASTAHistogram::~FASTAHistogram()
 {
 }
 
-//const auto & FASTAHistogram::GetFrequencyTable() const
-//{
-//	return mCodonFrequencies;
-//}
-//
-//const auto & FASTAHistogram::GetTotalAminoCount() const
-//{
-//	return mTotalAminoCount;
-//}
+const std::unordered_map<char, unsigned int> & FASTAHistogram::GetFrequencyTable() const
+{
+	return mCodonFrequencies;
+}
+
+const unsigned int & FASTAHistogram::GetTotalAminoCount() const
+{
+	return mTotalAminoCount;
+}
 
 const std::unordered_map<char, std::string> & FASTAHistogram::GetCodeToNameMap() const
 {
