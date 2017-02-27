@@ -38,6 +38,9 @@
     <ClInclude Include="FASTAHistogram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NeedlemanWunsch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DNAAlignDlg.cpp">
@@ -59,6 +62,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FASTAHistogram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NeedlemanWunsch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

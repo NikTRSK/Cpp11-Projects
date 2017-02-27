@@ -22,6 +22,7 @@ private:
 	void OnExit(wxCommandEvent& event);
 	void OnNew(wxCommandEvent& event);
 	void OnAminoHist(wxCommandEvent& event);
+	void OnPairwiseAlign(wxCommandEvent & event);
 	
 	wxDECLARE_EVENT_TABLE();
 private:

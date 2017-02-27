@@ -18,16 +18,19 @@
 #include "Exceptions.h"
 #include "DNAAlignDlg.h"
 #include "FASTA.h"
+#include "NeedlemanWunsch.h"
 
 enum
 {
 	ID_AMINO_HIST=1000,
+	ID_PAIRWISE_ALIGN=2000
 };
 
 wxBEGIN_EVENT_TABLE(DNAFrame, wxFrame)
 	EVT_MENU(wxID_EXIT, DNAFrame::OnExit)
 	EVT_MENU(wxID_NEW, DNAFrame::OnNew)
 	EVT_MENU(ID_AMINO_HIST, DNAFrame::OnAminoHist)
+	EVT_MENU(ID_PAIRWISE_ALIGN, DNAFrame::OnPairwiseAlign)
 wxEND_EVENT_TABLE()
 
 DNAFrame::DNAFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -38,6 +41,8 @@ DNAFrame::DNAFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 	menuFile->Append(wxID_NEW);
 	menuFile->Append(ID_AMINO_HIST, "Amino Acid Histogram...",
 					 "Create a histogram from a FASTA file.");
+	menuFile->Append(ID_PAIRWISE_ALIGN, "Pairwise Alignment...",
+					 "Perform Pairwise Alignment.");
 	menuFile->Append(wxID_EXIT);
 	
 	wxMenuBar* menuBar = new wxMenuBar;
@@ -92,4 +97,16 @@ void DNAFrame::OnAminoHist(wxCommandEvent& event)
 		std::cout << fle.what() << std::endl;
 		wxMessageBox("FASTA file is invalid", "Error", wxOK | wxICON_ERROR);
 	}
+}
+
+void DNAFrame::OnPairwiseAlign(wxCommandEvent& event)
+{
+	DNAAlignDlg align;
+	if (align.ShowModal() == wxID_CANCEL)
+	{
+		return;
+	}
+	NeedlemanWunsch nw(align.GetInputAPath(), align.GetInputBPath(), align.GetOutputPath());
+	nw.RunAlgorithm();
+	wxBusyInfo info("Calculating pairwise match...", this);
 }
