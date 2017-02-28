@@ -9,13 +9,24 @@ public:
 	~NeedlemanWunsch();
 	void RunAlgorithm();
 	void InitMatrix();
-	void PrintMatrix();
 	void PopulateMatrix();
+	void Backtrack();
+
+	void PrintMatrix();
+	void PrintDirectionMatrix();
 
 	void WriteResults();
 
 private:
+	enum Direction : char
+	{
+		DIAGONAL, // 0
+		LEFT, // 1
+		UP // 2
+	};
+
 	std::vector<std::vector<short> > mMatrix;
+	std::vector<std::vector<Direction> > mDirections;
 
 	std::shared_ptr<FASTA> mInputFileA;
 	std::shared_ptr<FASTA> mInputFileB;
@@ -24,12 +35,11 @@ private:
 	unsigned int mRows;
 	unsigned int mCols;
 
-	enum Direction : char
-	{
-		UP,
-		LEFT,
-		DIAGONAL
-	};
+	std::string mFileAData;
+	std::string mFileBData;
+
+	std::string mResultingSequenceA;
+	std::string mResultingSequenceB;
 
 	short Max(const unsigned int& row, const unsigned int& col);
 };

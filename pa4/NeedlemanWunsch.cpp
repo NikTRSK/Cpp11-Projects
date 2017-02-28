@@ -1,6 +1,7 @@
 #include "NeedlemanWunsch.h"
 #include "Exceptions.h"
 #include <algorithm>
+#include <iomanip>
 
 NeedlemanWunsch::NeedlemanWunsch(std::string inFileA, std::string inFileB,  std::string outFile)
 {
@@ -9,6 +10,9 @@ NeedlemanWunsch::NeedlemanWunsch(std::string inFileA, std::string inFileB,  std:
 		mInputFileA = std::make_shared<FASTA>(inFileA.c_str());
 		mInputFileB = std::make_shared<FASTA>(inFileB.c_str());
 		mOutputFile = outFile;
+
+		mFileAData = mInputFileA->GetData();
+		mFileBData = mInputFileB->GetData();
 	}
 	catch (FileLoadExcept& fle)
 	{
@@ -25,7 +29,17 @@ NeedlemanWunsch::~NeedlemanWunsch()
 void NeedlemanWunsch::RunAlgorithm()
 {
 	InitMatrix();
-	PrintMatrix();
+//	PrintMatrix();
+	PopulateMatrix();
+//	std::cout << "\nRESULTS\n";
+//	PrintMatrix();
+//	std::cout << "\nRESULTS\n";
+//	PrintDirectionMatrix();
+	Backtrack();
+//	std::cout << "Final:\n";
+//	std::cout << mResultingSequenceA << std::endl;
+//	std::cout << mResultingSequenceB << std::endl;
+	WriteResults();
 }
 
 void NeedlemanWunsch::InitMatrix()
@@ -35,44 +49,53 @@ void NeedlemanWunsch::InitMatrix()
 	mCols = mInputFileA->GetData().length() + 1;
 	std::string FileAData = mInputFileA->GetData();
 	std::string FileBData = mInputFileB->GetData();
-	mMatrix.resize(mRows + 1);
-	int score = 0;
-	for (unsigned int row = 0; row <= mRows; ++row)
+	mMatrix.resize(mRows);
+	mDirections.resize(mRows);
+	
+	for (unsigned int row = 0; row < mRows; ++row)
 	{
-		mMatrix[row].resize(mCols + 1);
+		mMatrix[row].resize(mCols);
+		mDirections[row].resize(mCols);
 	}
 
+	int score = 0;
 	mMatrix[0][0] = 0;
-	mMatrix[1][1] = 0;
 	// Populate FileA
 	for (unsigned int col = 1; col < mCols; ++col)
 	{
-		std::cout << FileAData[col - 1] << std::endl;
-		mMatrix[0][col + 1] = FileAData[col-1];
-		mMatrix[1][col + 1] = --score;
+		mMatrix[0][col] = --score;
+		mDirections[0][col] = LEFT;
 	}
 	score = 0;
 	// Populate FileB
 	for (unsigned int row = 1; row < mRows; ++row)
 	{
-		std::cout << FileBData[row-1] << std::endl;
-		mMatrix[row + 1][0] = FileBData[row-1];
-		mMatrix[row + 1][1] = --score;
+		mMatrix[row][0] = --score;
+		mDirections[row][0] = UP;
 	}
 }
 
 void NeedlemanWunsch::PrintMatrix()
 {
-	for (unsigned int i = 0; i <= mRows; ++i)
+	for (unsigned int i = 0; i < mRows; ++i)
 	{
-		for (unsigned int j = 0; j <= mCols; ++j)
+		for (unsigned int j = 0; j < mCols; ++j)
 		{
-			if (i == 0 || j == 0)
-			{
-				std::cout << static_cast<char>(mMatrix[i][j]) << "  |  ";
-			}
-			else
-				std::cout << (mMatrix[i][j]) << "  |  ";
+			std::cout << std::setw(3) << (mMatrix[i][j]) << std::setw(0) << "  |  ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void NeedlemanWunsch::PrintDirectionMatrix()
+{
+	for (unsigned int i = 0; i < mRows; ++i)
+	{
+		for (unsigned int j = 0; j < mCols; ++j)
+		{
+			if (mDirections[i][j] == DIAGONAL)	std::cout << ("D") << "  |  ";
+			else if (mDirections[i][j] == LEFT)	std::cout << ("L") << "  |  ";
+			else if (mDirections[i][j] == UP)	std::cout << ("U") << "  |  ";
 		}
 		std::cout << std::endl;
 	}
@@ -81,21 +104,99 @@ void NeedlemanWunsch::PrintMatrix()
 void NeedlemanWunsch::PopulateMatrix()
 {
 	// Define starting point
-	unsigned int row = 2, col = 2;
-	for (row; row <= mRows; ++row)
+//	unsigned int row = 1, col = 1;
+	for (unsigned int row = 1; row < mRows; ++row)
 	{
-		mMatrix[row][col] = Max(row, col);
+		for (unsigned int col = 1; col < mCols; ++col)
+		{
+			mMatrix[row][col] = Max(row, col);
+		}
 	}
+}
+
+void NeedlemanWunsch::Backtrack()
+{
+	int row = mRows - 1,
+		col = mCols - 1;
+
+	mFileAData.insert(0, "_");
+	mFileBData.insert(0, "_");
+	while (row > 0 || col > 0)
+	{
+		if (mDirections[row][col] == DIAGONAL)
+		{
+			mResultingSequenceA.push_back(mFileAData[col]);
+			mResultingSequenceB.push_back(mFileBData[row]);
+			--row;
+			--col;
+		}
+		else if (mDirections[row][col] == LEFT)
+		{
+			mResultingSequenceA.push_back(mFileAData[col]);
+			mResultingSequenceB.push_back('_');
+			--col;
+		}
+		else if (mDirections[row][col] == UP)
+		{
+			mResultingSequenceA.push_back('_');
+			mResultingSequenceB.push_back(mFileBData[row]);
+			--row;
+		}
+	}
+
+	std::reverse(mResultingSequenceA.begin(), mResultingSequenceA.end());
+	std::reverse(mResultingSequenceB.begin(), mResultingSequenceB.end());
 }
 
 void NeedlemanWunsch::WriteResults()
 {
+	std::ofstream out(mOutputFile, std::ios::out | std::ios::trunc);
+	if (out.is_open())
+	{
+		// Write the data
+		out << "A: " << mInputFileA->GetHeader() << "\n";
+		out << "B: " << mInputFileB->GetHeader() << "\n";
+		out << "Score: " << mMatrix[mRows - 1][mCols - 1] << "\n\n";
+		out << mResultingSequenceA << "\n";
+		for (unsigned int i = 0; i < mResultingSequenceA.length(); ++i)
+		{
+			if (mResultingSequenceA[i] == mResultingSequenceB[i])
+			{
+				out << "|";
+			}
+			else
+			{
+				out << " ";
+			}
+		}
+		out << "\n";
+		out << mResultingSequenceB << "\n";
+
+		out.close();
+	}
 }
 
 short NeedlemanWunsch::Max(const unsigned int& row, const unsigned int& col)
 {
-	short up = mMatrix[row - 1][col] -1;
-	short down = mMatrix[row][col - 1] -1;
-	short diag = mMatrix[row - 1][col - 1] + mMatrix[row][col];
-	return std::max(diag, std::max(up, down));
+	char S;
+	// Sub 1 since we start at 1 but the strings are 0 based
+	if (mFileAData[col-1] == mFileBData[row-1])
+	{
+		S = 1;
+	}
+	else
+	{
+		S = -1;
+	}
+	short weights[] = {
+		mMatrix[row - 1][col - 1] + S, // Diagonal
+		mMatrix[row][col - 1] - 1,	   // Left
+		mMatrix[row - 1][col] - 1	   // Up
+	};
+
+	auto maxElemIdx = std::max_element(weights, weights+3);
+	
+	mDirections[row][col] = static_cast<Direction>(std::distance(weights, maxElemIdx));
+		
+	return *maxElemIdx;
 }
