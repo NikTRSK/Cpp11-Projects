@@ -29,16 +29,8 @@ NeedlemanWunsch::~NeedlemanWunsch()
 void NeedlemanWunsch::RunAlgorithm()
 {
 	InitMatrix();
-//	PrintMatrix();
 	PopulateMatrix();
-//	std::cout << "\nRESULTS\n";
-//	PrintMatrix();
-//	std::cout << "\nRESULTS\n";
-//	PrintDirectionMatrix();
 	Backtrack();
-//	std::cout << "Final:\n";
-//	std::cout << mResultingSequenceA << std::endl;
-//	std::cout << mResultingSequenceB << std::endl;
 	WriteResults();
 }
 

@@ -19,6 +19,7 @@
 #include "DNAAlignDlg.h"
 #include "FASTA.h"
 #include "NeedlemanWunsch.h"
+#include "timer.h"
 
 enum
 {
@@ -106,7 +107,10 @@ void DNAFrame::OnPairwiseAlign(wxCommandEvent& event)
 	{
 		return;
 	}
+	wxBusyInfo info("Calculating pairwise match...", this);
+	Timer timer;
+	timer.Start();
 	NeedlemanWunsch nw(align.GetInputAPath(), align.GetInputBPath(), align.GetOutputPath());
 	nw.RunAlgorithm();
-	wxBusyInfo info("Calculating pairwise match...", this);
+	std::cout << "Time elapsed: " << timer.GetElapsed() << std::endl;
 }

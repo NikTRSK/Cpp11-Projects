@@ -23,8 +23,6 @@ FASTA::FASTA(const char * filename)
 	// Erase the first character of the header
 	mHeader.erase(0, 1);
 
-	std::cout << mHeader << std::endl;
-
 	// Read in the data file
 	char c;
 	while (file.get(c))
@@ -40,8 +38,6 @@ FASTA::FASTA(const char * filename)
 			throw FileLoadExcept();
 		}
 	}
-
-	std::cout << mData << std::endl;
 }
 
 
