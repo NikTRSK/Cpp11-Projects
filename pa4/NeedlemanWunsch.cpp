@@ -149,21 +149,37 @@ void NeedlemanWunsch::WriteResults()
 		out << "A: " << mInputFileA->GetHeader() << "\n";
 		out << "B: " << mInputFileB->GetHeader() << "\n";
 		out << "Score: " << mMatrix[mRows - 1][mCols - 1] << "\n\n";
-		out << mResultingSequenceA << "\n";
-		for (unsigned int i = 0; i < mResultingSequenceA.length(); ++i)
-		{
-			if (mResultingSequenceA[i] == mResultingSequenceB[i])
-			{
-				out << "|";
-			}
-			else
-			{
-				out << " ";
-			}
-		}
-		out << "\n";
-		out << mResultingSequenceB << "\n";
 
+		int totalLength = mResultingSequenceA.length();
+		int subsequenceLen, substrStart = 0;
+		while (totalLength > 0)
+		{
+			if (totalLength > 70)
+			{
+				subsequenceLen = 70;
+			}
+			else 
+			{
+				subsequenceLen = totalLength;
+			}
+
+			out << mResultingSequenceA.substr(substrStart, subsequenceLen) << "\n";
+			for (int i = 0/*substrStart*/; i < subsequenceLen; ++i)
+			{
+				if (mResultingSequenceA[substrStart + i] == mResultingSequenceB[substrStart + i])
+				{
+					out << "|";
+				}
+				else
+				{
+					out << " ";
+				}
+			}
+			out << "\n";
+			out << mResultingSequenceB.substr(substrStart, subsequenceLen) << "\n\n";
+			substrStart += subsequenceLen;
+			totalLength -= subsequenceLen;
+		}
 		out.close();
 	}
 }
