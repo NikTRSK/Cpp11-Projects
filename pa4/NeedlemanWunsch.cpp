@@ -154,17 +154,10 @@ void NeedlemanWunsch::WriteResults()
 		int subsequenceLen, substrStart = 0;
 		while (totalLength > 0)
 		{
-			if (totalLength > 70)
-			{
-				subsequenceLen = 70;
-			}
-			else 
-			{
-				subsequenceLen = totalLength;
-			}
+			subsequenceLen = (totalLength > 70) ? 70 : totalLength;
 
 			out << mResultingSequenceA.substr(substrStart, subsequenceLen) << "\n";
-			for (int i = 0/*substrStart*/; i < subsequenceLen; ++i)
+			for (int i = 0; i < subsequenceLen; ++i)
 			{
 				if (mResultingSequenceA[substrStart + i] == mResultingSequenceB[substrStart + i])
 				{
@@ -186,16 +179,9 @@ void NeedlemanWunsch::WriteResults()
 
 short NeedlemanWunsch::Max(const unsigned int& row, const unsigned int& col)
 {
-	char S;
 	// Sub 1 since we start at 1 but the strings are 0 based
-	if (mFileAData[col-1] == mFileBData[row-1])
-	{
-		S = 1;
-	}
-	else
-	{
-		S = -1;
-	}
+	char S = (mFileAData[col - 1] == mFileBData[row - 1]) ? 1 : -1;
+
 	short weights[] = {
 		mMatrix[row - 1][col - 1] + S, // Diagonal
 		mMatrix[row][col - 1] - 1,	   // Left
