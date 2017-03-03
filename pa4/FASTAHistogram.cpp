@@ -16,9 +16,7 @@ FASTAHistogram::FASTAHistogram(std::shared_ptr<FASTA> FASTAFile)
 		// 0: T, 1: C, 2: A, 3: G
 		// Get the index in the state
 		base = BaseToIdx(FASTAData[i]);
-//		if (i == 66)
-//			std::cout << FASTAData[i];
-//		std::cout << state << ", " << base << " | " << FASTAData[i] << " | " << mCodonTable[state][base] << std::endl;
+		
 		if (mCodonTable[state][base] > 24)
 		{
 			auto & amino = mCodonFrequencies.find(mCodonTable[state][base]);
@@ -35,9 +33,6 @@ FASTAHistogram::FASTAHistogram(std::shared_ptr<FASTA> FASTAFile)
 		{
 			state = mCodonTable[state][base];
 		}
-
-//		for (auto const & item : mCodonFrequencies) std::cout << item.first << ": " << item.second << std::endl;
-//		base = BaseToIdx(FASTAData[i]);
 	}
 }
 

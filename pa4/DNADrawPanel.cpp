@@ -66,17 +66,17 @@ void DNADrawPanel::Render(wxDC& dc)
 			return c1.second < c2.second; });
 
 		std::vector<wxBrush>brushColors = { *wxRED_BRUSH, *wxGREEN_BRUSH, *wxBLUE_BRUSH };
-		std::vector<wxPen>penColors = { *wxRED_PEN, *wxGREEN_PEN, *wxBLUE_PEN };
+		std::vector<wxColour>textColor = { *wxRED, *wxGREEN, *wxBLUE };
 		unsigned int id = 0;
 
 		float percentage;
-		float barMaxWidth = GetSize().GetX() * 0.76; // available space to draw the bars
+		// Max size of the bar
+		float barMaxWidth = 800.0 / (maxCodon->second);
 		dc.SetPen(*wxBLACK_PEN);
 		for (auto const & codon : codonFrequencies)
 		{
-			// Set brush and pen colors
-//			dc.SetBrush(*wxRED_BRUSH);
-//			dc.SetPen(*wxBLACK_PEN);
+			// Set brush and text colors
+			dc.SetTextForeground(textColor[id]);
 			dc.SetBrush(brushColors[id++]);
 			if (id == 3)
 				id = 0;
@@ -85,12 +85,10 @@ void DNADrawPanel::Render(wxDC& dc)
 			codonName = codeToNameMap.find(codon.first)->second + ": " 
 						+ ToStringWithPrecision(percentage)
 						+ "% (" + std::to_string(codon.second) + ")";
-//			dc.SetFont()
 			dc.DrawText(codonName, x, y + 10);
-			float barWidth = /*barMaxWidth;*/barMaxWidth*percentage/maxCodon->second;
+			float barWidth = barMaxWidth * (codon.second);
 			dc.DrawRectangle(x + 150, y, barWidth, 30);
 			y += 30;
 		}
-		// TODO: Get the maxcodon stretch all the way to the end, figure out how to change font color
 	}
 }
