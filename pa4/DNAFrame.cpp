@@ -76,8 +76,6 @@ void DNAFrame::OnNew(wxCommandEvent& event)
 
 void DNAFrame::OnAminoHist(wxCommandEvent& event)
 {
-	// TODO: Implement (File>Amino Acid Histogram...)
-	// Handle exception
 	wxFileDialog
 		openFileDialog(this, _("Open an image file"), "./data", "",
 			"FASTA files (*.fasta)|*.fasta",
@@ -109,8 +107,15 @@ void DNAFrame::OnPairwiseAlign(wxCommandEvent& event)
 	}
 	wxBusyInfo info("Calculating pairwise match...", this);
 	Timer timer;
-	timer.Start();
-	NeedlemanWunsch nw(align.GetInputAPath(), align.GetInputBPath(), align.GetOutputPath());
-	nw.RunAlgorithm();
-	std::cout << "Time elapsed: " << timer.GetElapsed() << std::endl;
+	try {
+		timer.Start();
+		NeedlemanWunsch nw(align.GetInputAPath(), align.GetInputBPath(), align.GetOutputPath());
+		nw.RunAlgorithm();
+		std::cout << "Time elapsed: " << timer.GetElapsed() << std::endl;
+	}
+	catch (FileLoadExcept& fle)
+	{
+		std::cout << fle.what() << std::endl;
+		wxMessageBox("FASTA file is invalid", "Error", wxOK | wxICON_ERROR);
+	}
 }

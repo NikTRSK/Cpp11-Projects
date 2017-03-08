@@ -16,8 +16,8 @@ NeedlemanWunsch::NeedlemanWunsch(std::string inFileA, std::string inFileB,  std:
 	}
 	catch (FileLoadExcept& fle)
 	{
-		// TODO: handle the exception
-		std::cout << fle.what();
+		std::cerr << fle.what();
+		throw FileLoadExcept();
 	}
 }
 
