@@ -79,7 +79,9 @@ void DNADrawPanel::Render(wxDC& dc)
 			dc.SetTextForeground(textColor[id]);
 			dc.SetBrush(brushColors[id++]);
 			if (id == 3)
+			{
 				id = 0;
+			}
 
 			percentage = (static_cast<float>(codon.second) / mFASTAHistogram->GetTotalAminoCount()) * 100;
 			codonName = codeToNameMap.find(codon.first)->second + ": " 

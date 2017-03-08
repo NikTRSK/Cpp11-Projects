@@ -11,7 +11,6 @@ FASTA::FASTA(const char * filename)
 	}
 	// Get the total number of characters in the file
 	std::ifstream::pos_type fileLength = file.tellg();
-	//	std::cout << "^^^^^^^^" << fileSize << std::endl;
 	file.seekg(0, std::ios::beg); // Seek back to start of file
 	mData.reserve(static_cast<unsigned int>(fileLength));
 	// Get the header from the file
@@ -55,7 +54,7 @@ const std::string& FASTA::GetData() const
 	return mData;
 }
 
-bool FASTA::IsValid(char c)
+bool FASTA::IsValid(const char c)
 {
 	for (auto const& ch : mValidCharacters)
 	{
@@ -67,7 +66,7 @@ bool FASTA::IsValid(char c)
 	return false;
 }
 
-bool FASTA::IsIgnored(char c)
+bool FASTA::IsIgnored(const char c)
 {
 	for (auto const& ch : mIgnoredCharacters)
 	{

@@ -15,8 +15,8 @@ public:
 	const std::string & GetData() const;
 
 protected:
-	bool IsValid(char c);
-	bool IsIgnored(char c);
+	bool IsValid(const char c);
+	bool IsIgnored(const char c);
 
 private:
 	std::string mHeader;

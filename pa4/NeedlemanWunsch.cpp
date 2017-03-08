@@ -96,7 +96,6 @@ void NeedlemanWunsch::PrintDirectionMatrix()
 void NeedlemanWunsch::PopulateMatrix()
 {
 	// Define starting point
-//	unsigned int row = 1, col = 1;
 	for (unsigned int row = 1; row < mRows; ++row)
 	{
 		for (unsigned int col = 1; col < mCols; ++col)
