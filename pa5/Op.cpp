@@ -81,4 +81,90 @@ void OpGoto::Execute(MachineState& state)
 {
 	DebugOutput(state);
 	state.mProgramCounter = mParam;
+	// why doesn't go to increment action count
+}
+
+void OpAttack::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpRangedAttack::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpForward::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpEndturn::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpTestHuman::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpTestWall::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mTest = state.GetRandomBool();
+	// If facing a wall set mTest to true
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpTestZombie::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpTestRandom::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpTestPassable::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	state.mProgramCounter++;
+	state.mActionsTaken++;
+}
+
+void OpJE::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	if (state.mTest)
+	{
+		state.mProgramCounter = mParam;
+	}
+	else
+	{
+		state.mProgramCounter++;
+	}
+	state.mActionsTaken++;
+}
+
+void OpJNE::Execute(MachineState& state)
+{
+	DebugOutput(state);
+	//	state.mProgramCounter = mParam;
 }

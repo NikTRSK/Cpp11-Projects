@@ -47,4 +47,11 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 {
 	dc.SetPen(*wxBLACK_PEN);
 	dc.DrawRectangle(10, 10, 600, 600);
+	for (int i = 0; i < 20; ++i)
+	{
+		for (int j = 0; j < 20; ++j)
+		{
+			dc.DrawRectangle(j * 30 + 10, i * 30 + 10, 30, 30);
+		}
+	}
 }
