@@ -14,6 +14,7 @@
 #include <wx/sizer.h>
 #include <wx/filedlg.h>
 #include "ZomDrawPanel.h"
+#include "World.h"
 
 enum
 {
@@ -87,6 +88,7 @@ void ZomFrame::OnNew(wxCommandEvent& event)
 
 void ZomFrame::OnSimStart(wxCommandEvent& event)
 {
+//	World::get().AddZombie(mZombieMachine);
 	if (!mIsActive)
 	{
 		// Add timer to run once per second
@@ -98,13 +100,16 @@ void ZomFrame::OnSimStart(wxCommandEvent& event)
 		mTurnTimer->Stop();
 		mIsActive = false;
 	}
+	mPanel->PaintNow();
 }
 
 void ZomFrame::OnTurnTimer(wxTimerEvent& event)
 {
 	// TEMP CODE: Take turn for zombie machine
-	mZombieMachine.TakeTurn(zombieTestState);
+//	mZombieMachine.TakeTurn(zombieTestState);
+	World::get().UpdateWorld();
 	// END TEMP CODE
+	mPanel->PaintNow();
 }
 
 void ZomFrame::OnLoadZombie(wxCommandEvent& event)
@@ -118,7 +123,8 @@ void ZomFrame::OnLoadZombie(wxCommandEvent& event)
 		std::cout << "Loading file.\n";
 		// EXCEPTION ?
 		mZombieMachine.LoadMachine(fileDlg.GetPath().ToStdString());
-		mZombieMachine.BindState(zombieTestState);
+//		mZombieMachine.BindState(mZombieState);
+		World::get().AddZombie(mZombieMachine);
 //
 //		if (mInputAPath.size() != 0 &&
 //			mInputBPath.size() != 0 &&

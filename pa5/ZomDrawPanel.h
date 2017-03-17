@@ -12,6 +12,8 @@
 #include <wx/frame.h>
 #include <string>
 
+struct MachineState;
+
 class ZomDrawPanel : public wxPanel
 {
  
@@ -23,6 +25,7 @@ protected:
 	void PaintEvent(wxPaintEvent & evt);
 	void Render(wxDC& dc);
 	void DrawGrid(wxDC& dc);
+	void DrawState(MachineState& state, wxDC& dc);
  
 	DECLARE_EVENT_TABLE()
 	

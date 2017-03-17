@@ -5,7 +5,8 @@
 // Output state information for debugging purposes
 void Op::DebugOutput(MachineState& state)
 {
-	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
+	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam
+			  << " | Loc: " << state.GetX() << ", " << state.GetY() << std::endl;
 }
 
 void OpRotate::Execute(MachineState& state)
@@ -87,6 +88,7 @@ void OpGoto::Execute(MachineState& state)
 void OpAttack::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	state.UpdateLocation();
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -101,6 +103,8 @@ void OpRangedAttack::Execute(MachineState& state)
 void OpForward::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	state.UpdateLocation();
+	std::cout << "new loc: " << state.GetX() << ", " << state.GetY() << std::endl;
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }

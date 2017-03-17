@@ -7,7 +7,6 @@
 #include "Exceptions.h"
 #include <fstream>
 #include <unordered_map>
-#include <random>
 #include <ctime>
 
 // Defines state data accessible by the machine and ops
@@ -23,7 +22,10 @@ struct MachineState
 		, mActionsTaken(0)
 		, mFacing(UP)
 		, mTest(false)
-	{ }
+	{
+		mXCoordinate = 0;
+		mYCoordinate = 0;
+	}
 
 	~MachineState()
 	{
@@ -42,6 +44,10 @@ struct MachineState
 	int GetActionsPerTurn() const noexcept { return mActionsPerTurn; }
 	bool GetInfect() const noexcept { return mInfectOnAttack; }
 	static bool GetRandomBool() noexcept { return (rand() % 2) != 0; }
+	const int & GetX() const noexcept { return mXCoordinate; };
+	const int & GetY() const noexcept { return mYCoordinate; };
+	void UpdateLocation() noexcept;
+	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 20 && x >= 0 && y < 20 && y >= 0); };
 private:
 	// Data which is set by the traits
 	int mActionsPerTurn;
@@ -50,6 +56,31 @@ private:
 	int mXCoordinate;
 	int mYCoordinate;
 };
+
+inline void MachineState::UpdateLocation() noexcept
+{
+	switch (mFacing)
+	{
+		case MachineState::UP:
+			if (IsInbound(this->GetX(), this->GetY() - 1))
+				--this->mYCoordinate;
+			break;
+		case MachineState::DOWN:
+			if (IsInbound(this->GetX(), this->GetY() + 1))
+				++this->mYCoordinate;
+			break;
+		case MachineState::LEFT:
+			if (IsInbound(this->GetX() - 1, this->GetY()))
+				--this->mXCoordinate;
+			break;
+		case MachineState::RIGHT:
+			if (IsInbound(this->GetX() + 1, this->GetY()))
+				++this->mXCoordinate;
+			break;
+		default:
+			break;
+	}
+}
 
 // Describes the machine which processes ops.
 // Different policies dictate behavior possible for machine.

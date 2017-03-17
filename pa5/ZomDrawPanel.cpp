@@ -10,13 +10,14 @@
 #include <wx/dcclient.h>
 #include <wx/sizer.h>
 #include "Machine.h"
+#include "World.h"
 
 BEGIN_EVENT_TABLE(ZomDrawPanel, wxPanel)
 	EVT_PAINT(ZomDrawPanel::PaintEvent)
 END_EVENT_TABLE()
 
 ZomDrawPanel::ZomDrawPanel(wxFrame* parent)
-: wxPanel(parent)
+	: wxPanel(parent)
 {
 	
 }
@@ -54,4 +55,57 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 			dc.DrawRectangle(j * 30 + 10, i * 30 + 10, 30, 30);
 		}
 	}
+	
+	// Draw all zombies
+	std::cout << "SIZE: " << World::get().GetZombieStates().size() << std::endl;
+	for (auto zombie : World::get().GetZombieStates())
+	{
+		dc.SetBrush(wxBrush(*wxRED_BRUSH));
+
+//		wxPointList *points = new wxPointList(); 
+//		int x = 0, y = 0;
+//		points->Append(new wxPoint(x * 30 + 10, y * 30 + 40));
+//		points->Append(new wxPoint(x * 30 + 25, y * 30 + 10));
+//		points->Append(new wxPoint(x * 30 + 40, y * 30 + 40)); // midpoint
+//		dc.DrawPolygon(points);
+//		zombie.mFacing = MachineState::RIGHT;
+		DrawState(zombie, dc);
+	}
+}
+
+void ZomDrawPanel::DrawState(MachineState& state, wxDC& dc)
+{
+	// Is this a memory leak????
+	wxPointList *points = new wxPointList();
+
+	int x = state.GetX();
+	int y = state.GetY();
+
+	std::cout << "Drawing: " << state.mFacing << ", x: " << x << ", y: " << y << std::endl;
+	switch (state.mFacing)
+	{
+	case (MachineState::UP):
+		points->Append(new wxPoint(x * 30 + 10, y * 30 + 40));
+		points->Append(new wxPoint(x * 30 + 25, y * 30 + 10)); // midpoint
+		points->Append(new wxPoint(x * 30 + 40, y * 30 + 40));
+		break;
+	case (MachineState::RIGHT):
+		points->Append(new wxPoint(x*30 + 10, y*30 + 10));
+		points->Append(new wxPoint(x*30 + 10, y*30 + 40));
+		points->Append(new wxPoint(x*30 + 40, y*30 + 25)); // midpoint
+		break;
+	case (MachineState::DOWN):
+		points->Append(new wxPoint(x * 30 + 10, y * 30 + 10));
+		points->Append(new wxPoint(x * 30 + 25, y * 30 + 40)); // midpoint
+		points->Append(new wxPoint(x * 30 + 40, y * 30 + 10));
+		break;
+	case (MachineState::LEFT):
+		points->Append(new wxPoint(x * 30 + 40, y * 30 + 10));
+		points->Append(new wxPoint(x * 30 + 40, y * 30 + 40));
+		points->Append(new wxPoint(x * 30 + 10, y * 30 + 25)); // midpoint
+		break;
+	default:
+		break;
+	}
+	dc.DrawPolygon(points);
 }

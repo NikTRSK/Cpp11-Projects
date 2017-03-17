@@ -41,6 +41,8 @@ private:
 	MachineState zombieTestState;
 	Machine<ZombieTraits> zombieMachine;
 	// END TEMP CODE
+	MachineState mZombieState;
+	MachineState mHumanState;
 	Machine<ZombieTraits> mZombieMachine;
 	Machine<HumanTraits> mHumanMachine;
 	
