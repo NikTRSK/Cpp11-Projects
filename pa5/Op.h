@@ -14,7 +14,7 @@ public:
 	{ }
 
 	void DebugOutput(MachineState& state);
-
+	void UpdateLocation(MachineState& state) const noexcept;
 	virtual void Execute(MachineState& state) = 0;
 
 	MachineState* GetTarget(MachineState& state, int n = 1);

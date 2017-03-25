@@ -1,6 +1,7 @@
 #include "Op.h"
 #include "Machine.h"
 #include <iostream>
+#include "World.h"
 
 // Output state information for debugging purposes
 void Op::DebugOutput(MachineState& state)
@@ -88,7 +89,7 @@ void OpGoto::Execute(MachineState& state)
 void OpAttack::Execute(MachineState& state)
 {
 	DebugOutput(state);
-	state.UpdateLocation();
+//	UpdateLocation(state);
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -103,7 +104,7 @@ void OpRangedAttack::Execute(MachineState& state)
 void OpForward::Execute(MachineState& state)
 {
 	DebugOutput(state);
-	state.UpdateLocation();
+	UpdateLocation(state);
 	std::cout << "new loc: " << state.GetX() << ", " << state.GetY() << std::endl;
 	state.mProgramCounter++;
 	state.mActionsTaken++;
@@ -171,4 +172,43 @@ void OpJNE::Execute(MachineState& state)
 {
 	DebugOutput(state);
 	//	state.mProgramCounter = mParam;
+}
+
+void Op::UpdateLocation(MachineState& state) const noexcept
+{
+	int x = state.GetX();
+	int y = state.GetY();
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		if (state.IsInbound(x, y - 1) && !World::get().HasZombie(x, y - 1)
+			&& !World::get().HasHuman(x, y - 1))
+		{
+			--state.mCoordinate->y;
+		}
+		break;
+	case MachineState::DOWN:
+		if (state.IsInbound(x, y + 1) && !World::get().HasZombie(x, y + 1)
+			&& !World::get().HasHuman(x, y + 1))
+		{
+			++state.mCoordinate->y;
+		}
+		break;
+	case MachineState::LEFT:
+		if (state.IsInbound(x - 1, y) && !World::get().HasZombie(x - 1, y)
+			&& !World::get().HasHuman(x - 1, y))
+		{
+			--state.mCoordinate->x;
+		}
+		break;
+	case MachineState::RIGHT:
+		if (state.IsInbound(x + 1, y) && !World::get().HasZombie(x + 1, y)
+			&& !World::get().HasHuman(x + 1, y))
+		{
+			++state.mCoordinate->x;
+		}
+		break;
+	default:
+		break;
+	}
 }

@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <ctime>
 #include "Coordinate.h"
+//#include "World.h"
 
 // Defines state data accessible by the machine and ops
 struct MachineState
@@ -47,7 +48,6 @@ struct MachineState
 	static bool GetRandomBool() noexcept { return (rand() % 2) != 0; }
 	const int & GetX() const noexcept { return mCoordinate->x; };
 	const int & GetY() const noexcept { return mCoordinate->y; };
-	void UpdateLocation() noexcept;
 	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 20 && x >= 0 && y < 20 && y >= 0); };
 	int GetOpSize() const noexcept;
 	void SetOpSize(const int & size) noexcept;
@@ -58,35 +58,6 @@ private:
 
 	int mNumberOfOperations;
 };
-
-inline void MachineState::UpdateLocation() noexcept
-{
-	switch (mFacing)
-	{
-	case MachineState::UP:
-		//			if (IsInbound(GetX(), GetY() - 1) && !World::get().HasZombie(GetX(), GetY() - 1)
-		//				&& !World::get().HasHuman(GetX(), GetY() - 1))
-		//				--this->mCoordinate->y;
-		break;
-	case MachineState::DOWN:
-		//			if (IsInbound(GetX(), GetY() + 1) && !World::get().HasZombie(GetX(), GetY() + 1)
-		//				&& !World::get().HasHuman(GetX(), GetY() + 1))
-		//				++this->mCoordinate->y;
-		break;
-	case MachineState::LEFT:
-		//			if (IsInbound(GetX() - 1, GetY()) && !World::get().HasZombie(GetX() - 1, GetY())
-		//				&& !World::get().HasHuman(GetX() - 1, GetY()))
-		//				--this->mCoordinate->x;
-		break;
-	case MachineState::RIGHT:
-		//			if (IsInbound(GetX() + 1, GetY()) && !World::get().HasZombie(GetX() + 1, GetY())
-		//				&& !World::get().HasHuman(GetX() + 1, GetY()))
-		//				++this->mCoordinate->x;
-		break;
-	default:
-		break;
-	}
-}
 
 inline int MachineState::GetOpSize() const noexcept
 {
