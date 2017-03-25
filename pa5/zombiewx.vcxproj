@@ -79,6 +79,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Coordinate.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Machine.h" />
     <ClInclude Include="Op.h" />

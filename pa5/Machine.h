@@ -8,6 +8,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <ctime>
+#include "Coordinate.h"
 
 // Defines state data accessible by the machine and ops
 struct MachineState
@@ -23,8 +24,7 @@ struct MachineState
 		, mFacing(UP)
 		, mTest(false)
 	{
-		mXCoordinate = 0;
-		mYCoordinate = 0;
+		mCoordinate = std::make_shared<Coordinate>();
 	}
 
 	~MachineState()
@@ -40,46 +40,62 @@ struct MachineState
 	Facing mFacing;
 	// Test flag for branches
 	bool mTest;
+	std::shared_ptr<Coordinate> mCoordinate;
 
 	int GetActionsPerTurn() const noexcept { return mActionsPerTurn; }
 	bool GetInfect() const noexcept { return mInfectOnAttack; }
 	static bool GetRandomBool() noexcept { return (rand() % 2) != 0; }
-	const int & GetX() const noexcept { return mXCoordinate; };
-	const int & GetY() const noexcept { return mYCoordinate; };
+	const int & GetX() const noexcept { return mCoordinate->x; };
+	const int & GetY() const noexcept { return mCoordinate->y; };
 	void UpdateLocation() noexcept;
 	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 20 && x >= 0 && y < 20 && y >= 0); };
+	int GetOpSize() const noexcept;
+	void SetOpSize(const int & size) noexcept;
 private:
 	// Data which is set by the traits
 	int mActionsPerTurn;
 	bool mInfectOnAttack;
 
-	int mXCoordinate;
-	int mYCoordinate;
+	int mNumberOfOperations;
 };
 
 inline void MachineState::UpdateLocation() noexcept
 {
 	switch (mFacing)
 	{
-		case MachineState::UP:
-			if (IsInbound(this->GetX(), this->GetY() - 1))
-				--this->mYCoordinate;
-			break;
-		case MachineState::DOWN:
-			if (IsInbound(this->GetX(), this->GetY() + 1))
-				++this->mYCoordinate;
-			break;
-		case MachineState::LEFT:
-			if (IsInbound(this->GetX() - 1, this->GetY()))
-				--this->mXCoordinate;
-			break;
-		case MachineState::RIGHT:
-			if (IsInbound(this->GetX() + 1, this->GetY()))
-				++this->mXCoordinate;
-			break;
-		default:
-			break;
+	case MachineState::UP:
+		//			if (IsInbound(GetX(), GetY() - 1) && !World::get().HasZombie(GetX(), GetY() - 1)
+		//				&& !World::get().HasHuman(GetX(), GetY() - 1))
+		//				--this->mCoordinate->y;
+		break;
+	case MachineState::DOWN:
+		//			if (IsInbound(GetX(), GetY() + 1) && !World::get().HasZombie(GetX(), GetY() + 1)
+		//				&& !World::get().HasHuman(GetX(), GetY() + 1))
+		//				++this->mCoordinate->y;
+		break;
+	case MachineState::LEFT:
+		//			if (IsInbound(GetX() - 1, GetY()) && !World::get().HasZombie(GetX() - 1, GetY())
+		//				&& !World::get().HasHuman(GetX() - 1, GetY()))
+		//				--this->mCoordinate->x;
+		break;
+	case MachineState::RIGHT:
+		//			if (IsInbound(GetX() + 1, GetY()) && !World::get().HasZombie(GetX() + 1, GetY())
+		//				&& !World::get().HasHuman(GetX() + 1, GetY()))
+		//				++this->mCoordinate->x;
+		break;
+	default:
+		break;
 	}
+}
+
+inline int MachineState::GetOpSize() const noexcept
+{
+	return this->mNumberOfOperations;
+}
+
+inline void MachineState::SetOpSize(const int & size) noexcept
+{
+	this->mNumberOfOperations = size;
 }
 
 // Describes the machine which processes ops.
@@ -126,7 +142,7 @@ private:
 		if (key == "je") return je;
 		if (key == "jne") return jne;
 		if (key == "goto") return GoTo;
-		
+
 		return invalid;
 	};
 
@@ -153,57 +169,57 @@ void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 				std::cout << s;
 			std::cout << std::endl;
 		} // debug
-		switch(Convert(parameterizedString[0]))
+		switch (Convert(parameterizedString[0]))
 		{
-			case attack:
-				mOps.push_back(std::make_shared<OpAttack>(0));
-				break;
-			case ranged_attack:
-				mOps.push_back(std::make_shared<OpRangedAttack>(0));
-				break;
-			case rotate:
-				mOps.push_back(std::make_shared<OpRotate>(std::stoi(parameterizedString[1])));
-				break;
-			case forward:
-				mOps.push_back(std::make_shared<OpForward>(0));
-				break;
-			case endturn:
-				mOps.push_back(std::make_shared<OpEndturn>(0));
-				break;
-			case test_human:
-				mOps.push_back(std::make_shared<OpTestHuman>(0));
-				break;
-			case test_wall:
-				mOps.push_back(std::make_shared<OpTestWall>(0));
-				break;
-			case test_zombie:
-				mOps.push_back(std::make_shared<OpTestZombie>(0));
-				break;
-			case test_random:
-				mOps.push_back(std::make_shared<OpTestRandom>(0));
-				break;
-			case test_passable:
-				mOps.push_back(std::make_shared<OpTestPassable>(0));
-				break;
-			case je:
-				mOps.push_back(std::make_shared<OpJE>(std::stoi(parameterizedString[1])));
-				break;
-			case jne:
-				mOps.push_back(std::make_shared<OpJNE>(std::stoi(parameterizedString[1])));
-				break;
-			case GoTo:
-				mOps.push_back(std::make_shared<OpGoto>(std::stoi(parameterizedString[1])));
-				break;
-			default:
-				break;
+		case attack:
+			mOps.push_back(std::make_shared<OpAttack>(0));
+			break;
+		case ranged_attack:
+			mOps.push_back(std::make_shared<OpRangedAttack>(0));
+			break;
+		case rotate:
+			mOps.push_back(std::make_shared<OpRotate>(std::stoi(parameterizedString[1])));
+			break;
+		case forward:
+			mOps.push_back(std::make_shared<OpForward>(0));
+			break;
+		case endturn:
+			mOps.push_back(std::make_shared<OpEndturn>(0));
+			break;
+		case test_human:
+			mOps.push_back(std::make_shared<OpTestHuman>(0));
+			break;
+		case test_wall:
+			mOps.push_back(std::make_shared<OpTestWall>(0));
+			break;
+		case test_zombie:
+			mOps.push_back(std::make_shared<OpTestZombie>(0));
+			break;
+		case test_random:
+			mOps.push_back(std::make_shared<OpTestRandom>(0));
+			break;
+		case test_passable:
+			mOps.push_back(std::make_shared<OpTestPassable>(0));
+			break;
+		case je:
+			mOps.push_back(std::make_shared<OpJE>(std::stoi(parameterizedString[1])));
+			break;
+		case jne:
+			mOps.push_back(std::make_shared<OpJNE>(std::stoi(parameterizedString[1])));
+			break;
+		case GoTo:
+			mOps.push_back(std::make_shared<OpGoto>(std::stoi(parameterizedString[1])));
+			break;
+		default:
+			break;
 		}
 	}
 	// TEMP CODE: Add your parsing code here!
-//	mOps.clear();
-//	mOps.push_back(std::make_shared<OpRotate>(0));
-//	mOps.push_back(std::make_shared<OpRotate>(0));
-//	mOps.push_back(std::make_shared<OpRotate>(1));
-//	mOps.push_back(std::make_shared<OpGoto>(1));
+	//	mOps.clear();
+	//	mOps.push_back(std::make_shared<OpRotate>(0));
+	//	mOps.push_back(std::make_shared<OpRotate>(0));
+	//	mOps.push_back(std::make_shared<OpRotate>(1));
+	//	mOps.push_back(std::make_shared<OpGoto>(1));
 	// END TEMP CODE
 }
 
@@ -248,7 +264,7 @@ std::vector<std::string> Machine<MachineTraits>::ParseInstruction(std::string& i
 	if (found != std::string::npos)
 	{
 		result.push_back(Trim(input.substr(0, found)));
-		result.push_back(input.substr(found+1));
+		result.push_back(input.substr(found + 1));
 	}
 	else
 	{
