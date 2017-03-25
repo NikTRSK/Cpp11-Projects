@@ -82,14 +82,33 @@ void OpRotate::Execute(MachineState& state)
 void OpGoto::Execute(MachineState& state)
 {
 	DebugOutput(state);
-	state.mProgramCounter = mParam;
+	if (mParam < 1 || mParam >= state.GetOpSize())
+	{
+		throw GoToExcept();
+	}
+	else
+	{
+		state.mProgramCounter = mParam;
+
+	}
+	state.mActionsTaken++;
 	// why doesn't go to increment action count
 }
 
 void OpAttack::Execute(MachineState& state)
 {
 	DebugOutput(state);
-//	UpdateLocation(state);
+//	UpdateLocation();
+	if (World::get().HasHuman(state.GetX(), state.GetY()))
+	{
+		// Convert Human
+		World::get().ConvertHuman(state);
+	}
+	else if (World::get().HasZombie(state.GetX(), state.GetY()))
+	{
+		// Kill zombie
+		World::get().KillZombie(state);
+	}
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -104,17 +123,43 @@ void OpRangedAttack::Execute(MachineState& state)
 void OpForward::Execute(MachineState& state)
 {
 	DebugOutput(state);
-	UpdateLocation(state);
+//	std::cout << "\nBEFORE: \n"; World::get().PrintWorld();
+	if (TileIsOpen(state))
+	{
+		if (state.GetInfect())
+		{
+			std::cout << "UPDATING ZOMBIE\n";
+			World::get().mGridZombies[state.GetX()][state.GetY()] = nullptr;
+			UpdateLocation(state);
+			World::get().mGridZombies[state.GetX()][state.GetY()] = &state;
+		}
+		else
+		{
+			std::cout << "UPDATING HUMAN\n";
+			World::get().mGridHumans[state.GetX()][state.GetY()] = nullptr;
+			UpdateLocation(state);
+			World::get().mGridHumans[state.GetX()][state.GetY()] = &state;
+		}
+	}
 	std::cout << "new loc: " << state.GetX() << ", " << state.GetY() << std::endl;
 	state.mProgramCounter++;
 	state.mActionsTaken++;
+//	std::cout << "\nAFTER: \n"; World::get().PrintWorld();
 }
 
 void OpEndturn::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	// If Zombie set actions taken to 1, if human set to 2
+	if (state.GetInfect())
+	{
+		state.mActionsTaken = 1;
+	}
+	else
+	{
+		state.mActionsTaken = 2;
+	}
 	state.mProgramCounter++;
-	state.mActionsTaken++;
 }
 
 void OpTestHuman::Execute(MachineState& state)
@@ -181,34 +226,58 @@ void Op::UpdateLocation(MachineState& state) const noexcept
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
+		--state.mCoordinate->y;
+		break;
+	case MachineState::DOWN:
+		++state.mCoordinate->y;
+		break;
+	case MachineState::LEFT:
+		--state.mCoordinate->x;
+		break;
+	case MachineState::RIGHT:
+		++state.mCoordinate->x;
+		break;
+	default:
+		break;
+	}
+}
+
+bool Op::TileIsOpen(MachineState& state) const noexcept
+{
+	int x = state.GetX();
+	int y = state.GetY();
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
 		if (state.IsInbound(x, y - 1) && !World::get().HasZombie(x, y - 1)
 			&& !World::get().HasHuman(x, y - 1))
 		{
-			--state.mCoordinate->y;
+			return true;
 		}
 		break;
 	case MachineState::DOWN:
 		if (state.IsInbound(x, y + 1) && !World::get().HasZombie(x, y + 1)
 			&& !World::get().HasHuman(x, y + 1))
 		{
-			++state.mCoordinate->y;
+			return true;
 		}
 		break;
 	case MachineState::LEFT:
 		if (state.IsInbound(x - 1, y) && !World::get().HasZombie(x - 1, y)
 			&& !World::get().HasHuman(x - 1, y))
 		{
-			--state.mCoordinate->x;
+			return true;
 		}
 		break;
 	case MachineState::RIGHT:
 		if (state.IsInbound(x + 1, y) && !World::get().HasZombie(x + 1, y)
 			&& !World::get().HasHuman(x + 1, y))
 		{
-			++state.mCoordinate->x;
+			return true;
 		}
 		break;
 	default:
 		break;
 	}
+	return false;
 }

@@ -25,6 +25,7 @@ public:
 	bool HasZombie(const int& x, const int& y) const noexcept;
 	void KillZombie(MachineState& state) noexcept;
 	void ConvertHuman(MachineState& state) noexcept;
+	void PrintWorld() const noexcept;
 
 private:
 	const int mWorldSize = 20;
@@ -34,7 +35,10 @@ private:
 	std::vector<std::shared_ptr<Machine<HumanTraits>>> mHumans;
 	std::vector<MachineState> mHumanStates;
 
-	std::shared_ptr<Machine<ZombieTraits>> mGridZombies[20][20];
-	std::shared_ptr<Machine<HumanTraits>> mGridHumans[20][20];
+public:
+//	std::shared_ptr<Machine<ZombieTraits>> mGridZombies[20][20];
+//	std::shared_ptr<Machine<HumanTraits>> mGridHumans[20][20];
+	MachineState* mGridZombies[20][20];
+	MachineState* mGridHumans[20][20];
 };
 

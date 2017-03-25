@@ -199,6 +199,8 @@ void Machine<MachineTraits>::BindState(MachineState& state)
 {
 	state.mActionsPerTurn = MachineTraits::ACTIONS_PER_TURN;
 	state.mInfectOnAttack = MachineTraits::INFECT_ON_ATTACK;
+
+	state.SetOpSize(mOps.size());
 }
 
 template <typename MachineTraits>
@@ -210,6 +212,8 @@ void Machine<MachineTraits>::TakeTurn(MachineState& state)
 	{
 		mOps.at(state.mProgramCounter - 1)->Execute(state);
 	}
+
+	state.SetOpSize(mOps.size());
 }
 
 template <typename MachineTraits>
