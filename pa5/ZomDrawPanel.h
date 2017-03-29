@@ -33,5 +33,6 @@ public:
 	std::string mZombieFile;
 	std::string mHumanFile;
 	// Variables here
+	int mMonth;
 };
 

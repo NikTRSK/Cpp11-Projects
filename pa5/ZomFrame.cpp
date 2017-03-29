@@ -18,6 +18,7 @@
 enum
 {
 	ID_SImSTART = 1000,
+	ID_SIM_RESET,
 	ID_TURN_TIMER,
 	ID_LOAD_ZOMBIE,
 	ID_LOAD_SURVIVOR,
@@ -28,6 +29,7 @@ wxBEGIN_EVENT_TABLE(ZomFrame, wxFrame)
 EVT_MENU(wxID_EXIT, ZomFrame::OnExit)
 EVT_MENU(wxID_NEW, ZomFrame::OnNew)
 EVT_MENU(ID_SImSTART, ZomFrame::OnSimStart)
+EVT_MENU(ID_SIM_RESET, ZomFrame::OnSimReset)
 EVT_TIMER(ID_TURN_TIMER, ZomFrame::OnTurnTimer)
 EVT_MENU(ID_LOAD_ZOMBIE, ZomFrame::OnLoadZombie)
 EVT_MENU(ID_LOAD_SURVIVOR, ZomFrame::OnLoadSurvivor)
@@ -39,15 +41,16 @@ ZomFrame::ZomFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 	, mIsActive(false)
 {
 	// File menu
-	wxMenu* menuFile = new wxMenu;
+	menuFile = new wxMenu;
 	menuFile->Append(wxID_NEW);
-	menuFile->Append(ID_LOAD_ZOMBIE, "Load Zombie File");
-	menuFile->Append(ID_LOAD_SURVIVOR, "Load Survivor File");
 	menuFile->Append(wxID_EXIT);
 
 	// Simulation menu
 	mSimMenu = new wxMenu;
+	mSimMenu->Append(ID_LOAD_ZOMBIE, "Load Zombie File");
+	mSimMenu->Append(ID_LOAD_SURVIVOR, "Load Survivor File");
 	mSimMenu->Append(ID_SImSTART, "Start/stop\tSpace", "Start or stop the simulation");
+	mSimMenu->Append(ID_SIM_RESET, "Reset sim");
 	mSimMenu->Append(ID_RANDOMIZE, "Randomize", "Randomly generate zombies/humans");
 
 	wxMenuBar* menuBar = new wxMenuBar;
@@ -66,11 +69,9 @@ ZomFrame::ZomFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 	Show(true);
 
 	mTurnTimer = new wxTimer(this, ID_TURN_TIMER);
-
-	// TEMP CODE: Initialize zombie test machine
-	//	zombieMachine.LoadMachine(std::string(""));
-	//	zombieMachine.BindState(zombieTestState);
-	// END TEMP CODE
+	
+	// Disable sim menu on start
+	EnableDisableMenus(false);
 }
 
 ZomFrame::~ZomFrame()
@@ -86,6 +87,15 @@ void ZomFrame::OnExit(wxCommandEvent& event)
 void ZomFrame::OnNew(wxCommandEvent& event)
 {
 	// TODO: Add code for File>New
+	mTurnTimer->Stop();
+	mPanel->mMonth = 0;
+	World::get().ClearData();
+	mPanel->PaintNow();
+
+	mZombieMachine = nullptr;
+	mHumanMachine = nullptr;
+	mPanel->mZombieFile.clear();
+	mPanel->mHumanFile.clear();
 }
 
 void ZomFrame::OnSimStart(wxCommandEvent& event)
@@ -105,12 +115,17 @@ void ZomFrame::OnSimStart(wxCommandEvent& event)
 	mPanel->PaintNow();
 }
 
+void ZomFrame::OnSimReset(wxCommandEvent& event)
+{
+	mTurnTimer->Stop();
+	mPanel->mMonth = 0;
+	World::get().ClearData();
+	mPanel->PaintNow();
+}
+
 void ZomFrame::OnTurnTimer(wxTimerEvent& event)
 {
-	// TEMP CODE: Take turn for zombie machine
-	//	mZombieMachine.TakeTurn(zombieTestState);
 	World::get().UpdateWorld();
-	// END TEMP CODE
 	mPanel->PaintNow();
 }
 
@@ -124,8 +139,14 @@ void ZomFrame::OnLoadZombie(wxCommandEvent& event)
 	{
 		std::cout << "Loading file.\n";
 		// EXCEPTION ?
-		mPanel->mZombieFile = fileDlg.GetCurrentlySelectedFilename().ToStdString();
-		mZombieMachine.LoadMachine(fileDlg.GetPath().ToStdString());
+		mPanel->mZombieFile = fileDlg.GetFilename().ToStdString();
+		mZombieMachine = std::make_unique<Machine<ZombieTraits>>();
+		mZombieMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+	}
+
+	if (ZOMFilesLoaded())
+	{
+		EnableDisableMenus(true);
 	}
 }
 
@@ -139,14 +160,33 @@ void ZomFrame::OnLoadSurvivor(wxCommandEvent& event)
 	{
 		std::cout << "Loading file.\n";
 		// EXCEPTION ?
-		mPanel->mHumanFile = fileDlg.GetCurrentlySelectedFilename().ToStdString();
-		mHumanMachine.LoadMachine(fileDlg.GetPath().ToStdString());
+		mPanel->mHumanFile = fileDlg.GetFilename().ToStdString();
+		mHumanMachine = std::make_unique<Machine<HumanTraits>>();
+		mHumanMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+	}
+
+	if (ZOMFilesLoaded())
+	{
+		EnableDisableMenus(true);
 	}
 }
 
 void ZomFrame::OnRandomize(wxCommandEvent& event)
 {
 	World::get().ClearData();
-	World::get().GenerateZombies(mZombieMachine);
-	World::get().GenerateHumans(mHumanMachine);
+	World::get().GenerateZombies(*mZombieMachine);
+	World::get().GenerateHumans(*mHumanMachine);
+}
+
+bool ZomFrame::ZOMFilesLoaded() const noexcept
+{
+	return !mPanel->mHumanFile.empty() && !mPanel->mZombieFile.empty();
+}
+
+void ZomFrame::EnableDisableMenus(bool enable) const noexcept
+{
+	mSimMenu->Enable(ID_SImSTART, enable);
+	mSimMenu->Enable(ID_SIM_RESET, enable);
+	mSimMenu->Enable(ID_RANDOMIZE, enable);
+	menuFile->Enable(wxID_NEW, enable); // Do we need to enable/disable this
 }

@@ -22,15 +22,23 @@ private:
 	void OnExit(wxCommandEvent& event);
 	void OnNew(wxCommandEvent& event);
 	void OnSimStart(wxCommandEvent& event);
+	void OnSimReset(wxCommandEvent& event);
 	void OnTurnTimer(wxTimerEvent& event);
 	void OnLoadZombie(wxCommandEvent& event);
 	void OnLoadSurvivor(wxCommandEvent& event);
 	void OnRandomize(wxCommandEvent& event);
 
+	bool ZOMFilesLoaded() const noexcept;
+	// If enable = true enables menues. Disables otherwise
+	void EnableDisableMenus(bool enable) const noexcept;
+
 	wxDECLARE_EVENT_TABLE();
 private:
 	// Panel for drawing
 	class ZomDrawPanel* mPanel;
+
+	// File menu
+	wxMenu* menuFile;
 
 	// Simulation menu
 	wxMenu* mSimMenu;
@@ -44,8 +52,8 @@ private:
 	// END TEMP CODE
 	//	MachineState mZombieState;
 	//	MachineState mHumanState;
-	Machine<ZombieTraits> mZombieMachine;
-	Machine<HumanTraits> mHumanMachine;
+	std::unique_ptr<Machine<ZombieTraits>> mZombieMachine;
+	std::unique_ptr<Machine<HumanTraits>> mHumanMachine;
 
 	bool mIsActive;
 };

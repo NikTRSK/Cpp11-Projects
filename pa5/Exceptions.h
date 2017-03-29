@@ -16,3 +16,8 @@ class GoToExcept : public std::exception
 {
 	const char* what() const noexcept override { return "Cannot go to that location"; }
 };
+
+class RangedAttackExcept : public std::exception
+{
+	const char* what() const noexcept override { return "Zombies cannot perform ranged attacks"; }
+};

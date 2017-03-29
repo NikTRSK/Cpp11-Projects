@@ -90,6 +90,12 @@ public:
 	// Take a turn using this logic for the passed in state
 	void TakeTurn(MachineState& state);
 
+	// Get the Commands for a player
+	std::vector<std::shared_ptr<Op>> GetOps() const noexcept;
+
+	// Set the Commands for a player
+	void SetOps(std::vector<std::shared_ptr<Op>> opVector) noexcept;
+
 	// Destructor
 	~Machine();
 private:
@@ -214,6 +220,18 @@ void Machine<MachineTraits>::TakeTurn(MachineState& state)
 	}
 
 	state.SetOpSize(mOps.size());
+}
+
+template <typename MachineTraits>
+std::vector<std::shared_ptr<Op>> Machine<MachineTraits>::GetOps() const noexcept
+{
+	return this->mOps;
+}
+
+template <typename MachineTraits>
+void Machine<MachineTraits>::SetOps(std::vector<std::shared_ptr<Op>> opVector) noexcept
+{
+	this->mOps = opVector;
 }
 
 template <typename MachineTraits>

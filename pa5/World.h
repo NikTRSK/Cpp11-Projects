@@ -23,7 +23,8 @@ public:
 	void ClearData();
 	bool HasHuman(const int& x, const int& y) const noexcept;
 	bool HasZombie(const int& x, const int& y) const noexcept;
-	void KillZombie(MachineState& state) noexcept;
+	void KillZombie(MachineState& state, int offset) noexcept;
+	void KillHuman(MachineState& state, int offset) noexcept;
 	void ConvertHuman(MachineState& state) noexcept;
 	void PrintWorld() const noexcept;
 
@@ -36,8 +37,6 @@ private:
 	std::vector<MachineState> mHumanStates;
 
 public:
-//	std::shared_ptr<Machine<ZombieTraits>> mGridZombies[20][20];
-//	std::shared_ptr<Machine<HumanTraits>> mGridHumans[20][20];
 	MachineState* mGridZombies[20][20];
 	MachineState* mGridHumans[20][20];
 };

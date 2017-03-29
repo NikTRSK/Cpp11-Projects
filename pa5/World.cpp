@@ -20,46 +20,71 @@ void World::AddZombie(const Machine<ZombieTraits> & zombie)
 
 void World::GenerateZombies(const Machine<ZombieTraits> & zombie)
 {
-	for (auto i = 0; i < 20; ++i)
-	{
-		MachineState state;
-		int x, y;
-		do
-		{
-			x = rand() % 20;
-			y = rand() % 20;
-		} while (mGridZombies[x][y] != nullptr || mGridHumans[x][y] != nullptr);
-		state.mCoordinate->x = x;
-		state.mCoordinate->y = y;
-//		std::cout << "X: " << x << " Y: " << y << std::endl;
-		mZombieStates.push_back(state);
-		mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombie));
-		mZombies.back()->BindState(mZombieStates.back());
-//		mGridZombies[x][y] = mZombies.back();
-		mGridZombies[x][y] = &mZombieStates.back();
-	}
+	MachineState state;
+	int x = 5, y = 3;
+	state.mCoordinate->x = x;
+	state.mCoordinate->y = y;
+	mZombieStates.push_back(state);
+	mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombie));
+	mZombies.back()->BindState(mZombieStates.back());
+	mGridZombies[x][y] = &mZombieStates.back();
+
+
+
+
+
+//	for (auto i = 0; i < 20; ++i)
+//	{
+//		MachineState state;
+//		int x, y;
+//		do
+//		{
+//			x = rand() % 20;
+//			y = rand() % 20;
+//		} while (mGridZombies[x][y] != nullptr || mGridHumans[x][y] != nullptr);
+//		state.mCoordinate->x = x;
+//		state.mCoordinate->y = y;
+////		std::cout << "X: " << x << " Y: " << y << std::endl;
+//		mZombieStates.push_back(state);
+//		mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombie));
+//		mZombies.back()->BindState(mZombieStates.back());
+////		mGridZombies[x][y] = mZombies.back();
+//		mGridZombies[x][y] = &mZombieStates.back();
+//	}
 }
 
 void World::GenerateHumans(const Machine<HumanTraits>& human)
 {
-	for (auto i = 0; i < 10; ++i)
-	{
-		MachineState state;
-		int x, y;
-		do
-		{
-			x = rand() % 20;
-			y = rand() % 20;
-		} while (mGridHumans[x][y] != nullptr || mGridZombies[x][y] != nullptr);
-		state.mCoordinate->x = x;
-		state.mCoordinate->y = y;
-//		std::cout << "X: " << x << " Y: " << y << std::endl;
-		mHumanStates.push_back(state);
-		mHumans.push_back(std::make_shared<Machine<HumanTraits>>(human));
-		mHumans.back()->BindState(mHumanStates.back());
-//		mGridHumans[x][y] = mHumans.back();
-		mGridHumans[x][y] = &mHumanStates.back();
-	}
+
+	MachineState state2;
+	int x = 5, y = 5;
+	state2.mCoordinate->x = x;
+	state2.mCoordinate->y = y;
+	mHumanStates.push_back(state2);
+	mHumans.push_back(std::make_shared<Machine<HumanTraits>>(human));
+	mHumans.back()->BindState(mHumanStates.back());
+	mGridHumans[x][y] = &mHumanStates.back();
+
+
+
+//	for (auto i = 0; i < 10; ++i)
+//	{
+//		MachineState state;
+//		int x, y;
+//		do
+//		{
+//			x = rand() % 20;
+//			y = rand() % 20;
+//		} while (mGridHumans[x][y] != nullptr || mGridZombies[x][y] != nullptr);
+//		state.mCoordinate->x = x;
+//		state.mCoordinate->y = y;
+////		std::cout << "X: " << x << " Y: " << y << std::endl;
+//		mHumanStates.push_back(state);
+//		mHumans.push_back(std::make_shared<Machine<HumanTraits>>(human));
+//		mHumans.back()->BindState(mHumanStates.back());
+////		mGridHumans[x][y] = mHumans.back();
+//		mGridHumans[x][y] = &mHumanStates.back();
+//	}
 }
 
 
@@ -85,6 +110,7 @@ std::vector<MachineState> World::GetHumanStates() const
 
 void World::UpdateWorld()
 {
+	std::cout << "DEBUG: Size: " << mZombies.size() << std::endl;
 	for (unsigned int i = 0; i < mZombies.size(); ++i)
 	{
 		try
@@ -98,7 +124,8 @@ void World::UpdateWorld()
 			//			wxMessageBox("SHIT", "Error", wxOK | wxICON_ERROR);
 		}
 	}
-
+	std::cout << "DEBUG: Size: " << mZombies.size() << std::endl;
+	std::cout << "DEBUG: Size: " << mHumans.size() << std::endl;
 	for (unsigned int i = 0; i < mHumans.size(); ++i)
 	{
 		try
@@ -140,21 +167,85 @@ bool World::HasZombie(const int& x, const int& y) const noexcept
 	return mGridZombies[x][y] != nullptr;
 }
 
-void World::KillZombie(MachineState& state) noexcept
+void World::KillZombie(MachineState& state, int offset) noexcept
 {
-	// TODO:
-	std::shared_ptr<Machine<ZombieTraits>> zombie;
+	MachineState *zombieToKill = nullptr;
+
 	int x = state.GetX();
 	int y = state.GetY();
-	if (mGridZombies[x][y] == nullptr)
-		return;
-//	zombie = mGridZombies[x][y];
-	for (unsigned int i = 0; i < mZombies.size(); ++i)
+	switch (state.mFacing)
 	{
-		if (mZombies[i] == zombie)
+	case MachineState::UP:
+		zombieToKill = mGridZombies[x][y - offset];
+		mGridZombies[x][y - offset] = nullptr;
+		break;
+	case MachineState::DOWN:
+		zombieToKill = mGridZombies[x][y + offset];
+		mGridZombies[x][y + offset] = nullptr;
+		break;
+	case MachineState::LEFT:
+		zombieToKill = mGridZombies[x - offset][y];
+		mGridZombies[x - offset][y] = nullptr;
+		break;
+	case MachineState::RIGHT:
+		zombieToKill = mGridZombies[x + offset][y];
+		mGridZombies[x + offset][y] = nullptr;
+		break;
+	default:
+		break;
+	}
+
+//	if (mGridZombies[x][y] == nullptr)
+//		return;
+	for (unsigned int i = 0; i < mZombieStates.size(); ++i)
+	{
+		if (&mZombieStates[i] == zombieToKill)
 		{
 			std::cout << "Killing zombie\n";
 			mZombies.erase(mZombies.begin() + i);
+			mZombieStates.erase(mZombieStates.begin() + i);
+			return;
+		}
+	}
+}
+
+void World::KillHuman(MachineState& state, int offset) noexcept
+{
+	MachineState *humanToKill = nullptr;
+
+	int x = state.GetX();
+	int y = state.GetY();
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		humanToKill = mGridHumans[x][y - offset];
+		mGridHumans[x][y - offset] = nullptr;
+		break;
+	case MachineState::DOWN:
+		humanToKill = mGridHumans[x][y + offset];
+		mGridHumans[x][y + offset] = nullptr;
+		break;
+	case MachineState::LEFT:
+		humanToKill = mGridHumans[x - offset][y];
+		mGridHumans[x - offset][y] = nullptr;
+		break;
+	case MachineState::RIGHT:
+		humanToKill = mGridHumans[x + offset][y];
+		mGridHumans[x + offset][y] = nullptr;
+		break;
+	default:
+		break;
+	}
+
+	//	if (mGridZombies[x][y] == nullptr)
+	//		return;
+	for (unsigned int i = 0; i < mHumanStates.size(); ++i)
+	{
+		if (&mHumanStates[i] == humanToKill)
+		{
+			std::cout << "Killing human\n";
+			mHumans.erase(mHumans.begin() + i);
+			mHumanStates.erase(mHumanStates.begin() + i);
 			return;
 		}
 	}
@@ -162,21 +253,54 @@ void World::KillZombie(MachineState& state) noexcept
 
 void World::ConvertHuman(MachineState& state) noexcept
 {
-	// TODO:
-	std::shared_ptr<Machine<HumanTraits>> human;
+	// TODO: Actually convert human
+	MachineState *humanToConvert = nullptr;
+
 	int x = state.GetX();
 	int y = state.GetY();
-	if (mGridHumans[x][y] == nullptr)
-		return;
-//	human = mGridHumans[x][y];
-	for (unsigned int i = 0; i < mHumans.size(); ++i)
+	switch (state.mFacing)
 	{
-		if (mHumans[i] == human)
+	case MachineState::UP:
+		humanToConvert = mGridHumans[x][y - 1];
+		mGridHumans[x][y - 1] = nullptr;
+		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x][y - 1] << std::endl;
+		break;
+	case MachineState::DOWN:
+		humanToConvert = mGridHumans[x][y + 1];
+		mGridHumans[x][y + 1] = nullptr;
+		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x][y + 1] << std::endl;
+		break;
+	case MachineState::LEFT:
+		humanToConvert = mGridHumans[x - 1][y];
+		mGridHumans[x - 1][y] = nullptr;
+		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x - 1][y] << std::endl;
+		break;
+	case MachineState::RIGHT:
+		humanToConvert = mGridHumans[x + 1][y];
+		mGridHumans[x + 1][y] = nullptr;
+		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x + 1][y] << std::endl;
+		break;
+	default:
+		break;
+	}
+
+	//	if (mGridZombies[x][y] == nullptr)
+	//		return;
+	for (unsigned int i = 0; i < mHumanStates.size(); ++i)
+	{
+		if (&mHumanStates[i] == humanToConvert)
 		{
-			std::cout << "Converting human\n";
-			human->BindState(state);
+			std::cout << "Killing human\n";
+			
+			Machine<ZombieTraits> zombieMachine;
+			zombieMachine.SetOps(mZombies.back()->GetOps());
+			zombieMachine.BindState(*humanToConvert);
+			mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombieMachine));
+			mZombieStates.push_back(*humanToConvert);
 			mHumans.erase(mHumans.begin() + i);
-			//			mZombies.push_back(human);
+			mHumanStates.erase(mHumanStates.begin() + i);
+			
+			mGridZombies[x][y] = &mZombieStates.back();
 			return;
 		}
 	}

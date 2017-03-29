@@ -16,6 +16,7 @@ public:
 	void DebugOutput(MachineState& state);
 	void UpdateLocation(MachineState& state) const noexcept;
 	bool TileIsOpen(MachineState &state) const noexcept;
+	bool HasPlayer(MachineState &state) const noexcept;
 	virtual void Execute(MachineState& state) = 0;
 
 	MachineState* GetTarget(MachineState& state, int n = 1);
@@ -58,6 +59,7 @@ struct OpAttack : Op
 	{ }
 
 	virtual void Execute(MachineState& state) override;
+	void Attack(MachineState& state) const noexcept;
 };
 
 // Defines the ranged attack operation
@@ -69,6 +71,7 @@ struct OpRangedAttack : Op
 	{ }
 
 	virtual void Execute(MachineState& state) override;
+	void Attack(MachineState& state) const noexcept;
 };
 
 // Defines the forward operation

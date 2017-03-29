@@ -58,23 +58,6 @@ void OpRotate::Execute(MachineState& state)
 		break;
 	}
 
-	/*std::cout << "Now facing ";
-	switch (state.mFacing)
-	{
-	case (MachineState::UP):
-		std::cout << "UP";
-		break;
-	case (MachineState::RIGHT):
-		std::cout << "RIGHT";
-		break;
-	case (MachineState::DOWN):
-		std::cout << "DOWN";
-		break;
-	case (MachineState::LEFT):
-		std::cout << "LEFT";
-		break;
-	}
-	std::cout << std::endl;*/
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -98,16 +81,9 @@ void OpGoto::Execute(MachineState& state)
 void OpAttack::Execute(MachineState& state)
 {
 	DebugOutput(state);
-//	UpdateLocation();
-	if (World::get().HasHuman(state.GetX(), state.GetY()))
+	if (HasPlayer(state))
 	{
-		// Convert Human
-		World::get().ConvertHuman(state);
-	}
-	else if (World::get().HasZombie(state.GetX(), state.GetY()))
-	{
-		// Kill zombie
-		World::get().KillZombie(state);
+		Attack(state);
 	}
 	state.mProgramCounter++;
 	state.mActionsTaken++;
@@ -116,6 +92,14 @@ void OpAttack::Execute(MachineState& state)
 void OpRangedAttack::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	if (state.GetInfect())
+	{
+		throw RangedAttackExcept();
+	}
+	else
+	{
+		Attack(state);
+	}
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -128,20 +112,20 @@ void OpForward::Execute(MachineState& state)
 	{
 		if (state.GetInfect())
 		{
-			std::cout << "UPDATING ZOMBIE\n";
+//			std::cout << "UPDATING ZOMBIE\n";
 			World::get().mGridZombies[state.GetX()][state.GetY()] = nullptr;
 			UpdateLocation(state);
 			World::get().mGridZombies[state.GetX()][state.GetY()] = &state;
 		}
 		else
 		{
-			std::cout << "UPDATING HUMAN\n";
+//			std::cout << "UPDATING HUMAN\n";
 			World::get().mGridHumans[state.GetX()][state.GetY()] = nullptr;
 			UpdateLocation(state);
 			World::get().mGridHumans[state.GetX()][state.GetY()] = &state;
 		}
 	}
-	std::cout << "new loc: " << state.GetX() << ", " << state.GetY() << std::endl;
+//	std::cout << "new loc: " << state.GetX() << ", " << state.GetY() << std::endl;
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 //	std::cout << "\nAFTER: \n"; World::get().PrintWorld();
@@ -165,6 +149,38 @@ void OpEndturn::Execute(MachineState& state)
 void OpTestHuman::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	int x = state.GetX();
+	int y = state.GetY();
+	state.mTest = false;
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		if (state.IsInbound(x, y - mParam) && World::get().HasHuman(x, y - mParam))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::DOWN:
+		if (state.IsInbound(x, y + mParam) && World::get().HasHuman(x, y + mParam))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::LEFT:
+		if (state.IsInbound(x - mParam, y) && World::get().HasHuman(x - mParam, y))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::RIGHT:
+		if (state.IsInbound(x + mParam, y) && World::get().HasHuman(x + mParam, y))
+		{
+			state.mTest = true;
+		}
+		break;
+	default:
+		break;
+	}
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -172,7 +188,38 @@ void OpTestHuman::Execute(MachineState& state)
 void OpTestWall::Execute(MachineState& state)
 {
 	DebugOutput(state);
-	state.mTest = state.GetRandomBool();
+	int x = state.GetX();
+	int y = state.GetY();
+	state.mTest = false;
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		if (state.IsInbound(x, y - 1))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::DOWN:
+		if (state.IsInbound(x, y + 1))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::LEFT:
+		if (state.IsInbound(x - 1, y))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::RIGHT:
+		if (state.IsInbound(x + 1, y))
+		{
+			state.mTest = true;
+		}
+		break;
+	default:
+		break;
+	}
 	// If facing a wall set mTest to true
 	state.mProgramCounter++;
 	state.mActionsTaken++;
@@ -181,6 +228,38 @@ void OpTestWall::Execute(MachineState& state)
 void OpTestZombie::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	int x = state.GetX();
+	int y = state.GetY();
+	state.mTest = false;
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		if (state.IsInbound(x, y - mParam) && World::get().HasZombie(x, y - mParam))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::DOWN:
+		if (state.IsInbound(x, y + mParam) && World::get().HasZombie(x, y + mParam))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::LEFT:
+		if (state.IsInbound(x - mParam, y) && World::get().HasZombie(x - mParam, y))
+		{
+			state.mTest = true;
+		}
+		break;
+	case MachineState::RIGHT:
+		if (state.IsInbound(x + mParam, y) && World::get().HasZombie(x + mParam, y))
+		{
+			state.mTest = true;
+		}
+		break;
+	default:
+		break;
+	}
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -188,6 +267,7 @@ void OpTestZombie::Execute(MachineState& state)
 void OpTestRandom::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	state.mTest = state.GetRandomBool();
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -195,6 +275,7 @@ void OpTestRandom::Execute(MachineState& state)
 void OpTestPassable::Execute(MachineState& state)
 {
 	DebugOutput(state);
+	state.mTest = TileIsOpen(state);
 	state.mProgramCounter++;
 	state.mActionsTaken++;
 }
@@ -216,7 +297,15 @@ void OpJE::Execute(MachineState& state)
 void OpJNE::Execute(MachineState& state)
 {
 	DebugOutput(state);
-	//	state.mProgramCounter = mParam;
+	if (!state.mTest)
+	{
+		state.mProgramCounter = mParam;
+	}
+	else
+	{
+		state.mProgramCounter++;
+	}
+	state.mActionsTaken++;
 }
 
 void Op::UpdateLocation(MachineState& state) const noexcept
@@ -280,4 +369,173 @@ bool Op::TileIsOpen(MachineState& state) const noexcept
 		break;
 	}
 	return false;
+}
+
+bool Op::HasPlayer(MachineState& state) const noexcept
+{
+	int x = state.GetX();
+	int y = state.GetY();
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		if (state.IsInbound(x, y - 1) && (World::get().HasZombie(x, y - 1)
+			|| World::get().HasHuman(x, y - 1)))
+		{
+			return true;
+		}
+		break;
+	case MachineState::DOWN:
+		if (state.IsInbound(x, y + 1) && (World::get().HasZombie(x, y + 1)
+			|| World::get().HasHuman(x, y + 1)))
+		{
+			return true;
+		}
+		break;
+	case MachineState::LEFT:
+		if (state.IsInbound(x - 1, y) && (World::get().HasZombie(x - 1, y)
+			|| World::get().HasHuman(x - 1, y)))
+		{
+			return true;
+		}
+		break;
+	case MachineState::RIGHT:
+		if (state.IsInbound(x + 1, y) && (World::get().HasZombie(x + 1, y)
+			|| World::get().HasHuman(x + 1, y)))
+		{
+			return true;
+		}
+		break;
+	default:
+		break;
+	}
+	return false;
+}
+
+void OpAttack::Attack(MachineState& state) const noexcept
+{
+	int x = state.GetX();
+	int y = state.GetY();
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		if (World::get().HasZombie(x, y - 1))
+		{
+			World::get().KillZombie(state, 1);
+		}
+		// Zombies convert humans
+		else if (World::get().HasHuman(x, y - 1) && state.GetInfect())
+		{
+			World::get().ConvertHuman(state);
+		}
+		// Humans can only kill other humans
+		else if (World::get().HasHuman(x, y - 1) && !state.GetInfect())
+		{
+			World::get().KillHuman(state, 1);
+		}
+		break;
+	case MachineState::DOWN:
+		if (World::get().HasZombie(x, y + 1))
+		{
+			World::get().KillZombie(state, 1);
+		}
+		// Zombies convert humans
+		else if (World::get().HasHuman(x, y + 1) && state.GetInfect())
+		{
+			World::get().ConvertHuman(state);
+		}
+		// Humans can only kill other humans
+		else if (World::get().HasHuman(x, y + 1) && !state.GetInfect())
+		{
+			World::get().KillHuman(state, 1);
+		}
+		break;
+	case MachineState::LEFT:
+		if (World::get().HasZombie(x - 1, y))
+		{
+			World::get().KillZombie(state, 1);
+		}
+		// Zombies convert humans
+		else if (World::get().HasHuman(x - 1, y) && state.GetInfect())
+		{
+			World::get().ConvertHuman(state);
+		}
+		// Humans can only kill other humans
+		else if (World::get().HasHuman(x - 1, y) && !state.GetInfect())
+		{
+			World::get().KillHuman(state, 1);
+		}
+		break;
+	case MachineState::RIGHT:
+		if (World::get().HasZombie(x + 1, y))
+		{
+			World::get().KillZombie(state, 1);
+		}
+		// Zombies convert humans
+		else if (World::get().HasHuman(x + 1, y) && state.GetInfect())
+		{
+			World::get().ConvertHuman(state);
+		}
+		// Humans can only kill other humans
+		else if (World::get().HasHuman(x + 1, y) && !state.GetInfect())
+		{
+			World::get().KillHuman(state, 1);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void OpRangedAttack::Attack(MachineState& state) const noexcept
+{
+	int x = state.GetX();
+	int y = state.GetY();
+	switch (state.mFacing)
+	{
+	case MachineState::UP:
+		if (World::get().HasZombie(x, y - 2))
+		{
+			World::get().KillZombie(state, 2);
+		}
+		else if (World::get().HasHuman(x, y - 2))
+		{
+			World::get().KillHuman(state, 2);
+		}
+		break;
+	case MachineState::DOWN:
+		if (World::get().HasZombie(x, y + 2))
+		{
+			World::get().KillZombie(state, 2);
+		}
+		// Zombies convert humans
+		else if (World::get().HasHuman(x, y + 2))
+		{
+			World::get().KillHuman(state, 2);
+		}
+		break;
+	case MachineState::LEFT:
+		if (World::get().HasZombie(x - 2, y))
+		{
+			World::get().KillZombie(state, 2);
+		}
+		// Zombies convert humans
+		else if (World::get().HasHuman(x - 2, y))
+		{
+			World::get().KillHuman(state, 2);
+		}
+		break;
+	case MachineState::RIGHT:
+		if (World::get().HasZombie(x + 2, y))
+		{
+			World::get().KillZombie(state, 2);
+		}
+		// Zombies convert humans
+		else if (World::get().HasHuman(x + 2, y))
+		{
+			World::get().KillHuman(state, 2);
+		}
+		break;
+	default:
+		break;
+	}
 }

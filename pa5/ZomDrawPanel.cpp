@@ -19,7 +19,7 @@ END_EVENT_TABLE()
 ZomDrawPanel::ZomDrawPanel(wxFrame* parent)
 	: wxPanel(parent)
 {
-
+	mMonth = 0;
 }
 
 void ZomDrawPanel::PaintEvent(wxPaintEvent & evt)
@@ -74,14 +74,14 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 	dc.SetTextForeground(*wxRED);
 	dc.DrawText("Zombies", 630, 10);
 	dc.DrawText("Program: " + mZombieFile, 630, 30);
-	//	dc.DrawText("Alive: " + World::get().GetZombies().size(), 630, 50);
+	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetZombies().size()), 630, 50);
 
 
 	dc.SetTextForeground(*wxGREEN);
 	dc.DrawText("Humans", 630, 80);
 	dc.DrawText("Program: " + mHumanFile, 630, 100);
-	//	wxString size = "Alive: " + World::get().GetHumans().size();
-	//	dc.DrawText(size, 630, 120);
+	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetHumans().size()), 630, 120);
+	
 }
 
 void ZomDrawPanel::DrawState(MachineState& state, wxDC& dc)
