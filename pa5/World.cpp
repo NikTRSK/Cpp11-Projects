@@ -1,9 +1,13 @@
-#pragma once
 #include "World.h"
+#include "Exceptions.h"
+//#include <wx/msgdlg.h>
+//#include <wx/defs.h>
+
 
 
 World::World()
 {
+	srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 
@@ -20,71 +24,75 @@ void World::AddZombie(const Machine<ZombieTraits> & zombie)
 
 void World::GenerateZombies(const Machine<ZombieTraits> & zombie)
 {
-	MachineState state;
-	int x = 5, y = 3;
-	state.mCoordinate->x = x;
-	state.mCoordinate->y = y;
-	mZombieStates.push_back(state);
-	mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombie));
-	mZombies.back()->BindState(mZombieStates.back());
-	mGridZombies[x][y] = &mZombieStates.back();
+//	MachineState state;
+//	state.mFacing = static_cast<MachineState::Facing>(rand() % 4);
+//	int x = 5, y = 3;
+//	state.mCoordinate->x = x;
+//	state.mCoordinate->y = y;
+//	mZombieStates.push_back(state);
+//	mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombie));
+//	mZombies.back()->BindState(mZombieStates.back());
+//	mGridZombies[x][y] = &mZombieStates.back();
 
 
 
 
 
-//	for (auto i = 0; i < 20; ++i)
-//	{
-//		MachineState state;
-//		int x, y;
-//		do
-//		{
-//			x = rand() % 20;
-//			y = rand() % 20;
-//		} while (mGridZombies[x][y] != nullptr || mGridHumans[x][y] != nullptr);
-//		state.mCoordinate->x = x;
-//		state.mCoordinate->y = y;
-////		std::cout << "X: " << x << " Y: " << y << std::endl;
-//		mZombieStates.push_back(state);
-//		mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombie));
-//		mZombies.back()->BindState(mZombieStates.back());
-////		mGridZombies[x][y] = mZombies.back();
-//		mGridZombies[x][y] = &mZombieStates.back();
-//	}
+	for (auto i = 0; i < 20; ++i)
+	{
+		MachineState state;
+		state.mFacing = static_cast<MachineState::Facing>(rand() % 4);
+		int x, y;
+		do
+		{
+			x = rand() % 20;
+			y = rand() % 20;
+		} while (mGridZombies[x][y] != nullptr || mGridHumans[x][y] != nullptr);
+		state.mCoordinate->x = x;
+		state.mCoordinate->y = y;
+//		std::cout << "X: " << x << " Y: " << y << std::endl;
+		mZombieStates.push_back(state);
+		mZombies.push_back(std::make_shared<Machine<ZombieTraits>>(zombie));
+		mZombies.back()->BindState(mZombieStates.back());
+//		mGridZombies[x][y] = mZombies.back();
+		mGridZombies[x][y] = &mZombieStates.back();
+	}
 }
 
 void World::GenerateHumans(const Machine<HumanTraits>& human)
 {
 
-	MachineState state2;
-	int x = 5, y = 5;
-	state2.mCoordinate->x = x;
-	state2.mCoordinate->y = y;
-	mHumanStates.push_back(state2);
-	mHumans.push_back(std::make_shared<Machine<HumanTraits>>(human));
-	mHumans.back()->BindState(mHumanStates.back());
-	mGridHumans[x][y] = &mHumanStates.back();
+//	MachineState state2;
+//	state2.mFacing = static_cast<MachineState::Facing>(rand() % 4);
+//	int x = 5, y = 5;
+//	state2.mCoordinate->x = x;
+//	state2.mCoordinate->y = y;
+//	mHumanStates.push_back(state2);
+//	mHumans.push_back(std::make_shared<Machine<HumanTraits>>(human));
+//	mHumans.back()->BindState(mHumanStates.back());
+//	mGridHumans[x][y] = &mHumanStates.back();
 
 
 
-//	for (auto i = 0; i < 10; ++i)
-//	{
-//		MachineState state;
-//		int x, y;
-//		do
-//		{
-//			x = rand() % 20;
-//			y = rand() % 20;
-//		} while (mGridHumans[x][y] != nullptr || mGridZombies[x][y] != nullptr);
-//		state.mCoordinate->x = x;
-//		state.mCoordinate->y = y;
-////		std::cout << "X: " << x << " Y: " << y << std::endl;
-//		mHumanStates.push_back(state);
-//		mHumans.push_back(std::make_shared<Machine<HumanTraits>>(human));
-//		mHumans.back()->BindState(mHumanStates.back());
-////		mGridHumans[x][y] = mHumans.back();
-//		mGridHumans[x][y] = &mHumanStates.back();
-//	}
+	for (auto i = 0; i < 10; ++i)
+	{
+		MachineState state;
+		state.mFacing = static_cast<MachineState::Facing>(rand() % 4);
+		int x, y;
+		do
+		{
+			x = rand() % 20;
+			y = rand() % 20;
+		} while (mGridHumans[x][y] != nullptr || mGridZombies[x][y] != nullptr);
+		state.mCoordinate->x = x;
+		state.mCoordinate->y = y;
+//		std::cout << "X: " << x << " Y: " << y << std::endl;
+		mHumanStates.push_back(state);
+		mHumans.push_back(std::make_shared<Machine<HumanTraits>>(human));
+		mHumans.back()->BindState(mHumanStates.back());
+//		mGridHumans[x][y] = mHumans.back();
+		mGridHumans[x][y] = &mHumanStates.back();
+	}
 }
 
 
@@ -110,33 +118,50 @@ std::vector<MachineState> World::GetHumanStates() const
 
 void World::UpdateWorld()
 {
-	std::cout << "DEBUG: Size: " << mZombies.size() << std::endl;
 	for (unsigned int i = 0; i < mZombies.size(); ++i)
 	{
 		try
 		{
 			mZombies.at(i)->TakeTurn(mZombieStates.at(i));
 		}
-		//		catch(GoToExcept gte)
-		catch (std::exception e)
+		catch (const InvalidOp &e)
 		{
 			std::cerr << e.what() << std::endl;
-			//			wxMessageBox("SHIT", "Error", wxOK | wxICON_ERROR);
+//			wxMessageBox("Error", "Error", wxOK | wxICON_ERROR);
+//			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+		}
+		catch (const GoToExcept &e)
+		{
+			std::cerr << e.what() << std::endl;
+//			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+		}
+		catch (const RangedAttackExcept &e)
+		{
+			std::cerr << e.what() << std::endl;
+//			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
 		}
 	}
-	std::cout << "DEBUG: Size: " << mZombies.size() << std::endl;
-	std::cout << "DEBUG: Size: " << mHumans.size() << std::endl;
+
 	for (unsigned int i = 0; i < mHumans.size(); ++i)
 	{
 		try
 		{
 			mHumans.at(i)->TakeTurn(mHumanStates.at(i));
 		}
-		//		catch(GoToExcept gte)
-		catch (std::exception e)
+		catch (const InvalidOp &e)
 		{
 			std::cerr << e.what() << std::endl;
-			//			wxMessageBox("SHIT", "Error", wxOK | wxICON_ERROR);
+//			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+		}
+		catch (const GoToExcept &e)
+		{
+			std::cerr << e.what() << std::endl;
+//			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+		}
+		catch (const RangedAttackExcept &e)
+		{
+			std::cerr << e.what() << std::endl;
+//			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
 		}
 	}
 }
@@ -253,7 +278,6 @@ void World::KillHuman(MachineState& state, int offset) noexcept
 
 void World::ConvertHuman(MachineState& state) noexcept
 {
-	// TODO: Actually convert human
 	MachineState *humanToConvert = nullptr;
 
 	int x = state.GetX();
@@ -263,34 +287,28 @@ void World::ConvertHuman(MachineState& state) noexcept
 	case MachineState::UP:
 		humanToConvert = mGridHumans[x][y - 1];
 		mGridHumans[x][y - 1] = nullptr;
-		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x][y - 1] << std::endl;
 		break;
 	case MachineState::DOWN:
 		humanToConvert = mGridHumans[x][y + 1];
 		mGridHumans[x][y + 1] = nullptr;
-		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x][y + 1] << std::endl;
 		break;
 	case MachineState::LEFT:
 		humanToConvert = mGridHumans[x - 1][y];
 		mGridHumans[x - 1][y] = nullptr;
-		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x - 1][y] << std::endl;
 		break;
 	case MachineState::RIGHT:
 		humanToConvert = mGridHumans[x + 1][y];
 		mGridHumans[x + 1][y] = nullptr;
-		std::cout << "PTRS: " << humanToConvert << ", " << mGridHumans[x + 1][y] << std::endl;
 		break;
 	default:
 		break;
 	}
 
-	//	if (mGridZombies[x][y] == nullptr)
-	//		return;
 	for (unsigned int i = 0; i < mHumanStates.size(); ++i)
 	{
 		if (&mHumanStates[i] == humanToConvert)
 		{
-			std::cout << "Killing human\n";
+			std::cout << "Converting human\n";
 			
 			Machine<ZombieTraits> zombieMachine;
 			zombieMachine.SetOps(mZombies.back()->GetOps());

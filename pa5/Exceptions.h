@@ -3,6 +3,7 @@
 
 class InvalidOp : public std::exception
 {
+public:
 	const char* what() const noexcept override { return "Invalid OP code or parameters."; }
 };
 
@@ -14,10 +15,12 @@ public:
 
 class GoToExcept : public std::exception
 {
+public:
 	const char* what() const noexcept override { return "Cannot go to that location"; }
 };
 
 class RangedAttackExcept : public std::exception
 {
+public:
 	const char* what() const noexcept override { return "Zombies cannot perform ranged attacks"; }
 };

@@ -5,15 +5,13 @@
 //  Created by Sanjay Madhav on 12/27/14.
 //  Copyright (c) 2014 Sanjay Madhav. All rights reserved.
 //
-
+#include "ZomDrawPanel.h"
+#include "World.h"
 #include "ZomFrame.h"
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
 #include <wx/log.h>
-//#include <wx/sizer.h>
 #include <wx/filedlg.h>
-#include "ZomDrawPanel.h"
-#include "World.h"
 
 enum
 {
@@ -126,6 +124,7 @@ void ZomFrame::OnSimReset(wxCommandEvent& event)
 void ZomFrame::OnTurnTimer(wxTimerEvent& event)
 {
 	World::get().UpdateWorld();
+	mPanel->mMonth++;
 	mPanel->PaintNow();
 }
 
@@ -138,10 +137,16 @@ void ZomFrame::OnLoadZombie(wxCommandEvent& event)
 	if (fileDlg.ShowModal() == wxID_OK)
 	{
 		std::cout << "Loading file.\n";
-		// EXCEPTION ?
 		mPanel->mZombieFile = fileDlg.GetFilename().ToStdString();
 		mZombieMachine = std::make_unique<Machine<ZombieTraits>>();
-		mZombieMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+		try {
+			mZombieMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+		}
+		catch(const FileLoadExcept &e)
+		{
+			std::cerr << e.what() << std::endl;
+			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+		}
 	}
 
 	if (ZOMFilesLoaded())
@@ -162,7 +167,14 @@ void ZomFrame::OnLoadSurvivor(wxCommandEvent& event)
 		// EXCEPTION ?
 		mPanel->mHumanFile = fileDlg.GetFilename().ToStdString();
 		mHumanMachine = std::make_unique<Machine<HumanTraits>>();
-		mHumanMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+		try {
+			mHumanMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+		}
+		catch (const FileLoadExcept &e)
+		{
+			std::cerr << e.what() << std::endl;
+			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+		}
 	}
 
 	if (ZOMFilesLoaded())

@@ -45,13 +45,7 @@ private:
 
 	// Turn timer
 	wxTimer* mTurnTimer;
-
-	// TEMP CODE TEST MACHINES
-	//	MachineState zombieTestState;
-	//	Machine<ZombieTraits> zombieMachine;
-	// END TEMP CODE
-	//	MachineState mZombieState;
-	//	MachineState mHumanState;
+	
 	std::unique_ptr<Machine<ZombieTraits>> mZombieMachine;
 	std::unique_ptr<Machine<HumanTraits>> mHumanMachine;
 

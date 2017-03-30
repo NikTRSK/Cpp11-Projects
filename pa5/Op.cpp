@@ -107,15 +107,17 @@ void OpRangedAttack::Execute(MachineState& state)
 void OpForward::Execute(MachineState& state)
 {
 	DebugOutput(state);
-//	std::cout << "\nBEFORE: \n"; World::get().PrintWorld();
 	if (TileIsOpen(state))
 	{
 		if (state.GetInfect())
 		{
-//			std::cout << "UPDATING ZOMBIE\n";
+			std::cout << "UPDATING ZOMBIE\n";
+			std::cout << "OLD: " << state.GetX() << ", " << state.GetY() << std::endl;
 			World::get().mGridZombies[state.GetX()][state.GetY()] = nullptr;
 			UpdateLocation(state);
 			World::get().mGridZombies[state.GetX()][state.GetY()] = &state;
+
+			std::cout << "NEW: " << state.GetX() << ", " << state.GetY() << std::endl;
 		}
 		else
 		{
@@ -125,10 +127,8 @@ void OpForward::Execute(MachineState& state)
 			World::get().mGridHumans[state.GetX()][state.GetY()] = &state;
 		}
 	}
-//	std::cout << "new loc: " << state.GetX() << ", " << state.GetY() << std::endl;
 	state.mProgramCounter++;
 	state.mActionsTaken++;
-//	std::cout << "\nAFTER: \n"; World::get().PrintWorld();
 }
 
 void OpEndturn::Execute(MachineState& state)

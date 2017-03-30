@@ -8,7 +8,6 @@
 
 #include "ZomDrawPanel.h"
 #include <wx/dcclient.h>
-#include <wx/sizer.h>
 #include "Machine.h"
 #include "World.h"
 
@@ -48,12 +47,12 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 {
 	dc.SetPen(*wxBLACK_PEN);
 	dc.DrawRectangle(10, 10, 600, 600);
-	for (int i = 0; i < 20; ++i)
+
+	// Draw the grid.
+	for (int pos = 40; pos < 610; pos += 30)
 	{
-		for (int j = 0; j < 20; ++j)
-		{
-			dc.DrawRectangle(j * 30 + 10, i * 30 + 10, 30, 30);
-		}
+		dc.DrawLine(pos, 10, pos, 610);
+		dc.DrawLine(10, pos, 610, pos);
 	}
 
 	// Draw all zombies
@@ -78,9 +77,12 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 
 
 	dc.SetTextForeground(*wxGREEN);
-	dc.DrawText("Humans", 630, 80);
-	dc.DrawText("Program: " + mHumanFile, 630, 100);
-	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetHumans().size()), 630, 120);
+	dc.DrawText("Humans", 630, 100);
+	dc.DrawText("Program: " + mHumanFile, 630, 120);
+	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetHumans().size()), 630, 140);
+
+	dc.SetTextForeground(*wxBLACK);
+	dc.DrawText("Month: " + wxString::Format(wxT("%i"), mMonth), 630, 210);
 	
 }
 
@@ -118,4 +120,5 @@ void ZomDrawPanel::DrawState(MachineState& state, wxDC& dc)
 		break;
 	}
 	dc.DrawPolygon(points);
+	delete points;
 }

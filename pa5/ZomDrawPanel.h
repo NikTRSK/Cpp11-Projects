@@ -10,7 +10,6 @@
 #include <wx/sizer.h>
 #include <wx/panel.h>
 #include <wx/frame.h>
-#include <string>
 
 struct MachineState;
 

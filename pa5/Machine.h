@@ -140,12 +140,6 @@ void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 	while (std::getline(file, currentLine))
 	{
 		auto parameterizedString = ParseInstruction(currentLine);
-		{ // debug
-			std::cout << "PARSE DEBUG: ";
-			for (auto s : parameterizedString)
-				std::cout << s;
-			std::cout << std::endl;
-		} // debug
 		switch (Convert(parameterizedString[0]))
 		{
 		case attack:
@@ -212,7 +206,6 @@ void Machine<MachineTraits>::BindState(MachineState& state)
 template <typename MachineTraits>
 void Machine<MachineTraits>::TakeTurn(MachineState& state)
 {
-	std::cout << "TAKING TURN" << std::endl;
 	state.mActionsTaken = 0;
 	while (state.mActionsTaken < MachineTraits::ACTIONS_PER_TURN)
 	{
