@@ -24,14 +24,14 @@ protected:
 	void PaintEvent(wxPaintEvent & evt);
 	void Render(wxDC& dc);
 	void DrawGrid(wxDC& dc);
-	void DrawState(MachineState& state, wxDC& dc);
+	// Draw a zombie/human
+	void DrawState(const MachineState& state, wxDC& dc) const noexcept;
 
 	DECLARE_EVENT_TABLE()
 
 public:
 	std::string mZombieFile;
 	std::string mHumanFile;
-	// Variables here
 	int mMonth;
 };
 

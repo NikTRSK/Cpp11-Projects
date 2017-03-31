@@ -124,7 +124,6 @@ void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 	{
 		throw FileLoadExcept();
 	}
-	// Should we worry about malformated input files? Whitespace? casing?
 	mOps.clear();
 	std::string currentLine;
 	while (std::getline(file, currentLine))
@@ -157,13 +156,21 @@ void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 			mOps.push_back(std::make_shared<OpEndturn>(0));
 			break;
 		case test_human:
-			mOps.push_back(std::make_shared<OpTestHuman>(0));
+			if (parameterizedString.size() == 1 || parameterizedString[1] != "1" && parameterizedString[1] != "2")
+			{
+				throw FileLoadExcept();
+			}
+			mOps.push_back(std::make_shared<OpTestHuman>(std::stoi(parameterizedString[1])));
 			break;
 		case test_wall:
 			mOps.push_back(std::make_shared<OpTestWall>(0));
 			break;
 		case test_zombie:
-			mOps.push_back(std::make_shared<OpTestZombie>(0));
+			if (parameterizedString.size() == 1 || parameterizedString[1] != "1" && parameterizedString[1] != "2")
+			{
+				throw FileLoadExcept();
+			}
+			mOps.push_back(std::make_shared<OpTestZombie>(std::stoi(parameterizedString[1])));
 			break;
 		case test_random:
 			mOps.push_back(std::make_shared<OpTestRandom>(0));

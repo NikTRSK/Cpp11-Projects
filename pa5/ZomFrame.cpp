@@ -90,8 +90,6 @@ void ZomFrame::OnNew(wxCommandEvent& event)
 	World::get().ClearData();
 	mPanel->PaintNow();
 
-//	mZombieMachine = nullptr;
-//	mHumanMachine = nullptr;
 	mPanel->mZombieFile.clear();
 	mPanel->mHumanFile.clear();
 	EnableDisableMenus(false);
@@ -99,7 +97,6 @@ void ZomFrame::OnNew(wxCommandEvent& event)
 
 void ZomFrame::OnSimStart(wxCommandEvent& event)
 {
-	//	World::get().AddZombie(mZombieMachine);
 	if (!mIsActive)
 	{
 		// Add timer to run once per second
@@ -119,26 +116,14 @@ void ZomFrame::OnSimReset(wxCommandEvent& event)
 	mTurnTimer->Stop();
 	mPanel->mMonth = 0;
 	World::get().ClearData();
+	mSimMenu->Enable(ID_SImSTART, false);
+	mSimMenu->Enable(ID_SIM_RESET, false);
+	mSimMenu->Enable(ID_RANDOMIZE, true);
 	mPanel->PaintNow();
 }
 
 void ZomFrame::OnTurnTimer(wxTimerEvent& event)
 {
-//	if (mIsActive)
-//	{
-//		if (World::get().GetZombies().empty())
-//		{
-//			wxMessageBox("Appocalypse averted. Humans win.", "Sim Finished", wxOK);
-//			mTurnTimer->Stop();
-//			mIsActive = false;
-//		}
-//		else if (World::get().GetHumans().empty())
-//		{
-//			wxMessageBox("The end is nigh. Zombies win.", "Sim Finished", wxOK);
-//			mTurnTimer->Stop();
-//			mIsActive = false;
-//		}
-//	}
 	if (World::get().GetZombies().empty())
 	{
 		mTurnTimer->Stop();
@@ -167,7 +152,6 @@ void ZomFrame::OnLoadZombie(wxCommandEvent& event)
 
 	if (fileDlg.ShowModal() == wxID_OK)
 	{
-		std::cout << "Loading file.\n";
 		mPanel->mZombieFile = fileDlg.GetFilename().ToStdString();
 		try
 		{
@@ -177,6 +161,7 @@ void ZomFrame::OnLoadZombie(wxCommandEvent& event)
 		catch(const FileLoadExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
+			mPanel->mZombieFile.clear();
 			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
 		}
 	}
@@ -195,7 +180,6 @@ void ZomFrame::OnLoadSurvivor(wxCommandEvent& event)
 
 	if (fileDlg.ShowModal() == wxID_OK)
 	{
-		std::cout << "Loading file.\n";
 		mPanel->mHumanFile = fileDlg.GetFilename().ToStdString();
 		try
 		{
@@ -205,6 +189,7 @@ void ZomFrame::OnLoadSurvivor(wxCommandEvent& event)
 		catch (const FileLoadExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
+			mPanel->mHumanFile.clear();
 			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
 		}
 	}

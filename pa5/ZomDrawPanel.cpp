@@ -12,7 +12,7 @@
 #include "World.h"
 
 BEGIN_EVENT_TABLE(ZomDrawPanel, wxPanel)
-EVT_PAINT(ZomDrawPanel::PaintEvent)
+	EVT_PAINT(ZomDrawPanel::PaintEvent)
 END_EVENT_TABLE()
 
 ZomDrawPanel::ZomDrawPanel(wxFrame* parent)
@@ -55,18 +55,30 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 		dc.DrawLine(10, pos, 610, pos);
 	}
 
-	// Draw all zombies
-	for (auto zombie : World::get().GetZombies())
+	// Draw Zombies
+	dc.SetBrush(wxBrush(*wxRED_BRUSH));
+	for (unsigned int i = 0; i < 20; ++i)
 	{
-		dc.SetBrush(wxBrush(*wxRED_BRUSH));
-		DrawState(*zombie, dc);
+		for (unsigned int j = 0; j < 20; ++j)
+		{
+			if (World::get().mGridZombies[i][j] != nullptr)
+			{
+				DrawState(*World::get().mGridZombies[i][j], dc);
+			}
+		}
 	}
 
-	// Draw all humans
-	for (auto human : World::get().GetHumans())
+	// Draw Humans
+	dc.SetBrush(wxBrush(*wxGREEN_BRUSH));
+	for (unsigned int i = 0; i < 20; ++i)
 	{
-		dc.SetBrush(wxBrush(*wxGREEN_BRUSH));
-		DrawState(*human, dc);
+		for (unsigned int j = 0; j < 20; ++j)
+		{
+			if (World::get().mGridHumans[i][j] != nullptr)
+			{
+				DrawState(*World::get().mGridHumans[i][j], dc);
+			}
+		}
 	}
 
 	// Draw stats
@@ -86,7 +98,7 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 	
 }
 
-void ZomDrawPanel::DrawState(MachineState& state, wxDC& dc)
+void ZomDrawPanel::DrawState(const MachineState& state, wxDC& dc) const noexcept
 {
 	wxPointList *points = new wxPointList();
 

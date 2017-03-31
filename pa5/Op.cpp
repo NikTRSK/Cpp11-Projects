@@ -6,7 +6,7 @@
 // Output state information for debugging purposes
 void Op::DebugOutput(MachineState& state)
 {
-	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
+//	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
 }
 
 void OpRotate::Execute(MachineState& state)
@@ -109,15 +109,21 @@ void OpForward::Execute(MachineState& state)
 	{
 		if (state.GetInfect())
 		{
-			World::get().mGridZombies[state.GetX()][state.GetY()] = nullptr;
-			UpdateLocation(state);
-			World::get().mGridZombies[state.GetX()][state.GetY()] = &state;
+			if (World::get().mGridZombies[state.GetX()][state.GetY()] != nullptr)
+			{
+				World::get().mGridZombies[state.GetX()][state.GetY()] = nullptr;
+				UpdateLocation(state);
+				World::get().mGridZombies[state.GetX()][state.GetY()] = &state;
+			}
 		}
 		else
 		{
-			World::get().mGridHumans[state.GetX()][state.GetY()] = nullptr;
-			UpdateLocation(state);
-			World::get().mGridHumans[state.GetX()][state.GetY()] = &state;
+			if (World::get().mGridHumans[state.GetX()][state.GetY()] != nullptr)
+			{
+				World::get().mGridHumans[state.GetX()][state.GetY()] = nullptr;
+				UpdateLocation(state);
+				World::get().mGridHumans[state.GetX()][state.GetY()] = &state;
+			}
 		}
 	}
 	state.mProgramCounter++;

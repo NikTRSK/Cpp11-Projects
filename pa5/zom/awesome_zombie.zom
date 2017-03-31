@@ -9,7 +9,7 @@ attack
 test_wall
 jne,2
 je,5
-test_human
+test_human, 2
 je, 5 ; attack human if there
 rotate,0
 test_wall
