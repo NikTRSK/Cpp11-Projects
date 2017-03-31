@@ -36,7 +36,15 @@ void World::GenerateZombies() noexcept
 //	mZombieMachine.BindState(*state);
 //	mZombies.push_back(state);
 //	mGridZombies[x][y] = state;
-
+//
+//	state = new MachineState;
+//	state->mFacing = MachineState::LEFT;
+//	x = 6, y = 5;
+//	state->mCoordinate->x = x;
+//	state->mCoordinate->y = y;
+//	mZombieMachine.BindState(*state);
+//	mZombies.push_back(state);
+//	mGridZombies[x][y] = state;
 
 	std::random_device                  rand_dev;
 	std::mt19937                        generator(rand_dev());
@@ -66,7 +74,7 @@ void World::GenerateHumans() noexcept
 {
 //	MachineState *state = new MachineState;
 //	state->mFacing = MachineState::LEFT;
-//	int x = 6, y = 5;
+//	int x = 6, y = 4;
 //	state->mCoordinate->x = x;
 //	state->mCoordinate->y = y;
 //	mHumanMachine.BindState(*state);
@@ -111,8 +119,8 @@ std::vector<MachineState*> World::GetHumans() const noexcept
 void World::UpdateWorld() noexcept
 {
 	// We get the size ahead of time to avoid the problem of converting a human
-//	unsigned int count = mZombies.size();
-	for (auto z = mZombies.begin(); z != mZombies.end(); ++z)
+	MachineState *deleteIfInvalidMove = nullptr;
+	for (auto z = mZombies.begin(); z != mZombies.end();)
 	{
 		try
 		{
@@ -121,22 +129,33 @@ void World::UpdateWorld() noexcept
 		catch (const InvalidOp &e)
 		{
 			std::cerr << e.what() << std::endl;
-//			wxMessageBox("Error", "Error", wxOK | wxICON_ERROR);
-			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+			deleteIfInvalidMove = *z;
 		}
 		catch (const GoToExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+			deleteIfInvalidMove = *z;
 		}
 		catch (const RangedAttackExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+			deleteIfInvalidMove = *z;
+		}
+		if (deleteIfInvalidMove)
+		{
+			mGridZombies[(*z)->GetX()][(*z)->GetY()] = nullptr;
+			z = mZombies.erase(z);
+			deleteIfInvalidMove = nullptr;
+		}
+		else
+		{
+			std::cout << *z << std::endl;
+			if (*z != nullptr)
+				++z;
 		}
 	}
 
-	for (auto h = mHumans.begin(); h != mHumans.end(); ++h)
+	for (auto h = mHumans.begin(); h != mHumans.end();)
 	{
 		try
 		{
@@ -145,23 +164,34 @@ void World::UpdateWorld() noexcept
 		catch (const InvalidOp &e)
 		{
 			std::cerr << e.what() << std::endl;
-			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+			deleteIfInvalidMove = *h;
 		}
 		catch (const GoToExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+			deleteIfInvalidMove = *h;
 		}
 		catch (const RangedAttackExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			wxMessageBox(e.what(), "Error", wxOK | wxICON_ERROR);
+			deleteIfInvalidMove = *h;
+		}
+		if (deleteIfInvalidMove)
+		{
+			mGridHumans[(*h)->GetX()][(*h)->GetY()] = nullptr;
+			h = mZombies.erase(h);
+			deleteIfInvalidMove = nullptr;
+		}
+		else
+		{
+			++h;
 		}
 	}
 }
 
-void World::ClearData()
+void World::ClearData() noexcept
 {
+	// Delete all states & clear vectors
 	for (unsigned int i = 0; i < mZombies.size(); ++i)
 	{
 		delete mZombies[i];
@@ -173,6 +203,7 @@ void World::ClearData()
 		delete mHumans[i];
 	}
 	mHumans.clear();
+	// Clear grid
 	for (auto i = 0; i < mWorldSize; ++i)
 	{
 		for (auto j = 0; j < mWorldSize; ++j)
@@ -203,30 +234,31 @@ void World::KillZombie(MachineState& state, int offset) noexcept
 	{
 	case MachineState::UP:
 		zombieToKill = mGridZombies[x][y - offset];
-		mGridZombies[x][y - offset] = nullptr;
+//		mGridZombies[x][y - offset] = nullptr;
 		break;
 	case MachineState::DOWN:
 		zombieToKill = mGridZombies[x][y + offset];
-		mGridZombies[x][y + offset] = nullptr;
+//		mGridZombies[x][y + offset] = nullptr;
 		break;
 	case MachineState::LEFT:
 		zombieToKill = mGridZombies[x - offset][y];
-		mGridZombies[x - offset][y] = nullptr;
+//		mGridZombies[x - offset][y] = nullptr;
 		break;
 	case MachineState::RIGHT:
 		zombieToKill = mGridZombies[x + offset][y];
-		mGridZombies[x + offset][y] = nullptr;
+//		mGridZombies[x + offset][y] = nullptr;
 		break;
 	default:
 		break;
 	}
 
-	for (unsigned int i = 0; i < mZombies.size(); ++i)
+	for (auto zombie = mZombies.begin(); zombie != mZombies.end(); ++zombie)
 	{
-		if (mZombies[i] == zombieToKill)
+		if (*zombie == zombieToKill)
 		{
-			mZombies.erase(mZombies.begin() + i);
-			delete zombieToKill;
+			mZombies.erase(zombie);
+//			delete zombieToKill;
+			mGridZombies[zombieToKill->GetX()][zombieToKill->GetY()] = nullptr;
 			return;
 		}
 	}
@@ -303,51 +335,11 @@ void World::ConvertHuman(MachineState& state) noexcept
 	{
 		if (mHumans[i] == humanToConvert)
 		{
-			std::cout << "Converting human\n";
-			
 			mZombieMachine.BindState(*humanToConvert);
 			mZombies.push_back(humanToConvert);
-			mHumans.erase(mHumans.begin() + i);
-			
+			mHumans.erase(mHumans.begin() + i);	
 			mGridZombies[humanToConvert->GetX()][humanToConvert->GetY()] = humanToConvert;
 			return;
 		}
-	}
-}
-
-void World::PrintWorld() const noexcept
-{
-	std::cout << "Zombie Grid\n";
-	for (unsigned int i = 0; i < 20; ++i)
-	{
-		for (unsigned int j = 0; j < 20; ++j)
-		{
-			if (mGridZombies[i][j] == nullptr) 
-			{
-				std::cout << "0" << " | ";
-			}
-			else 
-			{
-				std::cout << "Z" << " | ";
-			}
-		}
-		std::cout << std::endl;
-	}
-
-	std::cout << "Human Grid\n";
-	for (unsigned int i = 0; i < 20; ++i)
-	{
-		for (unsigned int j = 0; j < 20; ++j)
-		{
-			if (mGridHumans[i][j] == nullptr)
-			{
-				std::cout << "0" << " | ";
-			}
-			else
-			{
-				std::cout << "H" << " | ";
-			}
-		}
-		std::cout << std::endl;
 	}
 }

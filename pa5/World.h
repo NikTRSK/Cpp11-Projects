@@ -1,7 +1,6 @@
 #pragma once
-#include "Singleton.h"
 #include <vector>
-#include <memory>
+#include "Singleton.h"
 #include "Traits.h"
 #include "Machine.h"
 
@@ -19,13 +18,12 @@ public:
 	std::vector<MachineState*> GetZombies() const noexcept;
 	std::vector<MachineState*> GetHumans() const noexcept;
 	void UpdateWorld() noexcept;
-	void ClearData();
+	void ClearData() noexcept;
 	bool HasHuman(const int& x, const int& y) const noexcept;
 	bool HasZombie(const int& x, const int& y) const noexcept;
 	void KillZombie(MachineState& state, int offset) noexcept;
 	void KillHuman(MachineState& state, int offset) noexcept;
 	void ConvertHuman(MachineState& state) noexcept;
-	void PrintWorld() const noexcept;
 
 private:
 	const int mWorldSize = 20;
@@ -34,6 +32,7 @@ private:
 	Machine<ZombieTraits> mZombieMachine;
 	Machine<HumanTraits> mHumanMachine;
 
+	// Players
 	std::vector<MachineState*> mZombies;
 	std::vector<MachineState*> mHumans;
 

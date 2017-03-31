@@ -74,7 +74,6 @@ void OpGoto::Execute(MachineState& state)
 
 	}
 	state.mActionsTaken++;
-	// why doesn't go to increment action count
 }
 
 void OpAttack::Execute(MachineState& state)
@@ -412,6 +411,7 @@ void OpAttack::Attack(MachineState& state) const noexcept
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
+		// Anyone can kill a zombie
 		if (World::get().HasZombie(x, y - 1))
 		{
 			World::get().KillZombie(state, 1);
@@ -421,7 +421,7 @@ void OpAttack::Attack(MachineState& state) const noexcept
 		{
 			World::get().ConvertHuman(state);
 		}
-		// Humans can only kill other humans
+		// Humans can kill other humans
 		else if (World::get().HasHuman(x, y - 1) && !state.GetInfect())
 		{
 			World::get().KillHuman(state, 1);
@@ -432,12 +432,10 @@ void OpAttack::Attack(MachineState& state) const noexcept
 		{
 			World::get().KillZombie(state, 1);
 		}
-		// Zombies convert humans
 		else if (World::get().HasHuman(x, y + 1) && state.GetInfect())
 		{
 			World::get().ConvertHuman(state);
 		}
-		// Humans can only kill other humans
 		else if (World::get().HasHuman(x, y + 1) && !state.GetInfect())
 		{
 			World::get().KillHuman(state, 1);
@@ -448,12 +446,10 @@ void OpAttack::Attack(MachineState& state) const noexcept
 		{
 			World::get().KillZombie(state, 1);
 		}
-		// Zombies convert humans
 		else if (World::get().HasHuman(x - 1, y) && state.GetInfect())
 		{
 			World::get().ConvertHuman(state);
 		}
-		// Humans can only kill other humans
 		else if (World::get().HasHuman(x - 1, y) && !state.GetInfect())
 		{
 			World::get().KillHuman(state, 1);
@@ -464,12 +460,10 @@ void OpAttack::Attack(MachineState& state) const noexcept
 		{
 			World::get().KillZombie(state, 1);
 		}
-		// Zombies convert humans
 		else if (World::get().HasHuman(x + 1, y) && state.GetInfect())
 		{
 			World::get().ConvertHuman(state);
 		}
-		// Humans can only kill other humans
 		else if (World::get().HasHuman(x + 1, y) && !state.GetInfect())
 		{
 			World::get().KillHuman(state, 1);
@@ -501,7 +495,6 @@ void OpRangedAttack::Attack(MachineState& state) const noexcept
 		{
 			World::get().KillZombie(state, 2);
 		}
-		// Zombies convert humans
 		else if (World::get().HasHuman(x, y + 2))
 		{
 			World::get().KillHuman(state, 2);
@@ -512,7 +505,6 @@ void OpRangedAttack::Attack(MachineState& state) const noexcept
 		{
 			World::get().KillZombie(state, 2);
 		}
-		// Zombies convert humans
 		else if (World::get().HasHuman(x - 2, y))
 		{
 			World::get().KillHuman(state, 2);
@@ -523,7 +515,6 @@ void OpRangedAttack::Attack(MachineState& state) const noexcept
 		{
 			World::get().KillZombie(state, 2);
 		}
-		// Zombies convert humans
 		else if (World::get().HasHuman(x + 2, y))
 		{
 			World::get().KillHuman(state, 2);

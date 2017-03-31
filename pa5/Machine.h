@@ -4,13 +4,11 @@
 #include <iostream>
 #include <memory>
 #include <algorithm>
+#include <fstream>
+#include <ctime>
 #include "Op.h"
 #include "Exceptions.h"
-#include <fstream>
-#include <unordered_map>
-#include <ctime>
 #include "Coordinate.h"
-//#include "World.h"
 
 // Defines state data accessible by the machine and ops
 struct MachineState
@@ -27,12 +25,11 @@ struct MachineState
 		, mTest(false)
 	{
 		mCoordinate = std::make_shared<Coordinate>();
+		srand(static_cast<unsigned int>(time(nullptr)));
 	}
 
 	~MachineState()
-	{
-		srand(static_cast<unsigned int>(time(nullptr)));
-	}
+	{ }
 
 	// Active line number in behavior program
 	int mProgramCounter;
@@ -44,14 +41,12 @@ struct MachineState
 	bool mTest;
 	std::shared_ptr<Coordinate> mCoordinate;
 
-	int GetActionsPerTurn() const noexcept { return mActionsPerTurn; }
 	bool GetInfect() const noexcept { return mInfectOnAttack; }
 	static bool GetRandomBool() noexcept { return (rand() % 2) != 0; }
 	const int & GetX() const noexcept { return mCoordinate->x; };
 	const int & GetY() const noexcept { return mCoordinate->y; };
 	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 20 && x >= 0 && y < 20 && y >= 0); };
-	int GetOpSize() const noexcept;
-	void SetOpSize(const int & size) noexcept;
+	int GetOpSize() const noexcept { return this->mNumberOfOperations; };
 private:
 	// Data which is set by the traits
 	int mActionsPerTurn;
@@ -59,16 +54,6 @@ private:
 
 	int mNumberOfOperations;
 };
-
-inline int MachineState::GetOpSize() const noexcept
-{
-	return this->mNumberOfOperations;
-}
-
-inline void MachineState::SetOpSize(const int & size) noexcept
-{
-	this->mNumberOfOperations = size;
-}
 
 // Describes the machine which processes ops.
 // Different policies dictate behavior possible for machine.
@@ -82,6 +67,9 @@ class Machine
 	};
 
 public:
+	// Destructor
+	~Machine();
+
 	// Load in all the ops for this machine from the specified file
 	void LoadMachine(const std::string& filename);
 
@@ -91,21 +79,21 @@ public:
 	// Take a turn using this logic for the passed in state
 	void TakeTurn(MachineState& state);
 
-	// Get the Commands for a player
-	std::vector<std::shared_ptr<Op>> GetOps() const noexcept;
-
 	// Set the Commands for a player
 	void SetOps(std::vector<std::shared_ptr<Op>> opVector) noexcept;
 
-	// Destructor
-	~Machine();
 private:
 	// Parses a single line of file and returns a vector containing the opperation and the parameter if any
 	std::vector<std::string> ParseInstruction(std::string & input) const noexcept;
+
 	// Trims whitespace from the sides of a string
 	void TrimInPlace(std::string & input) const noexcept;
 	std::string Trim(const std::string & input) const noexcept;
+	
+	// Checks if a string is a number
 	bool IsNumber(const std::string &input) const noexcept;
+
+	// Convert a string to an Op
 	Operation Convert(const std::string & key) const noexcept
 	{
 		if (key == "attack") return attack;
@@ -131,7 +119,7 @@ private:
 template <typename MachineTraits>
 void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 {
-	std::ifstream file(filename.c_str()/*, std::ios::ate*/);
+	std::ifstream file(filename.c_str());
 	if (!file.is_open())
 	{
 		throw FileLoadExcept();
@@ -193,7 +181,7 @@ void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 			mOps.push_back(std::make_shared<OpGoto>(std::stoi(parameterizedString[1])));
 			break;
 		default:
-			throw FileLoadExcept();
+			throw FileLoadExcept(); // If the operation is not valid just throw an exception
 		}
 	}
 }
@@ -204,25 +192,22 @@ void Machine<MachineTraits>::BindState(MachineState& state)
 	state.mActionsPerTurn = MachineTraits::ACTIONS_PER_TURN;
 	state.mInfectOnAttack = MachineTraits::INFECT_ON_ATTACK;
 
-	state.SetOpSize(mOps.size());
+	state.mNumberOfOperations = mOps.size();
 }
 
 template <typename MachineTraits>
 void Machine<MachineTraits>::TakeTurn(MachineState& state)
 {
+	// If the PC goes out of range
+	if (state.mProgramCounter > static_cast<int>(mOps.size()))
+	{
+		throw InvalidOp();
+	}
 	state.mActionsTaken = 0;
 	while (state.mActionsTaken < MachineTraits::ACTIONS_PER_TURN)
 	{
 		mOps.at(state.mProgramCounter - 1)->Execute(state);
 	}
-
-	state.SetOpSize(mOps.size());
-}
-
-template <typename MachineTraits>
-std::vector<std::shared_ptr<Op>> Machine<MachineTraits>::GetOps() const noexcept
-{
-	return this->mOps;
 }
 
 template <typename MachineTraits>
@@ -261,6 +246,7 @@ std::vector<std::string> Machine<MachineTraits>::ParseInstruction(std::string& i
 		result.push_back(Trim(input));
 	}
 
+	// Return a vector with command and parameter
 	return result;
 }
 
