@@ -92,7 +92,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Op.cpp" />
-    <ClCompile Include="World.cpp" />
+    <ClCompile Include="World.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="ZomApp.cpp" />
     <ClCompile Include="ZomDrawPanel.cpp" />
     <ClCompile Include="ZomFrame.cpp" />

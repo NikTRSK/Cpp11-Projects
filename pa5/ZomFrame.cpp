@@ -90,10 +90,11 @@ void ZomFrame::OnNew(wxCommandEvent& event)
 	World::get().ClearData();
 	mPanel->PaintNow();
 
-	mZombieMachine = nullptr;
-	mHumanMachine = nullptr;
+//	mZombieMachine = nullptr;
+//	mHumanMachine = nullptr;
 	mPanel->mZombieFile.clear();
 	mPanel->mHumanFile.clear();
+	EnableDisableMenus(false);
 }
 
 void ZomFrame::OnSimStart(wxCommandEvent& event)
@@ -123,9 +124,39 @@ void ZomFrame::OnSimReset(wxCommandEvent& event)
 
 void ZomFrame::OnTurnTimer(wxTimerEvent& event)
 {
-	World::get().UpdateWorld();
-	mPanel->mMonth++;
-	mPanel->PaintNow();
+//	if (mIsActive)
+//	{
+//		if (World::get().GetZombies().empty())
+//		{
+//			wxMessageBox("Appocalypse averted. Humans win.", "Sim Finished", wxOK);
+//			mTurnTimer->Stop();
+//			mIsActive = false;
+//		}
+//		else if (World::get().GetHumans().empty())
+//		{
+//			wxMessageBox("The end is nigh. Zombies win.", "Sim Finished", wxOK);
+//			mTurnTimer->Stop();
+//			mIsActive = false;
+//		}
+//	}
+	if (World::get().GetZombies().empty())
+	{
+		mTurnTimer->Stop();
+		mIsActive = false;
+		wxMessageBox("Appocalypse averted. Humans win.", "Sim Finished", wxOK);
+	}
+	else if (World::get().GetHumans().empty())
+	{
+		mTurnTimer->Stop();
+		mIsActive = false;
+		wxMessageBox("The end is nigh. Zombies win.", "Sim Finished", wxOK);
+	}
+	else
+	{
+		World::get().UpdateWorld();
+		mPanel->mMonth++;
+		mPanel->PaintNow();
+	}
 }
 
 void ZomFrame::OnLoadZombie(wxCommandEvent& event)
@@ -138,9 +169,10 @@ void ZomFrame::OnLoadZombie(wxCommandEvent& event)
 	{
 		std::cout << "Loading file.\n";
 		mPanel->mZombieFile = fileDlg.GetFilename().ToStdString();
-		mZombieMachine = std::make_unique<Machine<ZombieTraits>>();
-		try {
-			mZombieMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+		try
+		{
+			mZombieMachine.LoadMachine(fileDlg.GetPath().ToStdString());
+			World::get().SetZombieMachine(mZombieMachine);
 		}
 		catch(const FileLoadExcept &e)
 		{
@@ -164,11 +196,11 @@ void ZomFrame::OnLoadSurvivor(wxCommandEvent& event)
 	if (fileDlg.ShowModal() == wxID_OK)
 	{
 		std::cout << "Loading file.\n";
-		// EXCEPTION ?
 		mPanel->mHumanFile = fileDlg.GetFilename().ToStdString();
-		mHumanMachine = std::make_unique<Machine<HumanTraits>>();
-		try {
-			mHumanMachine->LoadMachine(fileDlg.GetPath().ToStdString());
+		try
+		{
+			mHumanMachine.LoadMachine(fileDlg.GetPath().ToStdString());
+			World::get().SetHumanMachine(mHumanMachine);
 		}
 		catch (const FileLoadExcept &e)
 		{
@@ -180,14 +212,19 @@ void ZomFrame::OnLoadSurvivor(wxCommandEvent& event)
 	if (ZOMFilesLoaded())
 	{
 		EnableDisableMenus(true);
+		mSimMenu->Enable(ID_SImSTART, false);
+		mSimMenu->Enable(ID_SIM_RESET, false);
 	}
 }
 
 void ZomFrame::OnRandomize(wxCommandEvent& event)
 {
 	World::get().ClearData();
-	World::get().GenerateZombies(*mZombieMachine);
-	World::get().GenerateHumans(*mHumanMachine);
+	World::get().GenerateZombies();
+	World::get().GenerateHumans();
+	mSimMenu->Enable(ID_SImSTART, true);
+	mSimMenu->Enable(ID_SIM_RESET, true);
+	mPanel->PaintNow();
 }
 
 bool ZomFrame::ZOMFilesLoaded() const noexcept
@@ -200,5 +237,4 @@ void ZomFrame::EnableDisableMenus(bool enable) const noexcept
 	mSimMenu->Enable(ID_SImSTART, enable);
 	mSimMenu->Enable(ID_SIM_RESET, enable);
 	mSimMenu->Enable(ID_RANDOMIZE, enable);
-	menuFile->Enable(wxID_NEW, enable); // Do we need to enable/disable this
 }

@@ -46,8 +46,8 @@ private:
 	// Turn timer
 	wxTimer* mTurnTimer;
 	
-	std::unique_ptr<Machine<ZombieTraits>> mZombieMachine;
-	std::unique_ptr<Machine<HumanTraits>> mHumanMachine;
+	Machine<ZombieTraits> mZombieMachine;
+	Machine<HumanTraits> mHumanMachine;
 
 	bool mIsActive;
 };

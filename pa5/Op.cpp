@@ -6,8 +6,7 @@
 // Output state information for debugging purposes
 void Op::DebugOutput(MachineState& state)
 {
-	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam
-			  << " | Loc: " << state.GetX() << ", " << state.GetY() << std::endl;
+	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
 }
 
 void OpRotate::Execute(MachineState& state)
@@ -111,17 +110,12 @@ void OpForward::Execute(MachineState& state)
 	{
 		if (state.GetInfect())
 		{
-			std::cout << "UPDATING ZOMBIE\n";
-			std::cout << "OLD: " << state.GetX() << ", " << state.GetY() << std::endl;
 			World::get().mGridZombies[state.GetX()][state.GetY()] = nullptr;
 			UpdateLocation(state);
 			World::get().mGridZombies[state.GetX()][state.GetY()] = &state;
-
-			std::cout << "NEW: " << state.GetX() << ", " << state.GetY() << std::endl;
 		}
 		else
 		{
-//			std::cout << "UPDATING HUMAN\n";
 			World::get().mGridHumans[state.GetX()][state.GetY()] = nullptr;
 			UpdateLocation(state);
 			World::get().mGridHumans[state.GetX()][state.GetY()] = &state;

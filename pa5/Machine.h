@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <algorithm>
 #include "Op.h"
 #include "Exceptions.h"
 #include <fstream>
@@ -104,6 +105,7 @@ private:
 	// Trims whitespace from the sides of a string
 	void TrimInPlace(std::string & input) const noexcept;
 	std::string Trim(const std::string & input) const noexcept;
+	bool IsNumber(const std::string &input) const noexcept;
 	Operation Convert(const std::string & key) const noexcept
 	{
 		if (key == "attack") return attack;
@@ -140,6 +142,15 @@ void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 	while (std::getline(file, currentLine))
 	{
 		auto parameterizedString = ParseInstruction(currentLine);
+		// Check if parameter is a digit. Only digits are allowed.
+		if (parameterizedString[0].empty())
+		{
+			continue;
+		}
+		if (parameterizedString.size() == 2 && !IsNumber(parameterizedString[1]))
+		{
+			throw FileLoadExcept();
+		}
 		switch (Convert(parameterizedString[0]))
 		{
 		case attack:
@@ -182,16 +193,9 @@ void Machine<MachineTraits>::LoadMachine(const std::string& filename)
 			mOps.push_back(std::make_shared<OpGoto>(std::stoi(parameterizedString[1])));
 			break;
 		default:
-			break;
+			throw FileLoadExcept();
 		}
 	}
-	// TEMP CODE: Add your parsing code here!
-	//	mOps.clear();
-	//	mOps.push_back(std::make_shared<OpRotate>(0));
-	//	mOps.push_back(std::make_shared<OpRotate>(0));
-	//	mOps.push_back(std::make_shared<OpRotate>(1));
-	//	mOps.push_back(std::make_shared<OpGoto>(1));
-	// END TEMP CODE
 }
 
 template <typename MachineTraits>
@@ -250,7 +254,7 @@ std::vector<std::string> Machine<MachineTraits>::ParseInstruction(std::string& i
 	if (found != std::string::npos)
 	{
 		result.push_back(Trim(input.substr(0, found)));
-		result.push_back(input.substr(found + 1));
+		result.push_back(Trim(input.substr(found + 1)));
 	}
 	else
 	{
@@ -293,4 +297,10 @@ std::string Machine<MachineTraits>::Trim(const std::string& input) const noexcep
 		right = 0;
 	}
 	return input.substr(left, right - left + 1);
+}
+
+template <typename MachineTraits>
+bool Machine<MachineTraits>::IsNumber(const std::string& input) const noexcept
+{
+	return !input.empty() && std::all_of(input.begin(), input.end(), ::isdigit);
 }

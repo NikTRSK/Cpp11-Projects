@@ -56,39 +56,38 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 	}
 
 	// Draw all zombies
-	for (auto zombie : World::get().GetZombieStates())
+	for (auto zombie : World::get().GetZombies())
 	{
 		dc.SetBrush(wxBrush(*wxRED_BRUSH));
-		DrawState(zombie, dc);
+		DrawState(*zombie, dc);
 	}
 
 	// Draw all humans
-	for (auto human : World::get().GetHumanStates())
+	for (auto human : World::get().GetHumans())
 	{
 		dc.SetBrush(wxBrush(*wxGREEN_BRUSH));
-		DrawState(human, dc);
+		DrawState(*human, dc);
 	}
 
 	// Draw stats
 	dc.SetTextForeground(*wxRED);
-	dc.DrawText("Zombies", 630, 10);
-	dc.DrawText("Program: " + mZombieFile, 630, 30);
-	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetZombies().size()), 630, 50);
+	dc.DrawText("Zombies", 620, 10);
+	dc.DrawText("Program: " + mZombieFile, 620, 30);
+	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetZombies().size()), 620, 50);
 
 
 	dc.SetTextForeground(*wxGREEN);
-	dc.DrawText("Humans", 630, 100);
-	dc.DrawText("Program: " + mHumanFile, 630, 120);
-	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetHumans().size()), 630, 140);
+	dc.DrawText("Humans", 620, 100);
+	dc.DrawText("Program: " + mHumanFile, 620, 120);
+	dc.DrawText("Alive: " + wxString::Format(wxT("%i"), World::get().GetHumans().size()), 620, 140);
 
 	dc.SetTextForeground(*wxBLACK);
-	dc.DrawText("Month: " + wxString::Format(wxT("%i"), mMonth), 630, 210);
+	dc.DrawText("Month: " + wxString::Format(wxT("%i"), mMonth), 620, 210);
 	
 }
 
 void ZomDrawPanel::DrawState(MachineState& state, wxDC& dc)
 {
-	// Is this a memory leak????
 	wxPointList *points = new wxPointList();
 
 	int x = state.GetX();

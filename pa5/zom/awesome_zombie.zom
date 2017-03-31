@@ -1,0 +1,26 @@
+;awesome_zombie
+test_random;awesome_zombie
+forward
+forward
+rotate,1
+attack
+forward
+attack
+test_wall
+jne,2
+je,5
+test_human
+je, 5 ; attack human if there
+rotate,0
+test_wall
+jne,2
+rotate,0
+forward
+rotate,0
+test_passable
+jne,4
+forward
+forward
+goto,18
+rotate,500
+goto,2

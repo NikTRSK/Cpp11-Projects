@@ -12,14 +12,13 @@ class World : public Singleton<World>
 public:
 	World();
 	~World();
-	void AddZombie(const Machine<ZombieTraits> & zombie);
-	void GenerateZombies(const Machine<ZombieTraits> & zombie);
-	void GenerateHumans(const Machine<HumanTraits> & human);
-	std::vector<std::shared_ptr<Machine<ZombieTraits>>> GetZombies() const;
-	std::vector<std::shared_ptr<Machine<HumanTraits>>> GetHumans() const;
-	std::vector<MachineState> GetZombieStates() const;
-	std::vector<MachineState> GetHumanStates() const;
-	void UpdateWorld();
+	void SetZombieMachine(Machine<ZombieTraits> zombieMachine) noexcept;
+	void SetHumanMachine(Machine<HumanTraits> humanMachine) noexcept;
+	void GenerateZombies() noexcept;
+	void GenerateHumans() noexcept;
+	std::vector<MachineState*> GetZombies() const noexcept;
+	std::vector<MachineState*> GetHumans() const noexcept;
+	void UpdateWorld() noexcept;
 	void ClearData();
 	bool HasHuman(const int& x, const int& y) const noexcept;
 	bool HasZombie(const int& x, const int& y) const noexcept;
@@ -31,10 +30,12 @@ public:
 private:
 	const int mWorldSize = 20;
 
-	std::vector<std::shared_ptr<Machine<ZombieTraits>>> mZombies;
-	std::vector<MachineState> mZombieStates;
-	std::vector<std::shared_ptr<Machine<HumanTraits>>> mHumans;
-	std::vector<MachineState> mHumanStates;
+	// Machines
+	Machine<ZombieTraits> mZombieMachine;
+	Machine<HumanTraits> mHumanMachine;
+
+	std::vector<MachineState*> mZombies;
+	std::vector<MachineState*> mHumans;
 
 public:
 	MachineState* mGridZombies[20][20];
