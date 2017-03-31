@@ -17,6 +17,7 @@ public:
 	void UpdateLocation(MachineState& state) const noexcept;
 	bool TileIsOpen(MachineState &state) const noexcept;
 	bool HasPlayer(MachineState &state) const noexcept;
+	bool frontTile(MachineState &state, MachineState *&frontState, int num);
 	virtual void Execute(MachineState& state) = 0;
 
 	MachineState* GetTarget(MachineState& state, int n = 1);

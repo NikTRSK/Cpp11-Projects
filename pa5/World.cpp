@@ -119,6 +119,37 @@ std::vector<MachineState*> World::GetHumans() const noexcept
 void World::UpdateWorld() noexcept
 {
 	// We get the size ahead of time to avoid the problem of converting a human
+//	MachineState *deleteIfInvalidMove = nullptr;
+
+//	std::for_each(mZombies.begin(), mZombies.end(), [this](auto z)
+//	{
+//		mZombieMachine.TakeTurn(**z);
+//	});
+//	for (auto z = mZombies.begin(); z != mZombies.end(); ++z)
+//	{
+//		mZombieMachine.TakeTurn(**z);
+//	}
+
+//	for (unsigned int z = 0; z < mZombies.size(); ++z)
+//	{
+//		mZombieMachine.TakeTurn(*mZombies[z]);
+//	}
+
+	
+
+/*	for (int i = mDeleteAfterTurn.size()-1; i >= 0; --i)
+	{
+		for (unsigned int j = 0; j < mZombies.size(); ++j)
+//		for (auto z = mZombies.begin(); z != mZombies.end(); ++z)
+		{
+			if (mZombies[j] == mDeleteAfterTurn[i])
+			{
+				mZombies.erase(mZombies.begin()+j);
+			}
+//			delete mDeleteAfterTurn[i];
+//			mDeleteAfterTurn.pop_back();
+		}
+	}*/
 	MachineState *deleteIfInvalidMove = nullptr;
 	for (auto z = mZombies.begin(); z != mZombies.end();)
 	{
@@ -149,12 +180,13 @@ void World::UpdateWorld() noexcept
 		}
 		else
 		{
-			std::cout << *z << std::endl;
-			if (*z != nullptr)
-				++z;
+			++z;
 		}
 	}
 
+	DeleteKilledZombies();
+
+	deleteIfInvalidMove = nullptr;
 	for (auto h = mHumans.begin(); h != mHumans.end();)
 	{
 		try
@@ -179,7 +211,7 @@ void World::UpdateWorld() noexcept
 		if (deleteIfInvalidMove)
 		{
 			mGridHumans[(*h)->GetX()][(*h)->GetY()] = nullptr;
-			h = mZombies.erase(h);
+			h = mHumans.erase(h);
 			deleteIfInvalidMove = nullptr;
 		}
 		else
@@ -187,6 +219,8 @@ void World::UpdateWorld() noexcept
 			++h;
 		}
 	}
+
+	DeleteKilledHumans();
 }
 
 void World::ClearData() noexcept
@@ -224,7 +258,7 @@ bool World::HasZombie(const int& x, const int& y) const noexcept
 	return mGridZombies[x][y] != nullptr;
 }
 
-void World::KillZombie(MachineState& state, int offset) noexcept
+void World::KillZombie(const MachineState& state, int offset) noexcept
 {
 	MachineState *zombieToKill = nullptr;
 
@@ -234,37 +268,33 @@ void World::KillZombie(MachineState& state, int offset) noexcept
 	{
 	case MachineState::UP:
 		zombieToKill = mGridZombies[x][y - offset];
-//		mGridZombies[x][y - offset] = nullptr;
 		break;
 	case MachineState::DOWN:
 		zombieToKill = mGridZombies[x][y + offset];
-//		mGridZombies[x][y + offset] = nullptr;
 		break;
 	case MachineState::LEFT:
 		zombieToKill = mGridZombies[x - offset][y];
-//		mGridZombies[x - offset][y] = nullptr;
 		break;
 	case MachineState::RIGHT:
 		zombieToKill = mGridZombies[x + offset][y];
-//		mGridZombies[x + offset][y] = nullptr;
 		break;
 	default:
 		break;
 	}
 
-	for (auto zombie = mZombies.begin(); zombie != mZombies.end(); ++zombie)
+	for (unsigned int i = 0; i < mZombies.size(); ++i)
 	{
-		if (*zombie == zombieToKill)
+		if (mZombies[i] == zombieToKill)
 		{
-			mZombies.erase(zombie);
-//			delete zombieToKill;
+			mDeleteAfterTurn.push_back(mZombies[i]);
 			mGridZombies[zombieToKill->GetX()][zombieToKill->GetY()] = nullptr;
+			//			zombieToKill = nullptr;
 			return;
 		}
 	}
 }
 
-void World::KillHuman(MachineState& state, int offset) noexcept
+void World::KillHuman(const MachineState& state, int offset) noexcept
 {
 	MachineState *humanToKill = nullptr;
 
@@ -274,19 +304,15 @@ void World::KillHuman(MachineState& state, int offset) noexcept
 	{
 	case MachineState::UP:
 		humanToKill = mGridHumans[x][y - offset];
-		mGridHumans[x][y - offset] = nullptr;
 		break;
 	case MachineState::DOWN:
 		humanToKill = mGridHumans[x][y + offset];
-		mGridHumans[x][y + offset] = nullptr;
 		break;
 	case MachineState::LEFT:
 		humanToKill = mGridHumans[x - offset][y];
-		mGridHumans[x - offset][y] = nullptr;
 		break;
 	case MachineState::RIGHT:
 		humanToKill = mGridHumans[x + offset][y];
-		mGridHumans[x + offset][y] = nullptr;
 		break;
 	default:
 		break;
@@ -296,8 +322,9 @@ void World::KillHuman(MachineState& state, int offset) noexcept
 	{
 		if (mHumans[i] == humanToKill)
 		{
-			mHumans.erase(mHumans.begin() + i);
-			delete humanToKill;
+			mDeleteAfterTurn.push_back(mHumans[i]);
+			mGridHumans[humanToKill->GetX()][humanToKill->GetY()] = nullptr;
+			//			zombieToKill = nullptr;
 			return;
 		}
 	}
@@ -342,4 +369,44 @@ void World::ConvertHuman(MachineState& state) noexcept
 			return;
 		}
 	}
+}
+
+void World::DeleteKilledZombies() noexcept
+{
+	for (int i = mDeleteAfterTurn.size() - 1; i >= 0; --i)
+	{
+		for (unsigned int j = 0; j < mZombies.size(); ++j)
+		{
+			if (mZombies[j] == mDeleteAfterTurn[i])
+			{
+				mZombies.erase(mZombies.begin() + j);
+			}
+		}
+	}
+
+	for (auto toDel = mDeleteAfterTurn.begin(); toDel != mDeleteAfterTurn.end(); ++toDel)
+	{
+		delete *toDel;
+	}
+	mDeleteAfterTurn.clear();
+}
+
+void World::DeleteKilledHumans() noexcept
+{
+	for (int i = mDeleteAfterTurn.size() - 1; i >= 0; --i)
+	{
+		for (unsigned int j = 0; j < mHumans.size(); ++j)
+		{
+			if (mHumans[j] == mDeleteAfterTurn[i])
+			{
+				mHumans.erase(mHumans.begin() + j);
+			}
+		}
+	}
+
+	for (auto toDel = mDeleteAfterTurn.begin(); toDel != mDeleteAfterTurn.end(); ++toDel)
+	{
+		delete *toDel;
+	}
+	mDeleteAfterTurn.clear();
 }

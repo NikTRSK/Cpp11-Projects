@@ -21,9 +21,11 @@ public:
 	void ClearData() noexcept;
 	bool HasHuman(const int& x, const int& y) const noexcept;
 	bool HasZombie(const int& x, const int& y) const noexcept;
-	void KillZombie(MachineState& state, int offset) noexcept;
-	void KillHuman(MachineState& state, int offset) noexcept;
+	void KillZombie(const MachineState& state, int offset) noexcept;
+	void KillHuman(const MachineState& state, int offset) noexcept;
 	void ConvertHuman(MachineState& state) noexcept;
+	void DeleteKilledZombies() noexcept;
+	void DeleteKilledHumans() noexcept;
 
 private:
 	const int mWorldSize = 20;
@@ -35,6 +37,8 @@ private:
 	// Players
 	std::vector<MachineState*> mZombies;
 	std::vector<MachineState*> mHumans;
+
+	std::vector<MachineState*> mDeleteAfterTurn;
 
 public:
 	MachineState* mGridZombies[20][20];
