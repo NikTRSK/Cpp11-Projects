@@ -37,7 +37,8 @@ private:
 	Machine<HumanTraits> mHumanMachine;
 
 	/* Note I'm using regular pointers since it's easier to manage that smart ptrs.
-	   Had issues with smart pointers for some reason */
+	   Had issues with smart pointers since the Ops take a reference so can't update
+	   location. */
 	// Players
 	std::vector<MachineState*> mZombies;
 	std::vector<MachineState*> mHumans;

@@ -6,7 +6,7 @@
 // Output state information for debugging purposes
 void Op::DebugOutput(MachineState& state)
 {
-	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
+//	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
 }
 
 void OpRotate::Execute(MachineState& state)
@@ -109,11 +109,9 @@ void OpForward::Execute(MachineState& state)
 	DebugOutput(state);
 	if (TileIsOpen(state))
 	{
-//		MachineState s = nullptr;
 		auto player = World::get().mGrid.find(std::pair<int, int>(x, y));
 		if (player != World::get().mGrid.end())
 		{
-//			s = player->second;
 			World::get().mGrid.erase(player);
 		}
 		
@@ -303,8 +301,6 @@ void OpJNE::Execute(MachineState& state)
 
 void Op::UpdateLocation(MachineState& state) const noexcept
 {
-	int x = state.GetX();
-	int y = state.GetY();
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
@@ -367,25 +363,25 @@ bool Op::HasPlayer(MachineState& state) const noexcept
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
-		if (state.IsInbound(x, y - 1) && World::get().mGrid.find(std::pair<int, int>(x, y - 1)) != World::get().mGrid.end())
+		if (World::get().mGrid.find(std::pair<int, int>(x, y - 1)) != World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::DOWN:
-		if (state.IsInbound(x, y + 1) && World::get().mGrid.find(std::pair<int, int>(x, y + 1)) != World::get().mGrid.end())
+		if (World::get().mGrid.find(std::pair<int, int>(x, y + 1)) != World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::LEFT:
-		if (state.IsInbound(x - 1, y) && World::get().mGrid.find(std::pair<int, int>(x - 1, y)) != World::get().mGrid.end())
+		if (World::get().mGrid.find(std::pair<int, int>(x - 1, y)) != World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::RIGHT:
-		if (state.IsInbound(x + 1, y) && World::get().mGrid.find(std::pair<int, int>(x + 1, y)) != World::get().mGrid.end())
+		if (World::get().mGrid.find(std::pair<int, int>(x + 1, y)) != World::get().mGrid.end())
 		{
 			return true;
 		}

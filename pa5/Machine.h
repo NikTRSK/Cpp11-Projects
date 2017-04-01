@@ -45,8 +45,9 @@ struct MachineState
 	static bool GetRandomBool() noexcept { return (rand() % 2) != 0; }
 	const int & GetX() const noexcept { return mCoordinate->x; };
 	const int & GetY() const noexcept { return mCoordinate->y; };
-	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 19 && x > 0 && y < 19 && y > 0); };
+	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 20 && x >= 0 && y < 20 && y >= 0); };
 	int GetOpSize() const noexcept { return this->mNumberOfOperations; };
+	void SetOpSize(const int & size) noexcept { this->mNumberOfOperations = size; };
 private:
 	// Data which is set by the traits
 	int mActionsPerTurn;
@@ -199,6 +200,7 @@ void Machine<MachineTraits>::BindState(MachineState& state)
 	state.mActionsPerTurn = MachineTraits::ACTIONS_PER_TURN;
 	state.mInfectOnAttack = MachineTraits::INFECT_ON_ATTACK;
 
+	state.mProgramCounter = 1;
 	state.mNumberOfOperations = mOps.size();
 }
 
