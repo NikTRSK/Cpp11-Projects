@@ -107,6 +107,7 @@ void OpForward::Execute(MachineState& state)
 	int x = state.GetX();
 	int y = state.GetY();
 	DebugOutput(state);
+	// If there isn't anyone in front of us, we can safely move
 	if (TileIsOpen(state))
 	{
 		auto player = World::get().mGrid.find(std::pair<int, int>(x, y));
@@ -126,14 +127,7 @@ void OpEndturn::Execute(MachineState& state)
 {
 	DebugOutput(state);
 	// If Zombie set actions taken to 1, if human set to 2
-	if (state.GetInfect())
-	{
-		state.mActionsTaken = 1;
-	}
-	else
-	{
-		state.mActionsTaken = 2;
-	}
+	state.mActionsTaken = (state.GetInfect()) ? 1 : 2;
 	state.mProgramCounter++;
 }
 
@@ -327,25 +321,25 @@ bool Op::TileIsOpen(MachineState& state) const noexcept
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
-		if (y != 0 && World::get().mGrid.find(std::pair<int, int>(x, y - 1)) == World::get().mGrid.end())
+		if (state.IsInbound(x, y - 1) && World::get().mGrid.find(std::pair<int, int>(x, y - 1)) == World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::DOWN:
-		if (y != 19 && World::get().mGrid.find(std::pair<int, int>(x, y + 1)) == World::get().mGrid.end())
+		if (state.IsInbound(x, y + 1) && World::get().mGrid.find(std::pair<int, int>(x, y + 1)) == World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::LEFT:
-		if (x != 0  && World::get().mGrid.find(std::pair<int, int>(x - 1, y)) == World::get().mGrid.end())
+		if (state.IsInbound(x - 1, y) && World::get().mGrid.find(std::pair<int, int>(x - 1, y)) == World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::RIGHT:
-		if (x != 19 && World::get().mGrid.find(std::pair<int, int>(x + 1, y)) == World::get().mGrid.end())
+		if (state.IsInbound(x + 1, y) && World::get().mGrid.find(std::pair<int, int>(x + 1, y)) == World::get().mGrid.end())
 		{
 			return true;
 		}

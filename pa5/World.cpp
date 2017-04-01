@@ -44,7 +44,6 @@ void World::GenerateZombies() noexcept
 			x = position(generator);
 			y = position(generator);
 			c = std::make_pair(x, y);
-			//		} while (mGrid[x][y] != nullptr);
 		} while (mGrid.find(c) != mGrid.end());
 		state->mCoordinate->x = x;
 		state->mCoordinate->y = y;
@@ -74,7 +73,6 @@ void World::GenerateHumans() noexcept
 			x = position(generator);
 			y = position(generator);
 			c = std::make_pair(x, y);
-			//		} while (mGrid[x][y] != nullptr);
 		} while (mGrid.find(c) != mGrid.end());
 		state->mCoordinate->x = x;
 		state->mCoordinate->y = y;
