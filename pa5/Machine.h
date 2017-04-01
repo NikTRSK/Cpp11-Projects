@@ -45,7 +45,7 @@ struct MachineState
 	static bool GetRandomBool() noexcept { return (rand() % 2) != 0; }
 	const int & GetX() const noexcept { return mCoordinate->x; };
 	const int & GetY() const noexcept { return mCoordinate->y; };
-	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 20 && x >= 0 && y < 20 && y >= 0); };
+	bool IsInbound(const int & x, const int & y) const noexcept { return (x < 19 && x > 0 && y < 19 && y > 0); };
 	int GetOpSize() const noexcept { return this->mNumberOfOperations; };
 private:
 	// Data which is set by the traits
@@ -205,14 +205,15 @@ void Machine<MachineTraits>::BindState(MachineState& state)
 template <typename MachineTraits>
 void Machine<MachineTraits>::TakeTurn(MachineState& state)
 {
-	// If the PC goes out of range
-	if (state.mProgramCounter > static_cast<int>(mOps.size()))
-	{
-		throw InvalidOp();
-	}
 	state.mActionsTaken = 0;
 	while (state.mActionsTaken < MachineTraits::ACTIONS_PER_TURN)
 	{
+		// If the PC goes out of range
+		if (state.mProgramCounter > static_cast<int>(mOps.size()))
+		{
+			throw InvalidOp();
+		}
+		
 		mOps.at(state.mProgramCounter - 1)->Execute(state);
 	}
 }

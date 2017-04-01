@@ -1,0 +1,7 @@
+forward
+forward
+rotate,0
+forward
+forward
+rotate,0
+goto,1

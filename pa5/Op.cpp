@@ -6,7 +6,7 @@
 // Output state information for debugging purposes
 void Op::DebugOutput(MachineState& state)
 {
-//	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
+	std::cout << state.mProgramCounter << ":" << mOpName << "," << mParam << std::endl;
 }
 
 void OpRotate::Execute(MachineState& state)
@@ -104,27 +104,21 @@ void OpRangedAttack::Execute(MachineState& state)
 
 void OpForward::Execute(MachineState& state)
 {
+	int x = state.GetX();
+	int y = state.GetY();
 	DebugOutput(state);
 	if (TileIsOpen(state))
 	{
-		if (state.GetInfect())
+//		MachineState s = nullptr;
+		auto player = World::get().mGrid.find(std::pair<int, int>(x, y));
+		if (player != World::get().mGrid.end())
 		{
-			if (World::get().mGridZombies[state.GetX()][state.GetY()] != nullptr)
-			{
-				World::get().mGridZombies[state.GetX()][state.GetY()] = nullptr;
-				UpdateLocation(state);
-				World::get().mGridZombies[state.GetX()][state.GetY()] = &state;
-			}
+//			s = player->second;
+			World::get().mGrid.erase(player);
 		}
-		else
-		{
-			if (World::get().mGridHumans[state.GetX()][state.GetY()] != nullptr)
-			{
-				World::get().mGridHumans[state.GetX()][state.GetY()] = nullptr;
-				UpdateLocation(state);
-				World::get().mGridHumans[state.GetX()][state.GetY()] = &state;
-			}
-		}
+		
+		UpdateLocation(state);
+		World::get().mGrid[std::pair<int, int>(state.GetX(), state.GetY())] = &state;
 	}
 	state.mProgramCounter++;
 	state.mActionsTaken++;
@@ -337,29 +331,25 @@ bool Op::TileIsOpen(MachineState& state) const noexcept
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
-		if (state.IsInbound(x, y - 1) && !World::get().HasZombie(x, y - 1)
-			&& !World::get().HasHuman(x, y - 1))
+		if (y != 0 && World::get().mGrid.find(std::pair<int, int>(x, y - 1)) == World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::DOWN:
-		if (state.IsInbound(x, y + 1) && !World::get().HasZombie(x, y + 1)
-			&& !World::get().HasHuman(x, y + 1))
+		if (y != 19 && World::get().mGrid.find(std::pair<int, int>(x, y + 1)) == World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::LEFT:
-		if (state.IsInbound(x - 1, y) && !World::get().HasZombie(x - 1, y)
-			&& !World::get().HasHuman(x - 1, y))
+		if (x != 0  && World::get().mGrid.find(std::pair<int, int>(x - 1, y)) == World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::RIGHT:
-		if (state.IsInbound(x + 1, y) && !World::get().HasZombie(x + 1, y)
-			&& !World::get().HasHuman(x + 1, y))
+		if (x != 19 && World::get().mGrid.find(std::pair<int, int>(x + 1, y)) == World::get().mGrid.end())
 		{
 			return true;
 		}
@@ -377,29 +367,25 @@ bool Op::HasPlayer(MachineState& state) const noexcept
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
-		if (state.IsInbound(x, y - 1) && (World::get().HasZombie(x, y - 1)
-			|| World::get().HasHuman(x, y - 1)))
+		if (state.IsInbound(x, y - 1) && World::get().mGrid.find(std::pair<int, int>(x, y - 1)) != World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::DOWN:
-		if (state.IsInbound(x, y + 1) && (World::get().HasZombie(x, y + 1)
-			|| World::get().HasHuman(x, y + 1)))
+		if (state.IsInbound(x, y + 1) && World::get().mGrid.find(std::pair<int, int>(x, y + 1)) != World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::LEFT:
-		if (state.IsInbound(x - 1, y) && (World::get().HasZombie(x - 1, y)
-			|| World::get().HasHuman(x - 1, y)))
+		if (state.IsInbound(x - 1, y) && World::get().mGrid.find(std::pair<int, int>(x - 1, y)) != World::get().mGrid.end())
 		{
 			return true;
 		}
 		break;
 	case MachineState::RIGHT:
-		if (state.IsInbound(x + 1, y) && (World::get().HasZombie(x + 1, y)
-			|| World::get().HasHuman(x + 1, y)))
+		if (state.IsInbound(x + 1, y) && World::get().mGrid.find(std::pair<int, int>(x + 1, y)) != World::get().mGrid.end())
 		{
 			return true;
 		}

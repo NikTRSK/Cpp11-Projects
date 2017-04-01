@@ -57,31 +57,38 @@ void ZomDrawPanel::DrawGrid(wxDC& dc)
 
 	// Draw Zombies
 	dc.SetBrush(wxBrush(*wxRED_BRUSH));
-	for (unsigned int i = 0; i < 20; ++i)
+
+	for (auto zombie : World::get().GetZombies())
 	{
-		for (unsigned int j = 0; j < 20; ++j)
-		{
-			if (World::get().mGridZombies[i][j] != nullptr)
-			{
-				DrawState(*World::get().mGridZombies[i][j], dc);
-			}
-		}
+		DrawState(*zombie, dc);
 	}
 
-	// Draw Humans
 	dc.SetBrush(wxBrush(*wxGREEN_BRUSH));
-	for (unsigned int i = 0; i < 20; ++i)
+
+	for (auto human : World::get().GetHumans())
 	{
-		for (unsigned int j = 0; j < 20; ++j)
-		{
-			if (World::get().mGridHumans[i][j] != nullptr)
-			{
-				DrawState(*World::get().mGridHumans[i][j], dc);
-			}
-		}
+		DrawState(*human, dc);
 	}
 
-	// Draw stats
+//	for (unsigned int i = 0; i < 20; ++i)
+//	{
+//		for (unsigned int j = 0; j < 20; ++j)
+//		{
+//			if (World::get().mGrid[i][j] != nullptr)
+//			{
+//				if (World::get().HasZombie(i,j))
+//				{
+//					dc.SetBrush(wxBrush(*wxRED_BRUSH));
+//				}
+//				else
+//				{
+//					dc.SetBrush(wxBrush(*wxGREEN_BRUSH));
+//				}
+//				DrawState(*World::get().mGrid[i][j], dc);
+//			}
+//		}
+//	}
+
 	dc.SetTextForeground(*wxRED);
 	dc.DrawText("Zombies", 620, 10);
 	dc.DrawText("Program: " + mZombieFile, 620, 30);

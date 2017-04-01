@@ -2,6 +2,7 @@
 #include "Exceptions.h"
 #include <random>
 #include <wx/msgdlg.h>
+#include <utility>
 //#include <wx/defs.h>
 
 
@@ -29,6 +30,25 @@ void World::SetHumanMachine(Machine<HumanTraits> humanMachine) noexcept
 
 void World::GenerateZombies() noexcept
 {
+//	MachineState* state;
+//	state = std::make_shared<MachineState>();
+//	state->mFacing = MachineState::DOWN;
+//	int x = 5, y = 4;
+//	state->mCoordinate->x = x;
+//	state->mCoordinate->y = y;
+//	mZombieMachine.BindState(*state);
+//	mZombies.push_back(state);
+//	mGrid[std::pair<int,int>(x,y)] = state;
+
+
+//	state = std::make_shared<MachineState>();
+//	state->mFacing = MachineState::UP;
+//	x = 5, y = 5;
+//	state->mCoordinate->x = x;
+//	state->mCoordinate->y = y;
+//	mZombieMachine.BindState(*state);
+//	mZombies.push_back(state);
+//	mGrid[std::pair<int, int>(x, y)] = state;
 	// Use uniform distribution instead of rand for accurate randomness.
 	std::random_device                  rand_dev;
 	std::mt19937                        generator(rand_dev());
@@ -41,21 +61,42 @@ void World::GenerateZombies() noexcept
 		state = new MachineState;
 		state->mFacing = static_cast<MachineState::Facing>(direction(generator));
 		int x, y;
+		std::pair<int, int> c;
 		do
 		{
 			x = position(generator);
 			y = position(generator);
-		} while (mGridZombies[x][y] != nullptr || mGridHumans[x][y] != nullptr);
+			c = std::make_pair(x, y);
+			//		} while (mGrid[x][y] != nullptr);
+		} while (mGrid.find(c) != mGrid.end());
 		state->mCoordinate->x = x;
 		state->mCoordinate->y = y;
 		mZombieMachine.BindState(*state);
 		mZombies.push_back(state);
-		mGridZombies[x][y] = state;
+		mGrid[c] = state;
 	}
 }
 
 void World::GenerateHumans() noexcept
 {
+//	MachineState* state;
+//	state = std::make_shared<MachineState>();
+//	state->mFacing = MachineState::UP;
+//	int x = 5, y = 10;
+//	state->mCoordinate->x = x;
+//	state->mCoordinate->y = y;
+//	mHumanMachine.BindState(*state);
+//	mHumans.push_back(state);
+//	mGrid[std::pair<int, int>(x, y)] = state;
+//
+//	state = std::make_shared<MachineState>();
+//	state->mFacing = MachineState::DOWN;
+//	x = 5, y = 4;
+//	state->mCoordinate->x = x;
+//	state->mCoordinate->y = y;
+//	mHumanMachine.BindState(*state);
+//	mHumans.push_back(state);
+//	mGrid[std::pair<int, int>(x, y)] = state;
 	// Use uniform distribution instead of rand for accurate randomness.
 	std::random_device                  rand_dev;
 	std::mt19937                        generator(rand_dev());
@@ -68,16 +109,19 @@ void World::GenerateHumans() noexcept
 		state = new MachineState;
 		state->mFacing = static_cast<MachineState::Facing>(direction(generator));
 		int x, y;
+		std::pair<int, int> c;
 		do
 		{
 			x = position(generator);
 			y = position(generator);
-		} while (mGridZombies[x][y] != nullptr || mGridHumans[x][y] != nullptr);
+			c = std::make_pair(x, y);
+			//		} while (mGrid[x][y] != nullptr);
+		} while (mGrid.find(c) != mGrid.end());
 		state->mCoordinate->x = x;
 		state->mCoordinate->y = y;
 		mHumanMachine.BindState(*state);
 		mHumans.push_back(state);
-		mGridHumans[x][y] = state;
+		mGrid[c] = state;
 	}
 }
 
@@ -96,76 +140,70 @@ void World::UpdateWorld() noexcept
 	/*	To avoid invalidating the iterator we have to
 	    conditionally advance depending on whether an
 		exception has been thrown or not */
-	MachineState *deleteIfInvalidMove = nullptr;
-	for (auto z = mZombies.begin(); z != mZombies.end();)
+	MachineState* deleteIfInvalidMove = nullptr;
+	for (auto z = mZombies.begin(); z != mZombies.end(); ++z)
 	{
 		// Not popping up a message box on exception since it's really distracting
 		try
 		{
-			mZombieMachine.TakeTurn(**z);
+			if (*z != nullptr)
+			{
+				mZombieMachine.TakeTurn(**z);
+			}
 		}
 		catch (const InvalidOp &e)
 		{
 			std::cerr << e.what() << std::endl;
-			deleteIfInvalidMove = *z;
+			KillZombie(**z, 0);
 		}
 		catch (const GoToExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			deleteIfInvalidMove = *z;
+			KillZombie(**z, 0);
 		}
 		catch (const RangedAttackExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			deleteIfInvalidMove = *z;
+			KillZombie(**z, 0);
 		}
-		if (deleteIfInvalidMove)
+		catch (const std::exception &e)
 		{
-			mGridZombies[(*z)->GetX()][(*z)->GetY()] = nullptr;
-			z = mZombies.erase(z);
-			deleteIfInvalidMove = nullptr;
-		}
-		else
-		{
-			++z;
+			std::cerr << e.what() << std::endl;
 		}
 	}
 
 	// After the turn Kill zombies and Convert humans
-	ConvertHumans(); 
+	ConvertHumans();
 	DeleteKilledZombies();
 
 	deleteIfInvalidMove = nullptr;
-	for (auto h = mHumans.begin(); h != mHumans.end();)
+	for (auto h = mHumans.begin(); h != mHumans.end(); ++h)
 	{
 		try
 		{
-			mHumanMachine.TakeTurn(**h);
+			if (*h != nullptr)
+			{
+				mHumanMachine.TakeTurn(**h);
+			}
 		}
 		catch (const InvalidOp &e)
 		{
 			std::cerr << e.what() << std::endl;
-			deleteIfInvalidMove = *h;
+			KillHuman(**h, 0);
 		}
 		catch (const GoToExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			deleteIfInvalidMove = *h;
+			KillHuman(**h, 0);
 		}
 		catch (const RangedAttackExcept &e)
 		{
 			std::cerr << e.what() << std::endl;
-			deleteIfInvalidMove = *h;
+			KillHuman(**h, 0);
 		}
-		if (deleteIfInvalidMove)
+		catch (const std::exception &e)
 		{
-			mGridHumans[(*h)->GetX()][(*h)->GetY()] = nullptr;
-			h = mHumans.erase(h);
-			deleteIfInvalidMove = nullptr;
-		}
-		else
-		{
-			++h;
+			std::cerr << e.what() << std::endl;
 		}
 	}
 
@@ -176,25 +214,15 @@ void World::UpdateWorld() noexcept
 
 void World::ClearData() noexcept
 {
-	// Delete all states & clear vectors
-	for (unsigned int i = 0; i < mZombies.size(); ++i)
-	{
-		delete mZombies[i];
-	}
+	// Clear vectors
 	mZombies.clear();
-	
-	for (unsigned int i = 0; i < mHumans.size(); ++i)
-	{
-		delete mHumans[i];
-	}
 	mHumans.clear();
 	// Clear grid
 	for (auto i = 0; i < 20; ++i)
 	{
 		for (auto j = 0; j < 20; ++j)
 		{
-			mGridZombies[i][j] = nullptr;
-			mGridHumans[i][j] = nullptr;
+//			mGrid[i][j] = nullptr;
 		}
 	}
 	mDeleteAfterTurn.clear();
@@ -203,49 +231,51 @@ void World::ClearData() noexcept
 
 bool World::HasHuman(const int& x, const int& y) const noexcept
 {
-	return mGridHumans[x][y] != nullptr;
+	auto it = mGrid.find(std::pair<int, int>(x, y));
+	return it != mGrid.end() && it->second->GetInfect() != true;
 }
 
 bool World::HasZombie(const int& x, const int& y) const noexcept
 {
-	return mGridZombies[x][y] != nullptr;
+	auto it = mGrid.find(std::pair<int, int>(x, y));
+	return it != mGrid.end() && it->second->GetInfect() == true;
 }
 
 void World::KillZombie(const MachineState& state, int offset) noexcept
 {
-	MachineState *zombieToKill = nullptr;
+	std::map<std::pair<int, int>, MachineState*>::iterator zombieToKill;
 
 	int x = state.GetX();
 	int y = state.GetY();
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
-		zombieToKill = mGridZombies[x][y - offset];
+		zombieToKill = mGrid.find(std::pair<int, int>(x, y - offset));
 		break;
 	case MachineState::DOWN:
-		zombieToKill = mGridZombies[x][y + offset];
+		zombieToKill = mGrid.find(std::pair<int, int>(x, y + offset));
 		break;
 	case MachineState::LEFT:
-		zombieToKill = mGridZombies[x - offset][y];
+		zombieToKill = mGrid.find(std::pair<int, int>(x - offset, y));
 		break;
 	case MachineState::RIGHT:
-		zombieToKill = mGridZombies[x + offset][y];
+		zombieToKill = mGrid.find(std::pair<int, int>(x + offset, y));
 		break;
 	default:
 		break;
 	}
 
-	if (zombieToKill)
+	if (zombieToKill != mGrid.end())
 	{
-		mGridZombies[zombieToKill->GetX()][zombieToKill->GetY()] = nullptr;
-
 		for (unsigned int i = 0; i < mZombies.size(); ++i)
 		{
 			// Only invalidate the killed zombie from the board.
 			// We actually remove it from zombies later.
-			if (mZombies[i] == zombieToKill)
+			if (mZombies[i] == zombieToKill->second)
 			{
 				mDeleteAfterTurn.push_back(mZombies[i]);
+//				mZombies.erase(mZombies.begin() + i);
+				mGrid.erase(zombieToKill);
 				return;
 			}
 		}
@@ -254,39 +284,39 @@ void World::KillZombie(const MachineState& state, int offset) noexcept
 
 void World::KillHuman(const MachineState& state, int offset) noexcept
 {
-	MachineState *humanToKill = nullptr;
+	std::map<std::pair<int, int>, MachineState*>::iterator humanToKill;
 
 	int x = state.GetX();
 	int y = state.GetY();
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
-		humanToKill = mGridHumans[x][y - offset];
+		humanToKill = mGrid.find(std::pair<int, int>(x, y - offset));
 		break;
 	case MachineState::DOWN:
-		humanToKill = mGridHumans[x][y + offset];
+		humanToKill = mGrid.find(std::pair<int, int>(x, y + offset));
 		break;
 	case MachineState::LEFT:
-		humanToKill = mGridHumans[x - offset][y];
+		humanToKill = mGrid.find(std::pair<int, int>(x - offset, y));
 		break;
 	case MachineState::RIGHT:
-		humanToKill = mGridHumans[x + offset][y];
+		humanToKill = mGrid.find(std::pair<int, int>(x + offset, y));
 		break;
 	default:
 		break;
 	}
 
-	if (humanToKill)
+	if (humanToKill != mGrid.end())
 	{
-		mGridHumans[humanToKill->GetX()][humanToKill->GetY()] = nullptr;
-
 		for (unsigned int i = 0; i < mHumans.size(); ++i)
 		{
-			// Only invalidate the killed human from the board.
-			// We actually remove it from humans later.
-			if (mHumans[i] == humanToKill)
+			// Only invalidate the killed zombie from the board.
+			// We actually remove it from zombies later.
+			if (mHumans[i] == humanToKill->second)
 			{
 				mDeleteAfterTurn.push_back(mHumans[i]);
+//				mHumans.erase(mHumans.begin() + i);
+				mGrid.erase(humanToKill);
 				return;
 			}
 		}
@@ -295,36 +325,33 @@ void World::KillHuman(const MachineState& state, int offset) noexcept
 
 void World::ConvertHuman(const MachineState& state) noexcept
 {
-	MachineState *humanToConvert = nullptr;
+	std::map<std::pair<int, int>, MachineState*>::iterator humanToConvert;
 
 	int x = state.GetX();
 	int y = state.GetY();
 	switch (state.mFacing)
 	{
 	case MachineState::UP:
-		humanToConvert = mGridHumans[x][y - 1];
+		humanToConvert = mGrid.find(std::pair<int, int>(x, y - 1));
 		break;
 	case MachineState::DOWN:
-		humanToConvert = mGridHumans[x][y + 1];
+		humanToConvert = mGrid.find(std::pair<int, int>(x, y + 1));
 		break;
 	case MachineState::LEFT:
-		humanToConvert = mGridHumans[x - 1][y];
+		humanToConvert = mGrid.find(std::pair<int, int>(x - 1, y));
 		break;
 	case MachineState::RIGHT:
-		humanToConvert = mGridHumans[x + 1][y];
+		humanToConvert = mGrid.find(std::pair<int, int>(x + 1, y));
 		break;
 	default:
 		break;
 	}
 
-	if (humanToConvert)
+	if (humanToConvert != mGrid.end())
 	{
-		mGridHumans[humanToConvert->GetX()][humanToConvert->GetY()] = nullptr;
-		mGridZombies[humanToConvert->GetX()][humanToConvert->GetY()] = humanToConvert;
-
 		for (unsigned int i = 0; i < mHumans.size(); ++i)
 		{
-			if (mHumans[i] == humanToConvert)
+			if (mHumans[i] == humanToConvert->second)
 			{
 				// We only invalidate the human from the board.
 				// We remove it after it is 
@@ -345,10 +372,16 @@ void World::DeleteKilledZombies() noexcept
 			if (mZombies[j] == mDeleteAfterTurn[i])
 			{
 				mZombies.erase(mZombies.begin() + j);
-//				delete mGridZombies[mDeleteAfterTurn[i]->GetX()][mDeleteAfterTurn[i]->GetY()];
+				break;
 			}
 		}
 	}
+//	for (auto human = mZombies.begin(); human != mZombies.end();)
+//	{
+//		if (*human == nullptr)
+//			human = mZombies.erase(human);
+//		else ++human;
+//	}
 
 	mDeleteAfterTurn.clear();
 }
@@ -356,6 +389,12 @@ void World::DeleteKilledZombies() noexcept
 void World::DeleteKilledHumans() noexcept
 {
 	// Remove all humans that were killed this turn
+//	for (auto human = mHumans.begin(); human != mHumans.end();)
+//	{
+//		if (*human == nullptr)
+//			human = mHumans.erase(human);
+//		else ++human;
+//	}
 	for (int i = mDeleteAfterTurn.size() - 1; i >= 0; --i)
 	{
 		for (unsigned int j = 0; j < mHumans.size(); ++j)
@@ -363,7 +402,6 @@ void World::DeleteKilledHumans() noexcept
 			if (mHumans[j] == mDeleteAfterTurn[i])
 			{
 				mHumans.erase(mHumans.begin() + j);
-//				delete mGridHumans[mDeleteAfterTurn[i]->GetX()][mDeleteAfterTurn[i]->GetY()];
 			}
 		}
 	}
@@ -384,7 +422,6 @@ void World::ConvertHumans() noexcept
 		}
 		mZombieMachine.BindState(*mHumansToTurn[i]);
 		mZombies.push_back(mHumansToTurn[i]);
-		mGridZombies[mHumansToTurn[i]->GetX()][mHumansToTurn[i]->GetY()] = mZombies.back();
 	}
 
 	mHumansToTurn.clear();

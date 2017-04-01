@@ -3,6 +3,7 @@
 #include "Singleton.h"
 #include "Traits.h"
 #include "Machine.h"
+#include <map>
 
 #define DECLARE_SINGLETON(SingletonClass) friend class Singleton<SingletonClass>;
 
@@ -47,7 +48,6 @@ private:
 
 public:
 	// The grid is public since there is really no need for encapsulation
-	MachineState* mGridZombies[20][20];
-	MachineState* mGridHumans[20][20];
+	std::map<std::pair<int, int>, MachineState*> mGrid;
 };
 
