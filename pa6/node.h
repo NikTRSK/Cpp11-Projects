@@ -101,6 +101,13 @@ public:
 	virtual void CodeGen(CodeContext& context) const override;
 };
 
+class NGoto : public NStatement
+{
+public:
+	NGoto();
+	virtual void CodeGen(CodeContext& context) const override;
+};
+
 class NBlock : public Node
 {
 public:

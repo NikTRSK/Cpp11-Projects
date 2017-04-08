@@ -1,5 +1,6 @@
 #include "node.h"
 #include <sstream>
+#include <iostream>
 
 void NBlock::AddStatement(NStatement* statement)
 {
@@ -11,7 +12,13 @@ void NBlock::CodeGen(CodeContext& context) const
 	// TODO: Loop through statements in list and code gen them
 	for (const auto &statement : mStatements)
 	{
+		std::cout << "Adding statement\n";
 		statement->CodeGen(context);
+	}
+	if (mbMainBlock)
+	{
+		NStatement * goto_begin = new NGoto();
+		goto_begin->CodeGen(context);
 	}
 }
 
@@ -124,4 +131,13 @@ NIs_Random::NIs_Random()
 void NIs_Random::CodeGen(CodeContext& context) const
 {
 	context.mOps.push_back("is_random");
+}
+
+NGoto::NGoto()
+{
+}
+
+void NGoto::CodeGen(CodeContext& context) const
+{
+	context.mOps.push_back("goto,1");
 }
