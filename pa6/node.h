@@ -37,8 +37,68 @@ private:
 	NNumeric* mDir;
 };
 
+class NForward : public NStatement
+{
+public:
+	NForward();
+	virtual void CodeGen(CodeContext& context) const override;
+};
+
+class NAttack : public NStatement
+{
+public:
+	NAttack();
+	virtual void CodeGen(CodeContext& context) const override;
+};
+
+class NRanged_Attack : public NStatement
+{
+public:
+	NRanged_Attack();
+	virtual void CodeGen(CodeContext& context) const override;
+};
+
 class NBoolean : public Node
 {
+};
+
+class NIs_Zombie : public NBoolean
+{
+public:
+	NIs_Zombie(NNumeric* dir);
+	virtual void CodeGen(CodeContext& context) const override;
+private:
+	NNumeric* mDir;
+};
+
+class NIs_Human : public NBoolean
+{
+public:
+	NIs_Human(NNumeric* dir);
+	virtual void CodeGen(CodeContext& context) const override;
+private:
+	NNumeric* mDir;
+};
+
+class NIs_Wall : public NBoolean
+{
+public:
+	NIs_Wall();
+	virtual void CodeGen(CodeContext& context) const override;
+};
+
+class NIs_Passable : public NBoolean
+{
+public:
+	NIs_Passable();
+	virtual void CodeGen(CodeContext& context) const override;
+};
+
+class NIs_Random : public NBoolean
+{
+public:
+	NIs_Random();
+	virtual void CodeGen(CodeContext& context) const override;
 };
 
 class NBlock : public Node

@@ -41,11 +41,14 @@ NBlock* g_MainBlock = nullptr;
 
 %%
 
-main_loop	: TMAIN TLBRACE block TRBRACE { std::cout << "Main entry point found!" << std::endl; }
+main_loop	: TMAIN TLBRACE block TRBRACE { ($3)->SetMainBlock(); g_MainBlock = $3;
+											std::cout << "Main entry point found!" << std::endl; }
 ;
 
-block		: statement { std::cout << "Single statement" << std::endl; }
-			  | block statement { std::cout << "Multiple statements" << std::endl; }
+block		: statement { $$ = new NBlock(); 
+						  ($$)->AddStatement($1); std::cout << "Single statement" << std::endl; }
+			  | block statement { ($1)->AddStatement($2); 
+								  std::cout << "Multiple statements" << std::endl; }
 /* TODO: Add support for multiple statements in a block */
 ;
 
@@ -56,34 +59,34 @@ statement	: rotate TSEMI | forward TSEMI | ifelse | ranged_attack TSEMI | attack
 			  | boolean TSEMI
 ;
 			
-rotate		: TROTATE TLPAREN numeric TRPAREN { std::cout << "Rotate command" << std::endl; }
+rotate		: TROTATE TLPAREN numeric TRPAREN { $$ = new NRotate($3); std::cout << "Rotate command" << std::endl; }
 ;
 
-forward		: TFORWARD TLPAREN TRPAREN { std::cout << "Forward command" << std::endl; }
+forward		: TFORWARD TLPAREN TRPAREN { $$ = new NForward(); std::cout << "Forward command" << std::endl; }
 ;
 
-is_zombie	: TISZOMBIE TLPAREN numeric TRPAREN { std::cout << "Test zombie command" << std::endl; }
+is_zombie	: TISZOMBIE TLPAREN numeric TRPAREN { $$ = new NIs_Zombie($3); std::cout << "Test zombie command" << std::endl; }
 ;
 
-is_human	: TISHUMAN TLPAREN numeric TRPAREN { std::cout << "Test human command" << std::endl; }
+is_human	: TISHUMAN TLPAREN numeric TRPAREN { $$ = new NIs_Human($3); std::cout << "Test human command" << std::endl; }
 ;
 
-is_wall		: TISWALL TLPAREN TRPAREN { std::cout << "Test wall command" << std::endl; }
+is_wall		: TISWALL TLPAREN TRPAREN { $$ = new NIs_Wall(); std::cout << "Test wall command" << std::endl; }
 ;
 
-is_passable	: TISPASSABLE TLPAREN TRPAREN { std::cout << "Test passable command" << std::endl; }
+is_passable	: TISPASSABLE TLPAREN TRPAREN { $$ = new NIs_Passable(); std::cout << "Test passable command" << std::endl; }
 ;
 
-is_random	: TISRANDOM TLPAREN TRPAREN { std::cout << "Test random command" << std::endl; }
+is_random	: TISRANDOM TLPAREN TRPAREN { $$ = new NIs_Random(); std::cout << "Test random command" << std::endl; }
 ;
 
-attack		: TATTACK TLPAREN TRPAREN { std::cout << "Attack command" << std::endl; }
+attack		: TATTACK TLPAREN TRPAREN { $$ = new NAttack(); std::cout << "Attack command" << std::endl; }
 ;
 
-ranged_attack	: TRANGEDATTTACK TLPAREN TRPAREN { std::cout << "Ranged attack command" << std::endl; }
+ranged_attack	: TRANGEDATTTACK TLPAREN TRPAREN { $$ = new NRanged_Attack(); std::cout << "Ranged attack command" << std::endl; }
 ;
 			
-numeric		: TINTEGER { std::cout << "Numeric value of " << *($1) << std::endl; }
+numeric		: TINTEGER { $$ = new NNumeric(*($1)); std::cout << "Numeric value of " << *($1) << std::endl; }
 ;
 
 boolean		: is_zombie | is_human | is_wall | is_passable | is_random
