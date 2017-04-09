@@ -8,6 +8,7 @@
 struct CodeContext
 {
 	std::vector<std::string> mOps;
+	std::map<int, int> mGoto;
 };
 
 class Node
@@ -98,13 +99,6 @@ class NIs_Random : public NBoolean
 {
 public:
 	NIs_Random();
-	virtual void CodeGen(CodeContext& context) const override;
-};
-
-class NGoto : public NStatement
-{
-public:
-	NGoto();
 	virtual void CodeGen(CodeContext& context) const override;
 };
 

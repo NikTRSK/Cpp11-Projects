@@ -17,8 +17,8 @@ void NBlock::CodeGen(CodeContext& context) const
 	}
 	if (mbMainBlock)
 	{
-		NStatement * goto_begin = new NGoto();
-		goto_begin->CodeGen(context);
+		context.mOps.push_back("goto,1");
+		context.mGoto[context.mOps.size()] = 1;
 	}
 }
 
@@ -133,16 +133,6 @@ void NIs_Random::CodeGen(CodeContext& context) const
 	context.mOps.push_back("is_random");
 }
 
-NGoto::NGoto()
-{
-}
-
-void NGoto::CodeGen(CodeContext& context) const
-{
-	context.mOps.push_back("goto,1");
-}
-
-
 NIf::NIf(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock)
 	:mCondition(condition), mIfBlock(ifBlock), mElseBlock(elseBlock)
 {
@@ -173,4 +163,7 @@ void NIf::CodeGen(CodeContext& context) const
 	// Flip if and else
 	context.mOps.at(JEPosition) += std::to_string(ifBeginPos); // Append je line number
 	context.mOps.at(gotoPos - 1) += std::to_string(ifEndPos); // Append goto for jump line number
+
+	// Add the goto so we can optimize it later
+	context.mGoto[gotoPos] = ifEndPos;
 }
