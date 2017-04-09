@@ -133,12 +133,12 @@ void NIs_Random::CodeGen(CodeContext& context) const
 	context.mOps.push_back("is_random");
 }
 
-NIf::NIf(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock)
+NIfElse::NIfElse(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock)
 	:mCondition(condition), mIfBlock(ifBlock), mElseBlock(elseBlock)
 {
 }
 
-void NIf::CodeGen(CodeContext& context) const
+void NIfElse::CodeGen(CodeContext& context) const
 {
 	// Push in condition
 	mCondition->CodeGen(context);

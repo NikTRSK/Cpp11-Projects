@@ -15,6 +15,9 @@ extern NBlock* g_MainBlock;
 extern int zompilerparse();
 extern FILE* zompilerin;
 
+void OptimizeGoTo(CodeContext & codeContext);
+void WriteToOutputFile(const CodeContext & codeContext) noexcept;
+
 int main(int argc, char* argv[])
 {
 	// Read input from the first command line parameter
@@ -23,22 +26,15 @@ int main(int argc, char* argv[])
 	// Start the parse
 	zompilerparse();
 	
-	// TODO: CodeGen from g_MainBlock
+	// CodeGen from g_MainBlock
 	if (g_MainBlock)
 	{
 		CodeContext codeContext;
 		g_MainBlock->CodeGen(codeContext);
 
-		FILE * output = fopen("out.zom", "w");
+		OptimizeGoTo(codeContext);
 
-		if (output) 
-		{
-			for (const auto &op : codeContext.mOps)
-			{
-				fputs((op + "\n").c_str(), output);
-			}
-		}
-		fclose(output);
+		WriteToOutputFile(codeContext);
 	}
 	
 	// Close the file stream
@@ -50,4 +46,31 @@ int main(int argc, char* argv[])
 void zompilererror(const char* s)
 {
 	std::cout << s << " on line " << g_LineNumber << std::endl;
+}
+
+void OptimizeGoTo(CodeContext & codeContext) noexcept
+{
+	for (const auto &gt : codeContext.mGoto)
+	{
+		codeContext.mOps.at(gt.first - 1) = "goto,1";
+	}
+}
+
+void WriteToOutputFile(const CodeContext & codeContext)
+{
+	FILE * output = fopen("out.zom", "w");
+
+	if (output)
+	{
+		for (const auto &op : codeContext.mOps)
+		{
+			fputs((op + "\n").c_str(), output);
+		}
+	}
+	else
+	{
+		std::cerr << "Couldn't create an otput file\n"; // Should this be an exception
+	}
+	// Close the file
+	fclose(output);
 }

@@ -114,11 +114,10 @@ private:
 	bool mbMainBlock;
 };
 
-class NIf : public NStatement
+class NIfElse : public NStatement
 {
 public:
-	NIf() {};
-	NIf(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock);
+	NIfElse(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock);
 	virtual void CodeGen(CodeContext& context) const override;
 
 private:

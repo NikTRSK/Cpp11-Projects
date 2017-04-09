@@ -53,7 +53,7 @@ block		: statement { $$ = new NBlock();
 ;
 
 ifelse		: TIF TLPAREN boolean TRPAREN TLBRACE block TRBRACE
-			  TELSE TLBRACE block TRBRACE { $$ = new NIf($3, $6, $10); };
+			  TELSE TLBRACE block TRBRACE { $$ = new NIfElse($3, $6, $10); };
 
 statement	: rotate TSEMI | forward TSEMI | ifelse | ranged_attack TSEMI | attack TSEMI
 			  | boolean TSEMI
