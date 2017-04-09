@@ -34,7 +34,7 @@ NBlock* g_MainBlock = nullptr;
 /* Statements */
 %type <block> main_loop block
 %type <statement> statement rotate forward ifelse attack ranged_attack
-%type <boolean> is_zombie is_human is_wall is_passable is_random
+%type <boolean> boolean is_zombie is_human is_wall is_passable is_random
  
 /* Expressions */
 %type <numeric> numeric
@@ -52,8 +52,8 @@ block		: statement { $$ = new NBlock();
 /* TODO: Add support for multiple statements in a block */
 ;
 
-ifelse		: TIF TLPAREN boolean TRPAREN TLBRACE { std::cout << "IF block\n"; } block TRBRACE
-			  TELSE TLBRACE { std::cout << "ELSE block\n"; } block TRBRACE
+ifelse		: TIF TLPAREN boolean TRPAREN TLBRACE block TRBRACE
+			  TELSE TLBRACE block TRBRACE { $$ = new NIf($3, $6, $10); };
 
 statement	: rotate TSEMI | forward TSEMI | ifelse | ranged_attack TSEMI | attack TSEMI
 			  | boolean TSEMI

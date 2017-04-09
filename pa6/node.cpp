@@ -141,3 +141,36 @@ void NGoto::CodeGen(CodeContext& context) const
 {
 	context.mOps.push_back("goto,1");
 }
+
+
+NIf::NIf(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock)
+	:mCondition(condition), mIfBlock(ifBlock), mElseBlock(elseBlock)
+{
+}
+
+void NIf::CodeGen(CodeContext& context) const
+{
+	// Push in condition
+	mCondition->CodeGen(context);
+
+	// Create JE block for If
+	context.mOps.push_back("je,");
+	int JEPosition = context.mOps.size() - 1;
+
+	// Else block
+	mElseBlock->CodeGen(context);
+
+	// Create goto for passing if block
+	context.mOps.push_back("goto,");
+	int gotoPos = context.mOps.size();
+
+	// If block
+	int ifBeginPos = context.mOps.size() + 1;
+
+	mIfBlock->CodeGen(context);
+	int ifEndPos = context.mOps.size() + 1;
+
+	// Flip if and else
+	context.mOps.at(JEPosition) += std::to_string(ifBeginPos); // Append je line number
+	context.mOps.at(gotoPos - 1) += std::to_string(ifEndPos); // Append goto for jump line number
+}

@@ -119,3 +119,16 @@ private:
 	std::list<NStatement*> mStatements;
 	bool mbMainBlock;
 };
+
+class NIf : public NStatement
+{
+public:
+	NIf() {};
+	NIf(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock);
+	virtual void CodeGen(CodeContext& context) const override;
+
+private:
+	NBoolean* mCondition = nullptr;
+	NBlock* mIfBlock = nullptr;
+	NBlock* mElseBlock = nullptr;
+};
