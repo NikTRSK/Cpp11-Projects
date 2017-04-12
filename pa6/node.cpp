@@ -81,11 +81,11 @@ void NIs_Zombie::CodeGen(CodeContext& context) const
 	// Should we handle wrong values here?
 	if (mDir->mvalue == 1)
 	{
-		context.mOps.push_back("is_zombie,1");
+		context.mOps.push_back("test_zombie,1");
 	}
 	else if (mDir->mvalue == 2)
 	{
-		context.mOps.push_back("is_zombie,2");
+		context.mOps.push_back("test_zombie,2");
 	}
 }
 
@@ -98,11 +98,11 @@ void NIs_Human::CodeGen(CodeContext& context) const
 {
 	if (mDir->mvalue == 1)
 	{
-		context.mOps.push_back("is_human,1");
+		context.mOps.push_back("test_human,1");
 	}
 	else if (mDir->mvalue == 2)
 	{
-		context.mOps.push_back("is_human,2");
+		context.mOps.push_back("test_human,2");
 	}
 }
 
@@ -112,7 +112,7 @@ NIs_Wall::NIs_Wall()
 
 void NIs_Wall::CodeGen(CodeContext& context) const
 {
-	context.mOps.push_back("is_wall");
+	context.mOps.push_back("test_wall");
 }
 
 NIs_Passable::NIs_Passable()
@@ -121,7 +121,7 @@ NIs_Passable::NIs_Passable()
 
 void NIs_Passable::CodeGen(CodeContext& context) const
 {
-	context.mOps.push_back("is_passable");
+	context.mOps.push_back("test_passable");
 }
 
 NIs_Random::NIs_Random()
@@ -130,7 +130,7 @@ NIs_Random::NIs_Random()
 
 void NIs_Random::CodeGen(CodeContext& context) const
 {
-	context.mOps.push_back("is_random");
+	context.mOps.push_back("test_random");
 }
 
 NIfElse::NIfElse(NBoolean* condition, NBlock* ifBlock, NBlock* elseBlock)

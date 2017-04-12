@@ -15,7 +15,7 @@ extern NBlock* g_MainBlock;
 extern int zompilerparse();
 extern FILE* zompilerin;
 
-void OptimizeGoTo(CodeContext & codeContext);
+void OptimizeGoTo(CodeContext & codeContext) noexcept;
 void WriteToOutputFile(const CodeContext & codeContext) noexcept;
 
 int main(int argc, char* argv[])
@@ -56,7 +56,7 @@ void OptimizeGoTo(CodeContext & codeContext) noexcept
 	}
 }
 
-void WriteToOutputFile(const CodeContext & codeContext)
+void WriteToOutputFile(const CodeContext & codeContext) noexcept
 {
 	FILE * output = fopen("out.zom", "w");
 
