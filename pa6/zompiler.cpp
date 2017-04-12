@@ -15,7 +15,9 @@ extern NBlock* g_MainBlock;
 extern int zompilerparse();
 extern FILE* zompilerin;
 
+// Performs optimizations on goto statements
 void OptimizeGoTo(CodeContext & codeContext) noexcept;
+// Writes the zomsembly code to an output file
 void WriteToOutputFile(const CodeContext & codeContext) noexcept;
 
 int main(int argc, char* argv[])

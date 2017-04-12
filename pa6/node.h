@@ -121,7 +121,7 @@ public:
 	virtual void CodeGen(CodeContext& context) const override;
 
 private:
-	NBoolean* mCondition = nullptr;
-	NBlock* mIfBlock = nullptr;
-	NBlock* mElseBlock = nullptr;
+	NBoolean* mCondition;
+	NBlock* mIfBlock;
+	NBlock* mElseBlock;
 };

@@ -9,12 +9,12 @@ void NBlock::AddStatement(NStatement* statement)
 
 void NBlock::CodeGen(CodeContext& context) const
 {
-	// TODO: Loop through statements in list and code gen them
+	// Loop through statements in list and code gen them
 	for (const auto &statement : mStatements)
 	{
-		std::cout << "Adding statement\n";
 		statement->CodeGen(context);
 	}
+	// Append the goto beginning statement
 	if (mbMainBlock)
 	{
 		context.mOps.push_back("goto,1");
@@ -34,6 +34,7 @@ NRotate::NRotate(NNumeric* dir)
 
 void NRotate::CodeGen(CodeContext& context) const
 {
+	// Create statement based on the parameter
 	if (mDir->mvalue == 0)
 	{
 		context.mOps.push_back("rotate,0");
@@ -78,7 +79,6 @@ NIs_Zombie::NIs_Zombie(NNumeric* dir)
 
 void NIs_Zombie::CodeGen(CodeContext& context) const
 {
-	// Should we handle wrong values here?
 	if (mDir->mvalue == 1)
 	{
 		context.mOps.push_back("test_zombie,1");
@@ -145,20 +145,20 @@ void NIfElse::CodeGen(CodeContext& context) const
 
 	// Create JE block for If
 	context.mOps.push_back("je,");
-	int JEPosition = context.mOps.size() - 1;
+	auto JEPosition = context.mOps.size() - 1;
 
 	// Else block
 	mElseBlock->CodeGen(context);
 
 	// Create goto for passing if block
 	context.mOps.push_back("goto,");
-	int gotoPos = context.mOps.size();
+	auto gotoPos = context.mOps.size();
 
 	// If block
-	int ifBeginPos = context.mOps.size() + 1;
+	auto ifBeginPos = context.mOps.size() + 1;
 
 	mIfBlock->CodeGen(context);
-	int ifEndPos = context.mOps.size() + 1;
+	auto ifEndPos = context.mOps.size() + 1;
 
 	// Flip if and else
 	context.mOps.at(JEPosition) += std::to_string(ifBeginPos); // Append je line number

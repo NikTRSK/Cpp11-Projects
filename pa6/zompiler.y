@@ -45,10 +45,8 @@ main_loop	: TMAIN TLBRACE block TRBRACE { ($3)->SetMainBlock(); g_MainBlock = $3
 											std::cout << "Main entry point found!" << std::endl; }
 ;
 
-block		: statement { $$ = new NBlock(); 
-						  ($$)->AddStatement($1); std::cout << "Single statement" << std::endl; }
-			  | block statement { ($1)->AddStatement($2); 
-								  std::cout << "Multiple statements" << std::endl; }
+block		: statement { $$ = new NBlock(); ($$)->AddStatement($1); }
+			  | block statement { ($1)->AddStatement($2); }
 /* TODO: Add support for multiple statements in a block */
 ;
 
