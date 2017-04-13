@@ -52,10 +52,6 @@ void zompilererror(const char* s)
 
 void OptimizeGoTo(CodeContext & codeContext) noexcept
 {
-//	for (const auto &gt : codeContext.mGoto)
-//	{
-//		codeContext.mOps.at(gt.first - 1) = "goto,1";
-//	}
 	// Iterate over the map and find a goto chain.
 	int gotoEnd = -1;
 	auto gotoPos = codeContext.mGoto.begin();
