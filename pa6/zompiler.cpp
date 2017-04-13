@@ -52,9 +52,35 @@ void zompilererror(const char* s)
 
 void OptimizeGoTo(CodeContext & codeContext) noexcept
 {
+//	for (const auto &gt : codeContext.mGoto)
+//	{
+//		codeContext.mOps.at(gt.first - 1) = "goto,1";
+//	}
+	// Iterate over the map and find a goto chain.
+	int gotoEnd = -1;
+	auto gotoPos = codeContext.mGoto.begin();
+	while (gotoPos != codeContext.mGoto.end() && gotoEnd == -1)
+	{
+		auto it = gotoPos;
+		while ((it = codeContext.mGoto.find(it->second)) != codeContext.mGoto.end())
+		{
+			gotoEnd = it->second;
+		}
+		++gotoPos;
+	}
+	// If gotoEnd is -1 we know we don't have a chain so we can keep going.
+	if (gotoEnd == -1)
+		return;
+
+	// Finally replace the gotos from the chain.
 	for (const auto &gt : codeContext.mGoto)
 	{
-		codeContext.mOps.at(gt.first - 1) = "goto,1";
+		if (gt.second == gotoEnd)
+		{
+			break;
+		}
+	
+		codeContext.mOps.at(gt.first - 1) = "goto," + std::to_string(gotoEnd);
 	}
 }
 
