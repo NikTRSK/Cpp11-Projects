@@ -22,5 +22,8 @@ std::vector<int> GeneratePopulationMember(std::mt19937 &randGen, const int &loca
 Population GeneratePopulation(std::mt19937 &randGen, const int &locationsSize, const int &popSize) noexcept;
 std::vector<std::pair<int, double>> ComputerFitness(const Population &population, const std::vector<Location>& locations) noexcept;
 double CalculateDistance(const Location &start, const Location &end) noexcept;
-
+std::vector<double> GenerateProbabilities(const int & popSize) noexcept;
+std::vector<std::pair<int, double>> SortFitness(const std::vector<std::pair<int, double>> & fitness) noexcept;
+int FindAvailableIndex(std::vector<double> probabilities, double randomDouble, size_t currIdx = 0, double runningSum = 0.0) noexcept;
+std::vector<std::pair<int, int>> GeneratePairs(std::vector<std::pair<int, double>> fitness, const int &popSize, std::mt19937 &randGen) noexcept;
 std::string ToString(std::vector<int> input, std::string delimiter) noexcept;

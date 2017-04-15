@@ -23,20 +23,33 @@ int main(int argc, const char* argv[])
 	
 	std::cout << inputFile << ", " << popSize << ", " << generations << ", " << mutationChance << ", " << seed << std::endl;
 
-	auto locs = ParseLocations(input);
-	for (auto l : locs)
+	auto locations = ParseLocations(input);
+	for (const auto &l : locations)
 	{
 		std::cout << l.mName << ", " << l.mLatitude << ", " << l.mLongitude << std::endl;
 	}
 
 	std::ofstream logFile("out.txt");
 	logFile << "INITIAL POPULATION:\n";
-	Population population = GeneratePopulation(randGen, locs.size(), popSize);
-	for (auto pop : population.mMembers)
+	Population population = GeneratePopulation(randGen, locations.size(), popSize);
+	for (const auto &pop : population.mMembers)
 	{
 		logFile << ToString(pop, ",");
 		logFile << std::endl;
 	}
+	auto fitness = ComputerFitness(population, locations);
+	logFile << "FITNESS:\n";
+	for (const auto & fit : fitness)
+	{
+		logFile << fit.first << ":" << fit.second << std::endl;
+	}
+	auto pairs = GeneratePairs(fitness, popSize, randGen);
+	logFile << "SELECTED PAIRS\n";
+	for (const auto & pair : pairs)
+	{
+		logFile << "(" << pair.first << "," << pair.second << ")\n";
+	}
+
 
 	return 0;
 }
