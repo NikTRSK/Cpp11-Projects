@@ -135,7 +135,7 @@ std::vector<double> GenerateProbabilities(const int & popSize, const std::vector
 	probabilities.at(idx) *= 6.0;
 
 	// Change this to remove loop
-	for (auto i = 2; i < sortedFitness.size() / 2; ++i)
+	for (unsigned int i = 2; i < sortedFitness.size() / 2; ++i)
 	{
 		idx = sortedFitness.at(i).first;
 		probabilities.at(idx) *= 3.0;
@@ -196,4 +196,68 @@ std::vector<std::pair<int, int>> GeneratePairs(std::vector<std::pair<int, double
 	});
 
 	return pairs;
+}
+
+Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, std::mt19937 &randGen, const double &mutationChance) noexcept
+{
+	Population resultPopulation;
+
+	std::vector<int> A;
+	std::vector<int> B;
+
+	// Extract parents from pairs
+	std::transform(pairs.begin(), pairs.end(), std::back_inserter(A), [](const auto &member)
+	{
+		return member.first;
+	});
+
+	std::transform(pairs.begin(), pairs.end(), std::back_inserter(B), [](const auto &member)
+	{
+		return member.second;
+	});
+	
+	for (unsigned int i = 0; i < pairs.size(); ++i)
+		resultPopulation.mMembers.push_back(CrossoverPairs(A, B, randGen, mutationChance));
+
+	return resultPopulation;
+}
+
+std::vector<int> CrossoverPairs(const std::vector<int> & parentA, const std::vector<int> & parentB, std::mt19937 &randGen, const double &mutationChance) noexcept
+{
+	std::uniform_int<int> distributionIndexGenerator(1, parentA.size() - 2);
+	std::uniform_int<int> parentBool(0, 1);
+
+	int crossoverIndex = distributionIndexGenerator(randGen);
+	int crossoverOrder = parentBool(randGen);
+
+	std::vector<int> result;
+	if (crossoverOrder == 1)
+	{
+		// A goes first
+		std::copy_n(parentA.begin(), crossoverIndex, std::back_inserter(result));
+		std::copy_if(parentB.begin(), parentB.end(), std::back_inserter(result), [&result](const int &val)
+		{
+			return std::find(result.begin(), result.end(), val) == result.end();
+		});
+	}
+	else
+	{
+		// B goes first
+		std::copy_n(parentB.begin(), crossoverIndex, std::back_inserter(result));
+		std::copy_if(parentA.begin(), parentA.end(), std::back_inserter(result), [&result](const int &val)
+		{
+			return std::find(result.begin(), result.end(), val) == result.end();
+		});
+	}
+
+	std::uniform_real_distribution<double> mutRnd(0.0, 1.0);
+	double randomChance = mutRnd(randGen);
+	if (randomChance <= mutationChance)
+	{
+		std::uniform_int_distribution<int> rnd(1, result.size() - 1);
+		int idx1 = rnd(randGen);
+		int idx2 = rnd(randGen);
+		std::swap(result.at(idx1), result.at(idx2));
+	}
+	return result;
 }

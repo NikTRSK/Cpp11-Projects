@@ -49,7 +49,13 @@ int main(int argc, const char* argv[])
 	{
 		logFile << "(" << pair.first << "," << pair.second << ")\n";
 	}
-
+	auto crossedoverPopulation = GenerateCrossover(pairs, randGen, mutationChance);
+	logFile << "GENERATION: 1\n";
+	for (auto member: crossedoverPopulation.mMembers)
+	{
+		logFile << ToString(member, ",");
+		logFile << std::endl;
+	}
 
 	return 0;
 }
