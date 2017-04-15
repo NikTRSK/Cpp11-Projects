@@ -5,6 +5,7 @@
 #include <iterator>
 #include <numeric>
 #include <sstream>
+#include <iostream>
 
 std::vector<Location> ParseLocations(std::ifstream &input) noexcept
 {
@@ -123,19 +124,30 @@ std::vector<std::pair<int, double>> SortFitness(const std::vector<std::pair<int,
 	return copy;
 }
 
-std::vector<double> GenerateProbabilities(const int & popSize) noexcept
+std::vector<double> GenerateProbabilities(const int & popSize, const std::vector<std::pair<int, double>> &sortedFitness) noexcept
 {
 	std::vector<double> probabilities(popSize);
 	std::generate(probabilities.begin(), probabilities.end(), [&popSize]() { return 1.0 / popSize; });
 
-	// The front 2 items are the highest ones so we multiply by 6.0
-	probabilities[0] *= 6.0;
-	probabilities[1] *= 6.0;
-	// Multiply by 3.0 from 2 to (size/2 - 1)
-	std::transform(probabilities.begin() + 2, probabilities.begin() + (popSize / 2 - 1), probabilities.begin() + 2, [](const auto &p)
+	int idx = sortedFitness.at(0).first;
+	probabilities.at(idx) *= 6.0;
+	idx = sortedFitness.at(1).first;
+	probabilities.at(idx) *= 6.0;
+
+	// Change this to remove loop
+	for (auto i = 2; i < sortedFitness.size() / 2; ++i)
 	{
-		return p * 3.0;
-	});
+		idx = sortedFitness.at(i).first;
+		probabilities.at(idx) *= 3.0;
+	}
+	// The front 2 items are the highest ones so we multiply by 6.0
+//	probabilities[0] *= 6.0;
+//	probabilities[1] *= 6.0;
+//	// Multiply by 3.0 from 2 to (size/2 - 1)
+//	std::transform(probabilities.begin() + 2, probabilities.begin() + (popSize / 2 - 1), probabilities.begin() + 2, [](const auto &p)
+//	{
+//		return p * 3.0;
+//	});
 
 	/* Normalize the vector */
 	// Sum up the vector.
@@ -169,18 +181,18 @@ std::vector<std::pair<int, int>> GeneratePairs(std::vector<std::pair<int, double
 {
 	auto sortedFitness = SortFitness(fitness);
 
-	auto probabilities = GenerateProbabilities(popSize);
+	auto probabilities = GenerateProbabilities(popSize, sortedFitness);
 
 	std::vector<std::pair<int, int>> pairs(popSize);
 
-	std::generate(pairs.begin(), pairs.end(), [&sortedFitness, &probabilities, &randGen] ()
+	std::generate(pairs.begin(), pairs.end(), [&fitness, &probabilities, &randGen] ()
 	{
 		int idxFirst, idxSecond;
 		std::uniform_real_distribution<double> urand(0.0, 1.0);
 		idxFirst = FindAvailableIndex(probabilities, urand(randGen));
 		idxSecond = FindAvailableIndex(probabilities, urand(randGen));
 
-		return std::make_pair(sortedFitness[idxFirst].first, sortedFitness[idxSecond].first);
+		return std::make_pair(fitness[idxFirst].first, fitness[idxSecond].first);
 	});
 
 	return pairs;
