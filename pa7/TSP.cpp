@@ -140,13 +140,9 @@ std::vector<double> GenerateProbabilities(const int & popSize, const std::vector
 		idx = sortedFitness.at(i).first;
 		probabilities.at(idx) *= 3.0;
 	}
-	// The front 2 items are the highest ones so we multiply by 6.0
-//	probabilities[0] *= 6.0;
-//	probabilities[1] *= 6.0;
-//	// Multiply by 3.0 from 2 to (size/2 - 1)
-//	std::transform(probabilities.begin() + 2, probabilities.begin() + (popSize / 2 - 1), probabilities.begin() + 2, [](const auto &p)
+//	std::transform(sortedFitness.begin() + 2, sortedFitness.begin() + (popSize / 2 - 1), probabilities.begin() + 2, [&probabilities](const auto &p)
 //	{
-//		return p * 3.0;
+//		return probabilities.at(p.first) *= 3.0;
 //	});
 
 	/* Normalize the vector */
@@ -198,7 +194,7 @@ std::vector<std::pair<int, int>> GeneratePairs(std::vector<std::pair<int, double
 	return pairs;
 }
 
-Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, std::mt19937 &randGen, const double &mutationChance) noexcept
+Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, const Population &population, std::mt19937 &randGen, const double &mutationChance) noexcept
 {
 	Population resultPopulation;
 
@@ -217,7 +213,7 @@ Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, std:
 	});
 	
 	for (unsigned int i = 0; i < pairs.size(); ++i)
-		resultPopulation.mMembers.push_back(CrossoverPairs(A, B, randGen, mutationChance));
+		resultPopulation.mMembers.push_back(CrossoverPairs(population.mMembers.at(A.at(i)), population.mMembers.at(B.at(i)), randGen, mutationChance));
 
 	return resultPopulation;
 }
@@ -229,12 +225,11 @@ std::vector<int> CrossoverPairs(const std::vector<int> & parentA, const std::vec
 
 	int crossoverIndex = distributionIndexGenerator(randGen);
 	int crossoverOrder = parentBool(randGen);
-
 	std::vector<int> result;
 	if (crossoverOrder == 1)
 	{
 		// A goes first
-		std::copy_n(parentA.begin(), crossoverIndex, std::back_inserter(result));
+		std::copy_n(parentA.begin(), crossoverIndex+1, std::back_inserter(result));
 		std::copy_if(parentB.begin(), parentB.end(), std::back_inserter(result), [&result](const int &val)
 		{
 			return std::find(result.begin(), result.end(), val) == result.end();
@@ -243,21 +238,21 @@ std::vector<int> CrossoverPairs(const std::vector<int> & parentA, const std::vec
 	else
 	{
 		// B goes first
-		std::copy_n(parentB.begin(), crossoverIndex, std::back_inserter(result));
+		std::copy_n(parentB.begin(), crossoverIndex+1, std::back_inserter(result));
 		std::copy_if(parentA.begin(), parentA.end(), std::back_inserter(result), [&result](const int &val)
 		{
 			return std::find(result.begin(), result.end(), val) == result.end();
 		});
 	}
-
 	std::uniform_real_distribution<double> mutRnd(0.0, 1.0);
 	double randomChance = mutRnd(randGen);
-	if (randomChance <= mutationChance)
+	if (randomChance <= mutationChance / 100.0)
 	{
 		std::uniform_int_distribution<int> rnd(1, result.size() - 1);
 		int idx1 = rnd(randGen);
 		int idx2 = rnd(randGen);
 		std::swap(result.at(idx1), result.at(idx2));
 	}
+
 	return result;
 }

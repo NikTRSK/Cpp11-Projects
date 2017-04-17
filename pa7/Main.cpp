@@ -43,19 +43,39 @@ int main(int argc, const char* argv[])
 	{
 		logFile << fit.first << ":" << fit.second << std::endl;
 	}
-	auto pairs = GeneratePairs(fitness, popSize, randGen);
-	logFile << "SELECTED PAIRS\n";
-	for (const auto & pair : pairs)
+
+	for (unsigned int genIter = 1; genIter <= generations; ++genIter)
 	{
-		logFile << "(" << pair.first << "," << pair.second << ")\n";
-	}
-	auto crossedoverPopulation = GenerateCrossover(pairs, randGen, mutationChance);
-	logFile << "GENERATION: 1\n";
-	for (auto member: crossedoverPopulation.mMembers)
-	{
-		logFile << ToString(member, ",");
-		logFile << std::endl;
+
+		auto pairs = GeneratePairs(fitness, popSize, randGen);
+		logFile << "SELECTED PAIRS:\n";
+		for (const auto & pair : pairs)
+		{
+			logFile << "(" << pair.first << "," << pair.second << ")\n";
+		}
+		auto crossedoverPopulation = GenerateCrossover(pairs, population, randGen, mutationChance);
+		logFile << "GENERATION: " << genIter << "\n";
+		for (auto member : crossedoverPopulation.mMembers)
+		{
+			logFile << ToString(member, ",");
+			logFile << std::endl;
+		}
+		population = crossedoverPopulation;
+
+		fitness = ComputerFitness(population, locations);
+		logFile << "FITNESS:\n";
+		for (const auto & fit : fitness)
+		{
+			logFile << fit.first << ":" << fit.second << std::endl;
+		}
 	}
 
+	logFile << "SOLUTION:\n";
+	for (int location : population.mMembers.back())
+	{
+		logFile << locations[location].mName << "\n";
+	}
+	logFile << locations.front().mName << "\n";
+	logFile << "DISTANCE: " << fitness.back().second << " miles\n";
 	return 0;
 }
