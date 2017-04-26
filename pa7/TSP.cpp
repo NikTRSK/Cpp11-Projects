@@ -134,16 +134,13 @@ std::vector<double> GenerateProbabilities(const int & popSize, const std::vector
 	idx = sortedFitness.at(1).first;
 	probabilities.at(idx) *= 6.0;
 
-	// Change this to remove loop
-	for (unsigned int i = 2; i < sortedFitness.size() / 2; ++i)
+	int halfSize = sortedFitness.size() / 2;
+
+	std::for_each(sortedFitness.begin() + 2, sortedFitness.begin() + halfSize, [&probabilities, &idx](const auto &fit)
 	{
-		idx = sortedFitness.at(i).first;
+		idx = fit.first;
 		probabilities.at(idx) *= 3.0;
-	}
-//	std::transform(sortedFitness.begin() + 2, sortedFitness.begin() + (popSize / 2 - 1), probabilities.begin() + 2, [&probabilities](const auto &p)
-//	{
-//		return probabilities.at(p.first) *= 3.0;
-//	});
+	});
 
 	/* Normalize the vector */
 	// Sum up the vector.
