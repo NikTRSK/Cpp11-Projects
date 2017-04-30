@@ -208,9 +208,13 @@ Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, cons
 	{
 		return member.second;
 	});
-	
-	for (unsigned int i = 0; i < pairs.size(); ++i)
+
+	std::vector<int> indexes(pairs.size());
+	std::iota(std::begin(indexes), std::end(indexes), 0);
+	std::for_each(indexes.begin(), indexes.end(), [&population, &resultPopulation, &A, &B, &randGen, &mutationChance](auto const &i)
+	{
 		resultPopulation.mMembers.push_back(CrossoverPairs(population.mMembers.at(A.at(i)), population.mMembers.at(B.at(i)), randGen, mutationChance));
+	});
 
 	return resultPopulation;
 }
