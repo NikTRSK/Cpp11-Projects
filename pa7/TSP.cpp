@@ -191,7 +191,7 @@ std::vector<std::pair<int, int>> GeneratePairs(std::vector<std::pair<int, double
 	return pairs;
 }
 
-Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, const Population &population, std::mt19937 &randGen, const double &mutationChance) noexcept
+Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, const Population &population, std::mt19937 &randGen, const double &mutationChance, const bool &extra) noexcept
 {
 	Population resultPopulation;
 
@@ -209,13 +209,23 @@ Population GenerateCrossover(const std::vector<std::pair<int ,int>> &pairs, cons
 		return member.second;
 	});
 
+
 	std::vector<int> indexes(pairs.size());
 	std::iota(std::begin(indexes), std::end(indexes), 0);
-	std::for_each(indexes.begin(), indexes.end(), [&population, &resultPopulation, &A, &B, &randGen, &mutationChance](auto const &i)
+	if (!extra)
 	{
-		resultPopulation.mMembers.push_back(CrossoverPairs(population.mMembers.at(A.at(i)), population.mMembers.at(B.at(i)), randGen, mutationChance));
-	});
-
+		std::for_each(indexes.begin(), indexes.end(), [&population, &resultPopulation, &A, &B, &randGen, &mutationChance](auto const &i)
+		{
+			resultPopulation.mMembers.push_back(CrossoverPairs(population.mMembers.at(A.at(i)), population.mMembers.at(B.at(i)), randGen, mutationChance));
+		});
+	}
+	else
+	{
+		std::for_each(indexes.begin(), indexes.end(), [&population, &resultPopulation, &A, &B, &randGen, &mutationChance](auto const &i)
+		{
+			resultPopulation.mMembers.push_back(OX1Crossover(population.mMembers.at(A.at(i)), population.mMembers.at(B.at(i)), randGen, mutationChance));
+		});
+	}
 	return resultPopulation;
 }
 
@@ -224,6 +234,7 @@ std::vector<int> CrossoverPairs(const std::vector<int> & parentA, const std::vec
 	std::uniform_int<int> distributionIndexGenerator(1, parentA.size() - 2);
 	std::uniform_int<int> parentBool(0, 1);
 
+	/* Crossover */
 	int crossoverIndex = distributionIndexGenerator(randGen);
 	int crossoverOrder = parentBool(randGen);
 	std::vector<int> result;
@@ -245,6 +256,8 @@ std::vector<int> CrossoverPairs(const std::vector<int> & parentA, const std::vec
 			return std::find(result.begin(), result.end(), val) == result.end();
 		});
 	}
+
+	/* Mutation */
 	std::uniform_real_distribution<double> mutRnd(0.0, 1.0);
 	double randomChance = mutRnd(randGen);
 	if (randomChance <= mutationChance / 100.0)
@@ -253,6 +266,113 @@ std::vector<int> CrossoverPairs(const std::vector<int> & parentA, const std::vec
 		int idx1 = rnd(randGen);
 		int idx2 = rnd(randGen);
 		std::swap(result.at(idx1), result.at(idx2));
+	}
+
+	return result;
+}
+
+std::vector<int> OX1Crossover(const std::vector<int> & parentA, const std::vector<int> & parentB, std::mt19937 &randGen, const double &mutationChance) noexcept
+{
+	std::uniform_int<int> distributionIndexGenerator(1, parentA.size() - 2);
+	std::uniform_int<int> parentBool(0, 1);
+
+	/* OX1 Crossover */
+	int idx1 = distributionIndexGenerator(randGen);
+	int idx2 = distributionIndexGenerator(randGen);
+
+	int crossoverIndexLeft, crossoverIndexRight;
+	if (idx1 < idx2)
+	{
+		crossoverIndexLeft = idx1;
+		crossoverIndexRight = idx2;
+	}
+	else
+	{
+		crossoverIndexLeft = idx2;
+		crossoverIndexRight = idx1;
+	}
+	
+	int crossoverOrder = parentBool(randGen);
+	
+	std::vector<int> result(parentA.size());
+	std::fill(result.begin() + 1, result.end(), -1);
+
+	if (crossoverOrder == 1)
+	{
+		// A goes first
+		unsigned int index = crossoverIndexLeft;
+		// Copy elements from the first parent between left and right index
+		std::for_each(parentA.begin() + crossoverIndexLeft, parentA.begin() + crossoverIndexRight,
+		[&index, &result](const auto &member) {
+			result.at(index++) = member;
+		});
+
+		// Temporary holder to fill the rest of the output vector
+		std::vector<int> rest;
+		std::copy_if(parentB.begin(), parentB.end(), std::back_inserter(rest), [&result](const int &val)
+		{
+			return std::find(result.begin(), result.end(), val) == result.end();
+		});
+
+		// Finally fill out the output array, making sure to wrap around
+		index = crossoverIndexRight;
+		std::for_each(rest.begin(), rest.end(), [&index, &result](const auto &member) {
+			result.at(index++) = member;
+			if (index == result.size())
+			{
+				index = 1;
+			}
+		});
+	}
+	else
+	{
+		// A goes first
+		unsigned int index = crossoverIndexLeft;
+		// Copy elements from the first parent between left and right index
+		std::for_each(parentB.begin() + crossoverIndexLeft, parentB.begin() + crossoverIndexRight,
+			[&index, &result](const auto &member) {
+			result.at(index++) = member;
+		});
+
+		// Temporary holder to fill the rest of the output vector
+		std::vector<int> rest;
+		std::copy_if(parentA.begin(), parentA.end(), std::back_inserter(rest), [&result](const int &val)
+		{
+			return std::find(result.begin(), result.end(), val) == result.end();
+		});
+
+		// Finally fill out the output array, making sure to wrap around
+		index = crossoverIndexRight;
+		std::for_each(rest.begin(), rest.end(), [&index, &result](const auto &member) {
+			result.at(index++) = member;
+			if (index == result.size())
+			{
+				index = 1;
+			}
+		});
+	}
+
+	/* Inversion Mutation */
+	std::uniform_real_distribution<double> mutRnd(0.0, 1.0);
+	double randomChance = mutRnd(randGen);
+	if (randomChance <= mutationChance / 100.0)
+	{
+		std::uniform_int_distribution<int> rnd(1, result.size() - 1);
+		int idx1 = rnd(randGen);
+		int idx2 = rnd(randGen);
+		int tourLeft, tourRight;
+		if (idx1 < idx2)
+		{
+			tourLeft = idx1;
+			tourRight = idx2;
+		}
+		else
+		{
+			tourLeft = idx2;
+			tourRight = idx1;
+		}
+
+		std::reverse(result.begin() + tourLeft, result.begin() + tourRight);
 	}
 
 	return result;

@@ -16,6 +16,13 @@ int main(int argc, const char* argv[])
 		generations = atoi(argv[3]), 
 		mutationChance = atoi(argv[4]), 
 		seed = atoi(argv[5]);
+
+	// Extra option
+	bool extra = false;
+	if (argc == 7)
+	{
+		extra = true;
+	}
 	
 	std::mt19937 randGen(seed);
 
@@ -55,7 +62,7 @@ int main(int argc, const char* argv[])
 			logFile << "(" << pair.first << "," << pair.second << ")\n";
 		});
 
-		auto crossedoverPopulation = GenerateCrossover(pairs, population, randGen, mutationChance);
+		auto crossedoverPopulation = GenerateCrossover(pairs, population, randGen, mutationChance, extra);
 		logFile << "GENERATION: " << genIter << "\n";
 		std::for_each(crossedoverPopulation.mMembers.begin(), crossedoverPopulation.mMembers.end(), [&logFile](const auto &member)
 		{
